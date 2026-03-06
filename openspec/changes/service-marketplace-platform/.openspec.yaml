@@ -1,0 +1,18 @@
+schema: change
+name: service-marketplace-platform
+status: draft
+created_at: "2026-03-06"
+description: >
+  Marketplace de serviços locais (pedreiros, encanadores, advogados, arquitetos, etc.)
+  com matching inteligente por IA, análise de imagens via VLM, e sistema de reputação
+  granular com NLP em PT-BR.
+artifacts:
+  - id: proposal
+    file: proposal.md
+    status: done
+  - id: design
+    file: design.md
+    status: done
+  - id: tasks
+    file: tasks.md
+    status: done
