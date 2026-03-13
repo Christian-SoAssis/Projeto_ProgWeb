@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#11d4d4",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#102222",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-display">
+<!-- Header -->
+<header class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10">
+<div class="flex items-center p-4 justify-between max-w-md mx-auto w-full">
+<div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/20">
+<span class="material-symbols-outlined text-primary">person</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight flex-1 ml-3">Assist Premium</h2>
+<div class="flex items-center justify-end gap-2">
+<button class="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex-1 w-full max-w-md mx-auto pb-24">
+<!-- Profile Summary -->
+<section class="p-4">
+<div class="flex items-center gap-4 bg-primary/5 p-4 rounded-xl border border-primary/10">
+<div class="relative">
+<div class="size-16 rounded-full border-2 border-primary overflow-hidden bg-cover bg-center" data-alt="Foto de perfil do usuário sorrindo" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD3uGkrUV4MTRuZR1gPMtD0jGinQU0hvvyhzgEyryPEysBxNOBvALfNRvL5_TcdEoY9E_6see1JqTL-YdDcD62tIlkmyrdl3VR6batOU250CtcqCALK2hCrWQFfh5svdKPAe7rAYJklMkS-WSB4fhEcO6_YhQqcYymJ9P8vkE2_qVSQqSdSg64u7qslNaN7KhkZ4_6PSMZRDF9BmCqZQyvXX5iCkfsleU0BahyuhXdvc8ZiSkJS3N9fn8xFqEOJ6W5wIWsEsSSVDg")'></div>
+<div class="absolute -bottom-1 -right-1 bg-primary text-background-dark rounded-full p-0.5">
+<span class="material-symbols-outlined text-[14px] font-bold">verified</span>
+</div>
+</div>
+<div class="flex flex-col">
+<p class="text-slate-900 dark:text-slate-100 text-xl font-bold leading-tight">Olá, João Silva</p>
+<div class="flex items-center gap-1.5 mt-1">
+<span class="text-primary text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/20">CLIENTE PREMIUM</span>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium">ID: #882910</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Quick Stats -->
+<section class="px-4 grid grid-cols-3 gap-3">
+<div class="bg-primary/5 rounded-xl p-3 border border-primary/10 flex flex-col items-center">
+<span class="text-primary font-bold text-lg">12</span>
+<span class="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-bold tracking-wider">Serviços</span>
+</div>
+<div class="bg-primary/5 rounded-xl p-3 border border-primary/10 flex flex-col items-center">
+<span class="text-primary font-bold text-lg">02</span>
+<span class="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-bold tracking-wider">Pendentes</span>
+</div>
+<div class="bg-primary/5 rounded-xl p-3 border border-primary/10 flex flex-col items-center">
+<span class="text-primary font-bold text-lg">4.9</span>
+<span class="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-bold tracking-wider">Avaliação</span>
+</div>
+</section>
+<!-- Next Appointments -->
+<section class="mt-6 px-4">
+<div class="flex items-center justify-between mb-3">
+<h3 class="text-slate-900 dark:text-slate-100 text-lg font-bold">Próximos Agendamentos</h3>
+<a class="text-primary text-sm font-medium" href="#">Ver tudo</a>
+</div>
+<div class="space-y-3">
+<div class="bg-white dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center gap-4">
+<div class="size-12 rounded-lg bg-primary/10 flex flex-col items-center justify-center text-primary border border-primary/20">
+<span class="text-xs font-bold leading-none">DEZ</span>
+<span class="text-lg font-black leading-none mt-0.5">14</span>
+</div>
+<div class="flex-1">
+<p class="text-slate-900 dark:text-slate-100 font-bold text-sm">Limpeza Residencial</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs mt-0.5">Amanhã às 09:00 • Maria Clara</p>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_right</span>
+</div>
+<div class="bg-white dark:bg-slate-900/50 p-4 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center gap-4">
+<div class="size-12 rounded-lg bg-primary/10 flex flex-col items-center justify-center text-primary border border-primary/20 opacity-70">
+<span class="text-xs font-bold leading-none">DEZ</span>
+<span class="text-lg font-black leading-none mt-0.5">18</span>
+</div>
+<div class="flex-1">
+<p class="text-slate-900 dark:text-slate-100 font-bold text-sm">Manutenção Elétrica</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs mt-0.5">Sexta às 14:30 • Eng. Carlos</p>
+</div>
+<span class="material-symbols-outlined text-slate-400">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Active Services Grid -->
+<section class="mt-6 px-4">
+<div class="flex items-center justify-between mb-3">
+<h3 class="text-slate-900 dark:text-slate-100 text-lg font-bold">Serviços Ativos</h3>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="relative overflow-hidden aspect-square rounded-xl group">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Serviço de limpeza doméstica profissional" style='background-image: linear-gradient(0deg, rgba(16, 34, 34, 0.9) 0%, rgba(16, 34, 34, 0) 60%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuC3ic6ImFvcKIhSLotv3fI2yf5dPJxOaOzkA0SyIvlLLxOOTYc8WpoU6RXgv6Uz85IaQPnu4KnWr1FP2WrUFdTF98lr0WQ1caQ3S4wWy3Ptej9XwYEYS-JZzgkGZwAaYgpQfDXG6p3kDemPR-yLPRynpKwHlom5GVISmUEDa8STlka0lpU2PBP-byx_ZVG8_PDM1j87WS6W8AHf48tIaJ6BK8wvMEDwBEICP7nQcllj4fl3j9ny7-3xILm1PuppYluod29xfvRIhA")'></div>
+<div class="absolute bottom-0 left-0 p-3 w-full">
+<p class="text-white text-sm font-bold">Limpeza Mensal</p>
+<p class="text-primary text-[10px] font-medium mt-0.5">CONTRATO ATIVO</p>
+</div>
+</div>
+<div class="relative overflow-hidden aspect-square rounded-xl group">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Painel elétrico sendo inspecionado" style='background-image: linear-gradient(0deg, rgba(16, 34, 34, 0.9) 0%, rgba(16, 34, 34, 0) 60%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuD54PikBTNsvyvmwJVSiNOvYGE8QGrbIW9LUtpucONqWY2_jS4b8UWhsZ3wHDh6Oeeo-E7YM4Vp0m-1BVv-WiHxP9K57Jm6lWdEw-MKBmzVXj14NjpFFmYuAEdLZ7X2GiNt4muF2moEmjaVoAbqjrUS2rLOl6IrqDTzicKLX20rh6bKNhpOg9Sn_bKtnOxCYKu8oNhtZeNz0cPKzaEsISmsLR3iitL9SVK4JeqXgE_Xk-R2qQZBtFuvSwH4ZuuP8zFiMEbJasoPEA")'></div>
+<div class="absolute bottom-0 left-0 p-3 w-full">
+<p class="text-white text-sm font-bold">Segurança 24h</p>
+<p class="text-primary text-[10px] font-medium mt-0.5">MONITORANDO</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Recent Activity -->
+<section class="mt-6 px-4">
+<h3 class="text-slate-900 dark:text-slate-100 text-lg font-bold mb-3">Atividade Recente</h3>
+<div class="bg-white dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 divide-y dark:divide-slate-800">
+<div class="p-4 flex gap-3 items-start">
+<div class="size-8 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+</div>
+<div>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-semibold">Pagamento Confirmado</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs mt-1">Sua assinatura Premium foi renovada com sucesso.</p>
+<p class="text-slate-400 text-[10px] mt-2 font-medium">Há 2 horas</p>
+</div>
+</div>
+<div class="p-4 flex gap-3 items-start">
+<div class="size-8 rounded-full bg-primary/20 text-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[18px]">chat_bubble</span>
+</div>
+<div>
+<p class="text-slate-900 dark:text-slate-100 text-sm font-semibold">Nova Mensagem</p>
+<p class="text-slate-500 dark:text-slate-400 text-xs mt-1">Carlos (Eletricista) enviou fotos do serviço concluído.</p>
+<p class="text-slate-400 text-[10px] mt-2 font-medium">Ontem, 18:45</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 bg-background-light dark:bg-background-dark border-t border-primary/10 z-50">
+<div class="max-w-md mx-auto flex h-16 items-center justify-around px-2">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined fill-1">home</span>
+<p class="text-[10px] font-bold uppercase tracking-wider">Início</p>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<p class="text-[10px] font-bold uppercase tracking-wider">Serviços</p>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500 relative" href="#">
+<span class="material-symbols-outlined">chat_bubble</span>
+<div class="absolute top-0 right-1 size-2 bg-primary rounded-full ring-2 ring-background-dark"></div>
+<p class="text-[10px] font-bold uppercase tracking-wider">Mensagens</p>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 dark:text-slate-500" href="#">
+<span class="material-symbols-outlined">person</span>
+<p class="text-[10px] font-bold uppercase tracking-wider">Perfil</p>
+</a>
+</div>
+</nav>
+</body></html>
