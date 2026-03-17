@@ -1,20 +1,36 @@
 schema: spec-driven
 
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  ## Plataforma: Service Marketplace (Brasil)
+  Marketplace de serviços locais conectando clientes a profissionais verificados.
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+  ## Stack Obrigatória — Backend
+  - **Framework**: FastAPI exclusivamente (sem Flask, Django, Express, NestJS, etc.)
+  - **Tipagem**: Pydantic v2 para todos os schemas de entrada/saída e validação
+  - **ORM / DB**: SQLAlchemy 2.0 (async) ou SQLModel (que usa SQLAlchemy 2.0 internamente) para PostgreSQL
+  - **Banco de dados**: PostgreSQL 16 com extensões PostGIS e pgvector
+  - Toda rota deve ter type hints completos e modelos Pydantic v2 como request/response body
+
+  ## Stack Obrigatória — Frontend
+  - **Framework**: Next.js 14 (App Router) com TypeScript
+  - **Componentes UI**: shadcn/ui exclusivamente — proibido usar outros component libraries (MUI, Chakra, Mantine, Radix direto, etc.)
+  - **Estilização**: Tailwind CSS (já incluído pelo shadcn/ui)
+
+  ## Deploy
+  - A aplicação DEVE rodar via **Docker e docker-compose**
+  - Cada serviço (backend, frontend, postgres, redis, minio, typesense) deve ter seu próprio container definido no `docker-compose.yml`
+  - Sem dependência de serviços gerenciados externos obrigatórios para rodar localmente
+
+  ## Convenções Gerais
+  - Commits no estilo Conventional Commits
+  - Variáveis de ambiente via arquivos `.env` (nunca hardcoded)
+  - Português (PT-BR) para mensagens de erro exibidas ao usuário final
+
+rules:
+  proposal:
+    - Sempre listar impacto em docker-compose quando adicionar um novo serviço
+    - Restrições de stack (FastAPI, Pydantic v2, SQLAlchemy 2.0, shadcn/ui) são inegociáveis
+  tasks:
+    - Dividir tarefas em chunks de no máximo 2 horas
+    - Toda tarefa de backend deve incluir sub-tarefa de schema Pydantic v2
+    - Toda tarefa de frontend deve usar exclusivamente componentes shadcn/ui
