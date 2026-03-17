@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Assist - Conecte-se com profissionais verificados</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#11d4d4",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#102222",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>.glass-header {
+    background: rgba(16, 34, 34, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(17, 212, 212, 0.1)
+    }
+.hero-blur-bg {
+    background-image: radial-gradient(circle at 50% 50%, rgba(17, 212, 212, 0.05) 0%, transparent 70%), url(https://lh3.googleusercontent.com/aida-public/AB6AXuD-cr1x9lADQKF_5GSOtJ2tgTJvlUNOIDCp1eqrgMSO8zUqJBQAsCNhdM53KcHMXwVJKCm7EA7sWm5NRU45wDS0dycFInckOXyII-PH3-jrPaxL4hI7mR9ok2ajgKOKEK16X2e7zsxWgM2XoHwwOe8xppfXpS82TktEgmWzM_jgr9vdsCsy1hZH2IAfnXduAwH9GW5xM4MxBgzyzHaJeFiCL0HUHSDSejsCLSHDzo0aV6dxPJah9-QThn0XDObEvr92njM-Tvl_Lw);
+    background-size: cover;
+    background-position: center
+    }</style>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<header class="fixed top-0 left-0 right-0 z-50 glass-header">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-3xl">verified_user</span>
+<h1 class="text-2xl font-black tracking-tight text-primary">Assist</h1>
+</div>
+<nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
+<a class="hover:text-primary transition-colors" href="#">Como funciona</a>
+<a class="hover:text-primary transition-colors" href="#">Categorias</a>
+<a class="hover:text-primary transition-colors" href="#">Seja um Profissional</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="px-5 py-2 text-sm font-semibold hover:text-primary transition-colors">Entrar</button>
+<button class="bg-primary text-background-dark px-6 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-opacity">
+                    Cadastrar
+                </button>
+</div>
+</div>
+</header>
+<main class="relative pt-20">
+<section class="relative min-h-[90vh] flex flex-col items-center justify-center px-6 overflow-hidden">
+<div class="absolute inset-0 hero-blur-bg opacity-20" data-alt="Blurred image of professional modern office workspace"></div>
+<div class="relative z-10 max-w-4xl w-full text-center space-y-8">
+<div class="space-y-4">
+<span class="inline-block py-1 px-3 rounded-full bg-primary/10 text-primary text-xs font-bold tracking-widest uppercase">
+                        Plataforma Premium
+                    </span>
+<h2 class="text-5xl md:text-7xl font-black leading-[1.1] tracking-tighter">
+                        Conecte-se com profissionais <span class="text-primary">verificados</span> de elite
+                    </h2>
+<p class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto">
+                        A solução definitiva para serviços especializados de alto padrão no mercado brasileiro.
+                    </p>
+</div>
+<div class="w-full max-w-3xl mx-auto bg-white/5 dark:bg-slate-800/40 p-2 rounded-2xl border border-slate-700/50 backdrop-blur-md shadow-2xl">
+<div class="flex flex-col md:flex-row gap-2">
+<div class="flex-1 relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-transparent border-none focus:ring-0 py-4 pl-12 pr-4 text-slate-100 placeholder:text-slate-500 rounded-xl" placeholder="Qual serviço você precisa?" type="text"/>
+</div>
+<div class="hidden md:block w-px bg-slate-700/50 my-2"></div>
+<div class="flex-1 relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors">location_on</span>
+<input class="w-full bg-transparent border-none focus:ring-0 py-4 pl-12 pr-4 text-slate-100 placeholder:text-slate-500 rounded-xl" placeholder="Localização" type="text"/>
+</div>
+<button class="bg-primary text-background-dark font-bold px-8 py-4 rounded-xl hover:shadow-[0_0_20px_rgba(17,212,212,0.4)] transition-all">
+                            Buscar
+                        </button>
+</div>
+</div>
+<div class="flex flex-wrap justify-center gap-6 pt-4">
+<div class="flex items-center gap-2 px-4 py-2 rounded-full border border-slate-800 hover:border-primary/50 cursor-pointer transition-colors group">
+<span class="material-symbols-outlined text-primary text-sm">build</span>
+<span class="text-sm font-medium text-slate-400 group-hover:text-slate-200">Manutenção</span>
+</div>
+<div class="flex items-center gap-2 px-4 py-2 rounded-full border border-slate-800 hover:border-primary/50 cursor-pointer transition-colors group">
+<span class="material-symbols-outlined text-primary text-sm">gavel</span>
+<span class="text-sm font-medium text-slate-400 group-hover:text-slate-200">Jurídico</span>
+</div>
+<div class="flex items-center gap-2 px-4 py-2 rounded-full border border-slate-800 hover:border-primary/50 cursor-pointer transition-colors group">
+<span class="material-symbols-outlined text-primary text-sm">computer</span>
+<span class="text-sm font-medium text-slate-400 group-hover:text-slate-200">Suporte TI</span>
+</div>
+<div class="flex items-center gap-2 px-4 py-2 rounded-full border border-slate-800 hover:border-primary/50 cursor-pointer transition-colors group">
+<span class="material-symbols-outlined text-primary text-sm">more_horiz</span>
+<span class="text-sm font-medium text-slate-400 group-hover:text-slate-200">Mais</span>
+</div>
+</div>
+</div>
+</section>
+<section class="max-w-7xl mx-auto px-6 py-12 border-t border-slate-800/50">
+<div class="flex flex-wrap items-center justify-center md:justify-between gap-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-2xl">verified</span>
+</div>
+<div>
+<p class="font-bold text-slate-200 leading-none">Profissionais Verificados</p>
+<p class="text-xs text-slate-500 mt-1">Riguroso processo de seleção</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-2xl">payments</span>
+</div>
+<div>
+<p class="font-bold text-slate-200 leading-none">Pagamento via PIX</p>
+<p class="text-xs text-slate-500 mt-1">Transações seguras e instantâneas</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-2xl">shield_with_heart</span>
+</div>
+<div>
+<p class="font-bold text-slate-200 leading-none">Garantia Assist</p>
+<p class="text-xs text-slate-500 mt-1">Seguro para todos os serviços</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-2xl">support_agent</span>
+</div>
+<div>
+<p class="font-bold text-slate-200 leading-none">Suporte 24/7 VIP</p>
+<p class="text-xs text-slate-500 mt-1">Atendimento humanizado</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="bg-background-dark border-t border-slate-800 py-12 mt-20">
+<div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-2xl">verified_user</span>
+<h1 class="text-xl font-black tracking-tight text-white">Assist</h1>
+</div>
+<div class="flex gap-8 text-sm text-slate-500">
+<a class="hover:text-primary" href="#">Termos</a>
+<a class="hover:text-primary" href="#">Privacidade</a>
+<a class="hover:text-primary" href="#">Contato</a>
+</div>
+<p class="text-xs text-slate-600">© 2024 Assist Marketplace. Feito para o Brasil.</p>
+</div>
+</footer>
+</body></html>
