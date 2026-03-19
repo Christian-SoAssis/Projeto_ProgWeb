@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Client Dashboard - Neomorphic UI</title>
+<!-- Tailwind CSS CDN with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration for Custom Colors -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            charcoal: '#121212',
+            mint: '#3EB489',
+            silver: '#C0C0C0',
+          },
+          borderRadius: {
+            'xl-custom': '20px',
+          }
+        }
+      }
+    }
+  </script>
+<!-- Neomorphic Effects Styling -->
+<style data-purpose="neomorphic-shadows">
+    /* Deep charcoal neomorphism requires subtle light highlights and very dark shadows */
+    .neo-surface {
+      background: #121212;
+      box-shadow: 6px 6px 12px #0a0a0a, -4px -4px 12px #1e1e1e;
+    }
+    .neo-inset {
+      background: #121212;
+      box-shadow: inset 4px 4px 8px #0a0a0a, inset -4px -4px 8px #1e1e1e;
+    }
+    .neo-button {
+      background: #121212;
+      box-shadow: 4px 4px 8px #080808, -2px -2px 8px #1c1c1c;
+      transition: all 0.2s ease-in-out;
+    }
+    .neo-button:active {
+      box-shadow: inset 2px 2px 5px #080808, inset -2px -2px 5px #1c1c1c;
+      transform: scale(0.98);
+    }
+    .neo-status-pill {
+      background: #121212;
+      box-shadow: 2px 2px 5px #0a0a0a, -2px -2px 5px #1a1a1a;
+    }
+  </style>
+<style data-purpose="typography">
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #C0C0C0; /* Silver typography */
+    }
+    .text-glow-mint {
+      text-shadow: 0 0 8px rgba(62, 180, 137, 0.4);
+    }
+  </style>
+</head>
+<body class="bg-charcoal min-h-screen flex flex-col items-center p-4">
+<!-- BEGIN: TopStatusBar -->
+<header class="w-full max-w-md mb-8 pt-2" data-purpose="status-bar-container">
+<div class="neo-surface rounded-full px-6 py-3 flex justify-between items-center">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-mint animate-pulse"></div>
+<span class="text-mint text-sm font-semibold tracking-wide uppercase text-glow-mint">Contrato Ativo</span>
+</div>
+<div class="neo-button rounded-full p-2" data-purpose="user-notification">
+<svg class="h-5 w-5 text-silver" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+</header>
+<!-- END: TopStatusBar -->
+<!-- BEGIN: MainContent -->
+<main class="w-full max-w-md flex flex-col gap-8" data-purpose="dashboard-content">
+<!-- Greeting Section -->
+<section data-purpose="greeting">
+<h1 class="text-2xl font-light text-silver">Olá, <span class="font-bold">Ricardo</span></h1>
+<p class="text-gray-500 text-sm mt-1">Bem-vindo ao seu painel de controle.</p>
+</section>
+<!-- Project Summary Card -->
+<section class="neo-surface rounded-xl-custom p-6 border border-white/5" data-purpose="project-summary">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h2 class="text-lg font-semibold text-silver">Projeto Atual</h2>
+<p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Ref: #EL-2023-089</p>
+</div>
+<div class="neo-inset px-3 py-1 rounded-lg">
+<span class="text-xs font-mono text-mint">EM ANDAMENTO</span>
+</div>
+</div>
+<div class="mb-8">
+<h3 class="text-2xl font-medium text-white mb-2">Manutenção Elétrica</h3>
+<p class="text-silver/70 text-sm leading-relaxed">
+          Revisão completa do quadro de distribuição e instalação de novos pontos de iluminação LED.
+        </p>
+</div>
+<!-- Progress Indicators -->
+<div class="space-y-4" data-purpose="progress-tracking">
+<div class="flex justify-between text-xs mb-1">
+<span>Progresso da Etapa</span>
+<span class="text-mint">75%</span>
+</div>
+<div class="w-full neo-inset h-3 rounded-full overflow-hidden p-0.5">
+<div class="bg-gradient-to-r from-mint/50 to-mint h-full rounded-full" style="width: 75%"></div>
+</div>
+</div>
+</section>
+<!-- Quick Stats Grid -->
+<section class="grid grid-cols-2 gap-4" data-purpose="stats-grid">
+<div class="neo-surface rounded-xl-custom p-4 flex flex-col gap-2">
+<span class="text-[10px] text-gray-500 uppercase font-bold tracking-tighter">Próxima Visita</span>
+<span class="text-lg text-silver font-semibold">14 Out, 09h</span>
+</div>
+<div class="neo-surface rounded-xl-custom p-4 flex flex-col gap-2">
+<span class="text-[10px] text-gray-500 uppercase font-bold tracking-tighter">Técnico Resp.</span>
+<span class="text-lg text-silver font-semibold">Eng. Marcos</span>
+</div>
+</section>
+<!-- Action Buttons -->
+<section class="flex flex-col gap-4 mt-4" data-purpose="interaction-menu">
+<button class="neo-button w-full py-4 rounded-xl-custom flex items-center justify-between px-6 group">
+<span class="text-silver font-medium">Ver Relatórios Detalhados</span>
+<svg class="h-5 w-5 text-mint group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<button class="neo-button w-full py-4 rounded-xl-custom flex items-center justify-between px-6 group">
+<span class="text-silver font-medium">Solicitar Suporte</span>
+<svg class="h-5 w-5 text-silver/50" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</section>
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: BottomNavigation -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-sm" data-purpose="bottom-nav">
+<div class="neo-surface rounded-2xl flex justify-around items-center p-3">
+<a aria-label="Dashboard" class="neo-inset p-3 rounded-xl text-mint" href="#">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</a>
+<a aria-label="Projects" class="p-3 text-silver/40 hover:text-silver transition-colors" href="#">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</a>
+<a aria-label="Financial" class="p-3 text-silver/40 hover:text-silver transition-colors" href="#">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</a>
+<a aria-label="Settings" class="p-3 text-silver/40 hover:text-silver transition-colors" href="#">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</a>
+</div>
+</nav>
+<!-- END: BottomNavigation -->
+</body></html>

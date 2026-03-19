@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Assist - Busca de Profissionais</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              charcoal: '#121212',
+              surface: '#1a1a1a',
+              card: '#1e1e1e',
+              mint: '#00e5ff', // Vibrant Mint from screenshot
+              petrol: '#00838f',
+            }
+          },
+          boxShadow: {
+            'neo-convex': '6px 6px 12px #0a0a0a, -6px -6px 12px #222222',
+            'neo-inset': 'inset 4px 4px 8px #0a0a0a, inset -4px -4px 8px #222222',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-neo-styles">
+    /* Custom utility for neomorphic effects not easily handled by standard Tailwind classes */
+    .neo-convex {
+      background: #1e1e1e;
+      box-shadow: 6px 6px 12px #0a0a0a, -6px -6px 12px #222222;
+    }
+    .neo-inset {
+      background: #1e1e1e;
+      box-shadow: inset 4px 4px 8px #0a0a0a, inset -4px -4px 8px #222222;
+    }
+    .neo-button-active {
+      color: #00e5ff;
+      box-shadow: inset 2px 2px 5px #0a0a0a, inset -2px -2px 5px #222222;
+    }
+    /* Map Background simulation */
+    .map-grid {
+      background-image: radial-gradient(#222 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+  </style>
+</head>
+<body class="bg-brand-charcoal text-gray-200 font-sans antialiased overflow-hidden h-screen flex flex-col">
+<!-- BEGIN: MainHeader -->
+<header class="h-20 border-b border-white/5 flex items-center justify-between px-8 shrink-0 bg-brand-charcoal z-50">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-brand-mint rounded flex items-center justify-center">
+<span class="text-brand-charcoal font-black text-xl">A</span>
+</div>
+<span class="text-2xl font-bold tracking-tight text-white">Assist</span>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium hover:text-brand-mint transition-colors" href="#">Serviços</a>
+<a class="text-sm font-medium hover:text-brand-mint transition-colors" href="#">Como Funciona</a>
+<a class="text-sm font-medium hover:text-brand-mint transition-colors" href="#">Seja um Profissional</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="px-4 py-2 text-sm font-medium hover:text-white transition-colors">Login</button>
+<button class="px-6 py-2 bg-brand-mint text-brand-charcoal font-bold rounded-lg hover:brightness-110 transition-all">Cadastrar</button>
+</div>
+</header>
+<!-- END: MainHeader -->
+<!-- BEGIN: FilterSection -->
+<section class="px-8 py-4 bg-brand-charcoal/80 backdrop-blur-md border-b border-white/5 flex items-center gap-4 shrink-0 overflow-x-auto no-scrollbar">
+<div class="flex items-center gap-3">
+<!-- Active Filter -->
+<button class="neo-inset px-5 py-2 rounded-full text-xs font-bold text-brand-mint whitespace-nowrap">
+        Todos os Filtros
+      </button>
+<button class="neo-convex px-5 py-2 rounded-full text-xs font-medium text-gray-400 hover:text-white transition-colors whitespace-nowrap">
+        Reparos Elétricos
+      </button>
+<button class="neo-convex px-5 py-2 rounded-full text-xs font-medium text-gray-400 hover:text-white transition-colors whitespace-nowrap">
+        TI &amp; Tech
+      </button>
+<button class="neo-convex px-5 py-2 rounded-full text-xs font-medium text-gray-400 hover:text-white transition-colors whitespace-nowrap">
+        Jurídico
+      </button>
+<button class="neo-convex px-5 py-2 rounded-full text-xs font-medium text-gray-400 hover:text-white transition-colors whitespace-nowrap">
+        Preço
+      </button>
+<button class="neo-convex px-5 py-2 rounded-full text-xs font-medium text-gray-400 hover:text-white transition-colors whitespace-nowrap">
+        Avaliação (4.5+)
+      </button>
+</div>
+<div class="ml-auto flex items-center bg-black/30 rounded-lg p-1">
+<button class="p-2 text-brand-mint"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+<button class="p-2 text-gray-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 20l-5.447-2.724A2 2 0 013 15.483V4.517a2 2 0 011.553-1.943L9 2l6 3 5.447-2.724A2 2 0 0121 4.517v10.966a2 2 0 01-1.553 1.943L15 20l-6-3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg></button>
+</div>
+</section>
+<!-- END: FilterSection -->
+<!-- BEGIN: MainContent -->
+<main class="flex-grow flex overflow-hidden">
+<!-- LEFT: Professional List -->
+<aside class="w-full md:w-[450px] overflow-y-auto p-6 space-y-6 bg-brand-charcoal shrink-0 custom-scrollbar" id="professional-list">
+<div class="mb-4">
+<h2 class="text-lg font-semibold text-white">Profissionais Disponíveis (24)</h2>
+<p class="text-xs text-gray-500">Exibindo elite verificada em São Paulo, SP</p>
+</div>
+<!-- Professional Card 1 -->
+<article class="neo-convex p-5 rounded-2xl group cursor-pointer hover:scale-[1.01] transition-transform duration-200">
+<div class="flex gap-4">
+<div class="relative">
+<img alt="Avatar" class="w-20 h-20 rounded-xl object-cover grayscale group-hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBglgHD4F5MmEkJZ_qGiG5EMrWwsyPitZIN02T3zweiYDehpHEaDmsr4BjO9S5nC2WqPS9XLHc_SK8zKa-a_tDVMOEasIgf8rPGikFtgjzl_Cnn5ZQUhDaLiQ_yBJUCR5bD-zBRaJS2gdJVLQO261Who0bLDB61X-Fbd0roCRIWIVE2URIy5FKANWjdhg6d5Pticm1IPQOXy-FgI_Gpbgl6TWrC3MmVYoQK3AXhLhPmInxouL0j5y5Kh-aew6M-IBh_zeKDllC9y_J8"/>
+<div class="absolute -bottom-1 -right-1 bg-brand-mint p-1 rounded-full border-2 border-brand-surface">
+<svg class="w-3 h-3 text-brand-charcoal" fill="currentColor" viewbox="0 0 20 20"><path d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"></path></svg>
+</div>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-bold text-white text-base">Ricardo Silveira</h3>
+<span class="text-[10px] uppercase tracking-wider text-brand-mint font-black">Verified Platinum</span>
+</div>
+<div class="flex text-yellow-500 gap-0.5">
+<span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+</div>
+</div>
+<p class="text-sm text-gray-400 mt-2">Engenheiro Eletricista - Automação Residencial</p>
+<div class="flex items-center gap-3 mt-4">
+<span class="text-xs text-brand-mint font-semibold">R$ 180/hr</span>
+<span class="text-xs text-gray-600">•</span>
+<span class="text-xs text-gray-500">2.4km de você</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Professional Card 2 -->
+<article class="neo-convex p-5 rounded-2xl group cursor-pointer hover:scale-[1.01] transition-transform duration-200">
+<div class="flex gap-4">
+<div class="relative">
+<img alt="Avatar" class="w-20 h-20 rounded-xl object-cover grayscale group-hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5QsBLpsUHRDfEthcjDCF3IRCkhwn9yDeII_YHKRr4LYzdaqnYvNGylILqe8po9E79ZsJ56pLeHXxh1BJEa7yusGR98TlkqYszT0DFXyP_6JeWsHwyz9FpwF8WAbaCPWXfHtth8trwZyetKtVyKUWK0QV0I7Ok_LfLrE2R5ATGu5HHlw4F4M9eRZJIScie75gueLp1mvDn546mh7m6EUp_vXV9K-NzVe2ptqY366IJemghv8c6LepVKBlg3wVYYA8geGG4YyvvrKdL"/>
+<div class="absolute -bottom-1 -right-1 bg-brand-mint p-1 rounded-full border-2 border-brand-surface">
+<svg class="w-3 h-3 text-brand-charcoal" fill="currentColor" viewbox="0 0 20 20"><path d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"></path></svg>
+</div>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-bold text-white text-base">Ana Carolina Mendes</h3>
+<span class="text-[10px] uppercase tracking-wider text-brand-mint font-black">Verified Platinum</span>
+</div>
+<div class="flex text-yellow-500 gap-0.5">
+<span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+</div>
+</div>
+<p class="text-sm text-gray-400 mt-2">Advogada Especialista - Direito Civil</p>
+<div class="flex items-center gap-3 mt-4">
+<span class="text-xs text-brand-mint font-semibold">Sob Consulta</span>
+<span class="text-xs text-gray-600">•</span>
+<span class="text-xs text-gray-500">1.8km de você</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Professional Card 3 -->
+<article class="neo-convex p-5 rounded-2xl group cursor-pointer hover:scale-[1.01] transition-transform duration-200">
+<div class="flex gap-4">
+<div class="relative">
+<img alt="Avatar" class="w-20 h-20 rounded-xl object-cover grayscale group-hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhxrtofDTdrokSLOFB52oUkeO_EAt5xHMolCDghJlM5xmbqAV944_3e4DzwjCLnJe_0AX_e4MNbx6ijvO5ddChT15rdWxDGRd4eqi2IkgCzx6tPQMb6_6SJH66QuUBI_glq5Ut521LoOOwXZl1s7knU0Gn6XUS9dznMkKuBBIdmx0Mp4L_ZI8SPzSzpivQ4opeZTtUMOhT1hdOZZ9Adqh6wW3pFmR7ICx0611nSX88JgeBkbKsrUGENxdnoXFomUxrAew-2i3zF0vP"/>
+<div class="absolute -bottom-1 -right-1 bg-brand-mint p-1 rounded-full border-2 border-brand-surface">
+<svg class="w-3 h-3 text-brand-charcoal" fill="currentColor" viewbox="0 0 20 20"><path d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"></path></svg>
+</div>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-bold text-white text-base">Marcos Oliveira</h3>
+<span class="text-[10px] uppercase tracking-wider text-brand-mint font-black">Verified Platinum</span>
+</div>
+<div class="flex text-yellow-500 gap-0.5">
+<span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+</div>
+</div>
+<p class="text-sm text-gray-400 mt-2">Suporte de TI - Redes e Segurança</p>
+<div class="flex items-center gap-3 mt-4">
+<span class="text-xs text-brand-mint font-semibold">R$ 150/hr</span>
+<span class="text-xs text-gray-600">•</span>
+<span class="text-xs text-gray-500">4.1km de você</span>
+</div>
+</div>
+</div>
+</article>
+</aside>
+<!-- RIGHT: Interactive Map -->
+<section class="hidden md:block flex-grow relative bg-[#0d0d0d] map-grid overflow-hidden">
+<!-- Dark Map Elements Overlay -->
+<div class="absolute inset-0 opacity-20 pointer-events-none">
+<svg class="w-full h-full" viewbox="0 0 800 600">
+<path d="M0,100 L800,100 M0,300 L800,300 M0,500 L800,500 M200,0 L200,600 M400,0 L400,600 M600,0 L600,600" fill="none" stroke="#444" stroke-width="1"></path>
+<path d="M50,50 Q150,150 50,250 T50,450" fill="none" stroke="#333" stroke-width="8"></path>
+</svg>
+</div>
+<!-- Map Pins -->
+<!-- Pin 1 -->
+<div class="absolute top-1/4 left-1/3 group cursor-pointer">
+<div class="w-8 h-8 bg-brand-mint rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(0,229,255,0.4)] animate-pulse">
+<div class="w-3 h-3 bg-brand-charcoal rounded-full"></div>
+</div>
+</div>
+<!-- Pin 2: Active with Popup -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+<!-- Active Popup (Neomorphic) -->
+<div class="neo-convex p-3 rounded-xl mb-3 w-48 text-center animate-bounce">
+<p class="text-[10px] font-bold text-brand-mint uppercase tracking-widest mb-1">Ricardo Silveira</p>
+<p class="text-xs text-white">Disponível em 15 min</p>
+<div class="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[8px] border-t-brand-card absolute left-1/2 -translate-x-1/2 bottom-[-8px]"></div>
+</div>
+<div class="w-10 h-10 bg-brand-mint rounded-full flex items-center justify-center border-4 border-brand-charcoal shadow-2xl">
+<svg class="w-5 h-5 text-brand-charcoal" fill="currentColor" viewbox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 9.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1V9.414l1.293 1.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+</div>
+</div>
+<!-- Pin 3 -->
+<div class="absolute bottom-1/4 right-1/4 group cursor-pointer opacity-60">
+<div class="w-6 h-6 bg-brand-mint/50 rounded-full flex items-center justify-center border border-brand-mint/30">
+<div class="w-2 h-2 bg-brand-charcoal rounded-full"></div>
+</div>
+</div>
+<!-- Map Controls -->
+<div class="absolute bottom-8 right-8 flex flex-col gap-2">
+<button class="neo-convex w-10 h-10 rounded-lg flex items-center justify-center text-white hover:text-brand-mint transition-colors">+</button>
+<button class="neo-convex w-10 h-10 rounded-lg flex items-center justify-center text-white hover:text-brand-mint transition-colors">-</button>
+<button class="neo-convex w-10 h-10 rounded-lg flex items-center justify-center text-brand-mint mt-4">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</section>
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: MinimalFooter -->
+<footer class="h-14 border-t border-white/5 flex items-center justify-between px-8 bg-brand-charcoal shrink-0 text-xs text-gray-500">
+<div>
+<span class="text-brand-mint font-bold">Assist</span> © 2024 Marketplace. Todos os direitos reservados.
+    </div>
+<div class="flex items-center gap-6">
+<a class="hover:text-white transition-colors" href="#">Privacidade</a>
+<a class="hover:text-white transition-colors" href="#">Termos de Uso</a>
+<a class="hover:text-white transition-colors" href="#">Contato</a>
+</div>
+</footer>
+<!-- END: MinimalFooter -->
+</body></html>
