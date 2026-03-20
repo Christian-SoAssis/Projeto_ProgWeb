@@ -10,6 +10,8 @@
 - [ ] 1.6 Configurar variáveis de ambiente (`.env.example` para cada app)
 - [ ] 1.7 Pipeline CI básica: lint + type-check + testes (GitHub Actions)
 - [ ] 1.8 Configurar OpenTelemetry em todos os serviços + Grafana dashboard básico
+- [ ] 1.9 Gerar schema OpenAPI 3.1 automaticamente via FastAPI (`/docs` e `/openapi.json`) e exportar artefato versionado no CI
+- [ ] 1.10 Validar que o frontend consome apenas endpoints documentados no schema OpenAPI (lint de contratos via `openapi-typescript` + geração de tipos, CI falha se houver chamada a endpoint não documentado)
 
 ---
 
