@@ -34,3 +34,8 @@ rules:
     - Dividir tarefas em chunks de no máximo 2 horas
     - Toda tarefa de backend deve incluir sub-tarefa de schema Pydantic v2
     - Toda tarefa de frontend deve usar exclusivamente componentes shadcn/ui
+    - Toda tarefa de implementação deve ter sub-tarefa de testes escrita ANTES do código (TDD)
+    - Testes unitários obrigatórios para lógica de negócio (validators, services, utils, models)
+    - Testes de integração obrigatórios para endpoints (request/response, status codes, edge cases)
+    - Testes de contrato obrigatórios para comunicação entre serviços (schemas, payloads, HTTP mocks)
+    - Nenhuma task de código é considerada concluída sem cobertura de testes

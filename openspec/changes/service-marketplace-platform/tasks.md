@@ -15,6 +15,12 @@
 
 ## 2. Auth e Cadastro
 
+### 2.T Testes (TDD — escrever antes da implementação)
+- [ ] 2.T1 Testes unitários: regras de hash bcrypt, geração/validação de JWT, rotação de refresh token, lógica de roles
+- [ ] 2.T2 Testes de integração (pytest + httpx): POST /auth/register, POST /auth/login, POST /auth/refresh, POST /professionals, PATCH /admin/professionals/:id — com banco real
+- [ ] 2.T3 Testes de schema Pydantic: inputs inválidos para RegisterRequest, LoginRequest, RefreshRequest, ProfessionalCreateRequest (campos ausentes, tipos errados, e-mail inválido, senha fraca)
+
+### 2.I Implementação
 - [ ] 2.1 Implementar JWT (access token 15min + refresh token rotation 7d)
 - [ ] 2.2 Endpoint POST /auth/register (cliente) com hash bcrypt
 - [ ] 2.3 Endpoint POST /auth/login com validação de credenciais
@@ -28,6 +34,12 @@
 
 ## 3. Pedidos de Serviço + Análise de Imagem (VLM)
 
+### 3.T Testes (TDD — escrever antes da implementação)
+- [ ] 3.T1 Testes unitários: validação de geolocalização, cálculo de urgência, lógica de retry com backoff, parsing de output VLM (ai_complexity, ai_urgency, ai_specialties)
+- [ ] 3.T2 Testes de integração (pytest + httpx): POST /requests, GET /requests, GET /requests/:id, GET /categories — com banco real e upload de imagens mockado
+- [ ] 3.T3 Testes de schema Pydantic: inputs inválidos para ServiceRequestCreate (coordenadas fora de range, urgência inválida, campos ausentes, imagens acima do limite)
+
+### 3.I Implementação
 - [ ] 3.1 Endpoint POST /requests com geolocalização e urgência
 - [ ] 3.2 Upload de até 5 imagens por pedido (S3/MinIO, limite 10MB cada)
 - [ ] 3.3 Endpoint GET /requests (listagem paginada por cliente)
@@ -42,6 +54,12 @@
 
 ## 4. Motor de Matching
 
+### 4.T Testes (TDD — escrever antes da implementação)
+- [ ] 4.T1 Testes unitários: cálculo de geo-radius, scoring por categoria + reputation, lógica de fallback v0, ranking top-10
+- [ ] 4.T2 Testes de integração (pytest + httpx): GET /requests/:id/matches, POST /score (microservice FastAPI) — com banco real e profissionais seed
+- [ ] 4.T3 Testes de schema Pydantic: inputs inválidos para MatchRequest, ScoreRequest (features ausentes, tipos errados, lat/lng inválidos)
+
+### 4.I Implementação
 - [ ] 4.1 Endpoint GET /requests/:id/matches retornando top-10 profissionais
 - [ ] 4.2 Implementar matching v0 por regras: geo-radius + categoria + reputation_score
 - [ ] 4.3 Microservice Python (FastAPI): endpoint POST /score com features LightGBM
@@ -55,6 +73,12 @@
 
 ## 5. Bids, Contratos e Pagamento
 
+### 5.T Testes (TDD — escrever antes da implementação)
+- [ ] 5.T1 Testes unitários: regras de criação de bid (profissional verificado), lógica de aceite/rejeição, criação automática de contract, cálculo de split-payment
+- [ ] 5.T2 Testes de integração (pytest + httpx): POST /bids, GET /requests/:id/bids, PATCH /bids/:id, POST /contracts/:id/dispute, webhook de pagamento — com banco real
+- [ ] 5.T3 Testes de schema Pydantic: inputs inválidos para BidCreate, BidUpdate, DisputeCreate (valores negativos, status inválido, campos ausentes)
+
+### 5.I Implementação
 - [ ] 5.1 Endpoint POST /bids (profissional verificado envia bid)
 - [ ] 5.2 Endpoint GET /requests/:id/bids (cliente visualiza bids recebidos)
 - [ ] 5.3 Endpoint PATCH /bids/:id (cliente aceita/rejeita bid)
@@ -68,6 +92,12 @@
 
 ## 6. Chat In-App
 
+### 6.T Testes (TDD — escrever antes da implementação)
+- [ ] 6.T1 Testes unitários: autenticação de socket via JWT, lógica de detecção de desintermediação (regex WhatsApp/telefone/e-mail), persistência de mensagens
+- [ ] 6.T2 Testes de integração (pytest + httpx): GET /contracts/:id/messages (paginação com cursor), criação de alertas de admin ao detectar padrão suspeito — com banco real
+- [ ] 6.T3 Testes de schema Pydantic: inputs inválidos para MessageCreate, MessageQuery (cursor inválido, contrato inexistente, conteúdo vazio)
+
+### 6.I Implementação
 - [ ] 6.1 Configurar Socket.io no BFF com Redis Adapter para escalonamento horizontal
 - [ ] 6.2 Autenticação de socket via JWT
 - [ ] 6.3 Endpoint REST GET /contracts/:id/messages para histórico paginado com cursor
@@ -80,6 +110,12 @@
 
 ## 7. Reviews e Reputação Granular
 
+### 7.T Testes (TDD — escrever antes da implementação)
+- [ ] 7.T1 Testes unitários: cálculo de reputation_score ponderado, lógica de is_authentic, extração de scores por dimensão (pontualidade, qualidade, limpeza, comunicação), regra de >= 3 reviews
+- [ ] 7.T2 Testes de integração (pytest + httpx): POST /reviews (apenas após pagamento confirmado), recálculo de reputation_score após insert — com banco real
+- [ ] 7.T3 Testes de schema Pydantic: inputs inválidos para ReviewCreate (rating fora de range, texto vazio, contrato não completado, dimensões ausentes)
+
+### 7.I Implementação
 - [ ] 7.1 Endpoint POST /reviews (após pagamento confirmado)
 - [ ] 7.2 Worker NLP com BERTimbau para extração de scores por dimensão
 - [ ] 7.3 Fallback para Gemini API quando BERTimbau indisponível
@@ -92,6 +128,12 @@
 
 ## 8. Painéis e UX
 
+### 8.T Testes (TDD — escrever antes da implementação)
+- [ ] 8.T1 Testes unitários: cálculo de métricas (earnings, conversão, reputation), lógica de favoritos, filtros de KPIs admin
+- [ ] 8.T2 Testes de integração (pytest + httpx): PATCH /professionals/me, GET /professionals/me/metrics, POST /favorites, GET /favorites — com banco real
+- [ ] 8.T3 Testes de schema Pydantic: inputs inválidos para ProfessionalUpdate, FavoriteCreate (profissional inexistente, campos obrigatórios ausentes, tipos errados)
+
+### 8.I Implementação
 - [ ] 8.1 Painel do cliente: pedidos ativos, histórico, bids recebidos, favoritos
 - [ ] 8.2 Painel do profissional: agenda, bids pendentes, métricas de earnings e conversão
 - [ ] 8.3 Endpoint PATCH /professionals/me para atualização de perfil + re-indexação Typesense
@@ -104,6 +146,12 @@
 
 ## 9. Busca e Descoberta
 
+### 9.T Testes (TDD — escrever antes da implementação)
+- [ ] 9.T1 Testes unitários: lógica de filtro geo + full-text, cálculo de clustering de pins, construção de query Typesense, geração de embeddings para pgvector
+- [ ] 9.T2 Testes de integração (pytest + httpx): GET /search/professionals com combinações de filtros (q, lat/lng, radius_km, category), worker de indexação — com banco real + Typesense
+- [ ] 9.T3 Testes de schema Pydantic: inputs inválidos para SearchQuery (radius negativo, coordenadas fora de range, categoria inexistente, paginação inválida)
+
+### 9.I Implementação
 - [ ] 9.1 Configurar Typesense com schema de profissionais (nome, bio, categorias, geo, scores)
 - [ ] 9.2 Endpoint GET /search/professionals com filtros: q, lat/lng, radius_km, category
 - [ ] 9.3 Worker de indexação automática ao aprovar/atualizar profissional
