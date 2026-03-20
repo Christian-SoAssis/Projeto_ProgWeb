@@ -520,3 +520,315 @@ app/(dashboard)/layout.tsx (Server)
 | `ConfirmDialog` | Aceitar bid, Excluir conta | useState, onClick |
 | `Toast` | Global (via Provider) | Animated notification |
 | `OfflineBanner` | Dashboard layout | navigator.onLine |
+
+---
+
+## Regra: shadcn/ui obrigatório
+
+> [!CAUTION]
+> **Proibido criar componente visual do zero com Tailwind puro se existir equivalente no shadcn/ui.** Antes de criar qualquer componente de UI, verificar se o shadcn/ui já oferece solução. Componentes customizados só são permitidos para lógica de negócio específica (ex: `StarRating`, `SearchMap`, `CountdownTimer`).
+
+---
+
+## shadcn/ui — Componentes por Tela
+
+### Landing (`/`)
+
+- [ ] Button — CTAs "Encontrar Profissional", "Sou Profissional"
+- [ ] Input — Campo de busca no hero
+- [ ] Card — Cards de categorias populares, depoimentos
+- [ ] Badge — Tags de categoria, stats
+- [ ] Carousel — Depoimentos rotativos
+- [ ] Avatar — Fotos de profissionais destaque
+- [ ] Separator — Divisor entre seções
+
+### Login (`/login`)
+
+- [ ] Card — Container do formulário
+- [ ] Input — Email, senha
+- [ ] Label — Labels dos campos
+- [ ] Button — "Entrar", "Entrar com Google"
+- [ ] Separator — Divisor "ou"
+- [ ] Form — Wrapper react-hook-form + Zod
+- [ ] Alert — Mensagem de erro de autenticação
+
+### Register (`/register`)
+
+- [ ] Card — Container do formulário
+- [ ] Input — Nome, email, telefone, senha
+- [ ] Label — Labels dos campos
+- [ ] Button — "Criar conta"
+- [ ] Checkbox — Aceite dos termos e privacidade
+- [ ] Form — Wrapper react-hook-form + Zod
+- [ ] Separator — Divisor "ou"
+
+### Register Profissional (`/register/profissional`)
+
+- [ ] Card — Container de cada step
+- [ ] Input — Dados pessoais, bio
+- [ ] Label — Labels
+- [ ] Button — "Próximo", "Voltar", "Finalizar"
+- [ ] Textarea — Bio
+- [ ] Select — Tipo de documento (CPF/CNPJ)
+- [ ] Checkbox — Aceite dos termos, categorias (multi-select)
+- [ ] Form — Wrapper por step
+- [ ] Progress — Indicador de step (step 1/4, 2/4...)
+- [ ] Badge — Categorias selecionadas
+
+### Pedidos — Lista (`/pedidos`)
+
+- [ ] Card — Card de cada pedido
+- [ ] Badge — Status (aberto, em andamento, concluído), urgência
+- [ ] Tabs — Filtro por status (Todos, Abertos, Em andamento, Concluídos)
+- [ ] Button — "Novo Pedido" CTA
+- [ ] Skeleton — Loading state
+- [ ] DropdownMenu — Ações por pedido (ver detalhes, cancelar)
+- [ ] Alert — Banner offline
+
+### Pedidos — Novo (`/pedidos/novo`)
+
+- [ ] Card — Container do formulário
+- [ ] Input — Título
+- [ ] Label — Labels
+- [ ] Textarea — Descrição
+- [ ] Select — Categoria, urgência
+- [ ] Button — "Publicar Pedido", "Adicionar Imagem"
+- [ ] Form — Wrapper
+- [ ] Slider — Budget (range)
+- [ ] Dialog — Confirmação antes de publicar
+
+### Pedidos — Detalhes (`/pedidos/[id]`)
+
+- [ ] Card — Container de detalhes, card de análise IA
+- [ ] Badge — Status, urgência, complexidade IA
+- [ ] Button — "Ver Propostas", "Cancelar Pedido"
+- [ ] Separator — Entre seções
+- [ ] Avatar — Imagem do cliente
+- [ ] Dialog — Lightbox de imagens
+- [ ] Alert — Resultado da análise VLM
+
+### Propostas (`/pedidos/[id]/propostas`)
+
+- [ ] Card — Card de cada bid
+- [ ] Badge — Status do bid, preço
+- [ ] Button — "Aceitar", "Rejeitar"
+- [ ] Avatar — Foto do profissional
+- [ ] AlertDialog — Confirmação de aceite/rejeição
+- [ ] Select — Ordenação (preço, reputação, tempo de resposta)
+- [ ] Separator — Entre bids
+
+### Contrato — Detalhes (`/contratos/[id]`)
+
+- [ ] Card — Detalhes do contrato, dados do profissional
+- [ ] Badge — Status do contrato
+- [ ] Button — "Pagar", "Abrir Disputa", "Avaliar", "Chat"
+- [ ] Separator — Entre seções
+- [ ] Avatar — Profissional
+- [ ] Progress — Timeline de status
+
+### Contrato — Pagamento (`/contratos/[id]/pagamento`)
+
+- [ ] Card — Resumo do valor, detalhes da cobrança
+- [ ] Button — "Iniciar Pagamento"
+- [ ] Separator — Entre resumo e SDK
+- [ ] Badge — Método de pagamento (PIX, Cartão)
+- [ ] Alert — Info sobre comissão, prazo de repasse D+2
+
+### Contrato — Disputa (`/contratos/[id]/disputa`)
+
+- [ ] Card — Container do formulário, card de evidências
+- [ ] Input — Upload de evidências (file)
+- [ ] Label — Labels
+- [ ] Textarea — Motivo, mensagem de resposta, proposta de resolução
+- [ ] Select — Categoria da disputa (quality, no_show, overcharge, damage, other)
+- [ ] Button — "Abrir Disputa", "Enviar Resposta"
+- [ ] Form — Wrapper
+- [ ] Badge — Status da disputa, countdown 72h
+- [ ] Alert — Aviso sobre prazo de 72h
+- [ ] Separator — Entre seções
+
+### Contrato — Avaliação (`/contratos/[id]/avaliacao`)
+
+- [ ] Card — Container do formulário
+- [ ] Textarea — Texto da review (min 10 chars)
+- [ ] Button — "Enviar Avaliação"
+- [ ] Form — Wrapper
+- [ ] Label — Labels
+
+### Contrato — Chat (`/contratos/[id]/chat`)
+
+- [ ] Input — Campo de mensagem
+- [ ] Button — Enviar mensagem
+- [ ] ScrollArea — Lista de mensagens com scroll
+- [ ] Avatar — Foto do sender em cada bolha
+- [ ] Badge — Status da conexão (online/offline/reconectando)
+- [ ] Separator — Separador de datas no histórico
+- [ ] Tooltip — Timestamp da mensagem no hover
+
+### Favoritos (`/favoritos`)
+
+- [ ] Card — Card do profissional favorito
+- [ ] Avatar — Foto do profissional
+- [ ] Badge — Categorias, reputação
+- [ ] Button — "Remover", "Ver Perfil"
+- [ ] AlertDialog — Confirmação de remoção
+
+### Perfil (`/perfil`, `/profissional/perfil`)
+
+- [ ] Card — Container do formulário
+- [ ] Input — Nome, telefone, bio
+- [ ] Label — Labels
+- [ ] Textarea — Bio (profissional)
+- [ ] Button — "Salvar", "Upload Avatar"
+- [ ] Form — Wrapper
+- [ ] Avatar — Preview do avatar
+- [ ] Switch — Ativar/desativar notificações push
+- [ ] Select — Categorias (profissional)
+- [ ] Slider — Raio de atendimento (profissional)
+- [ ] Badge — Categorias selecionadas
+
+### Notificações (`/notificacoes`)
+
+- [ ] Card — Card de cada notificação
+- [ ] Badge — Tipo (bid, mensagem, disputa), não-lida
+- [ ] Button — "Marcar como lida", "Marcar todas"
+- [ ] ScrollArea — Lista com scroll infinito
+- [ ] Separator — Separador por data
+
+### Profissional — Dashboard (`/profissional/dashboard`)
+
+- [ ] Card — KPI cards (earnings, conversão, reputação, bids)
+- [ ] Badge — Variação % (positiva/negativa)
+- [ ] Tabs — Período (7d, 30d, 90d)
+- [ ] Separator — Entre seções
+
+### Profissional — Agenda (`/profissional/agenda`)
+
+- [ ] Card — Card de cada bid pendente
+- [ ] Badge — Status, preço, urgência
+- [ ] Button — "Ver Detalhes", "Cancelar Bid"
+- [ ] Table — Lista de bids em formato tabular
+- [ ] DropdownMenu — Ações por bid
+
+### Busca (`/busca`)
+
+- [ ] Input — Campo de busca full-text
+- [ ] Button — "Buscar", "Limpar filtros"
+- [ ] Card — Card de resultado (profissional)
+- [ ] Avatar — Foto do profissional
+- [ ] Badge — Categorias, verificado, reputação
+- [ ] Sheet — Sidebar de filtros (mobile)
+- [ ] Select — Categoria, ordenação
+- [ ] Slider — Raio de distância (km)
+- [ ] Command — Autocomplete de busca
+- [ ] Skeleton — Loading states dos resultados
+- [ ] Separator — Entre resultados
+
+### Perfil Público (`/p/[slug]`)
+
+- [ ] Card — Container do perfil, card de reviews
+- [ ] Avatar — Foto do profissional
+- [ ] Badge — Categorias, "Verificado", score de reputação
+- [ ] Button — "Solicitar Serviço", "Favoritar"
+- [ ] Tabs — Sobre, Reviews, Portfólio
+- [ ] Separator — Entre seções
+- [ ] ScrollArea — Lista de reviews
+
+### Admin — Dashboard (`/admin/dashboard`)
+
+- [ ] Card — KPI cards (usuários, receita, disputas, pedidos)
+- [ ] Badge — Variação %
+- [ ] Tabs — Período (7d, 30d, 90d)
+- [ ] Table — Últimas transações / eventos
+- [ ] Calendar — Date range picker
+- [ ] Popover — Container do calendar picker
+
+### Admin — Profissionais (`/admin/profissionais`)
+
+- [ ] Table — Lista de profissionais pendentes
+- [ ] Badge — Status (pendente, aprovado, rejeitado)
+- [ ] Button — "Aprovar", "Rejeitar"
+- [ ] AlertDialog — Confirmação de aprovação/rejeição
+- [ ] Dialog — Visualizar documentos
+- [ ] DropdownMenu — Ações por profissional
+- [ ] Input — Busca por nome/email
+
+### Admin — Disputas (`/admin/disputas`)
+
+- [ ] Table — Lista de disputas
+- [ ] Badge — Status (aberta, em análise, escalada, resolvida)
+- [ ] Button — "Ver Detalhes"
+- [ ] Tabs — Filtro por status
+- [ ] Input — Busca por ID de contrato
+
+### Admin — Disputa Detalhes (`/admin/disputas/[id]`)
+
+- [ ] Card — Detalhes da disputa, evidências, timeline
+- [ ] Badge — Status, categoria, resolução
+- [ ] Button — "Resolver Disputa"
+- [ ] Form — Formulário de resolução
+- [ ] Select — Tipo de resolução (refund_full, refund_partial, refund_denied)
+- [ ] Slider — Percentual de reembolso (1-99%)
+- [ ] Textarea — Notas do admin
+- [ ] AlertDialog — Confirmação de resolução
+- [ ] Dialog — Lightbox de evidências
+- [ ] Separator — Entre seções
+
+### Offline (`/offline`)
+
+- [ ] Card — Container da mensagem
+- [ ] Button — "Tentar Novamente"
+- [ ] Alert — Mensagem de offline
+
+---
+
+## Lista Completa de Componentes — CLI Install
+
+```bash
+npx shadcn@latest init
+
+npx shadcn@latest add \
+  alert \
+  alert-dialog \
+  avatar \
+  badge \
+  button \
+  calendar \
+  card \
+  carousel \
+  checkbox \
+  command \
+  dialog \
+  dropdown-menu \
+  form \
+  input \
+  label \
+  popover \
+  progress \
+  scroll-area \
+  select \
+  separator \
+  sheet \
+  skeleton \
+  slider \
+  switch \
+  table \
+  tabs \
+  textarea \
+  tooltip \
+  toast
+```
+
+**Total: 29 componentes**
+
+### Componentes NÃO disponíveis no shadcn/ui (custom permitido)
+
+| Componente Custom | Motivo | Construir com |
+|-------------------|--------|---------------|
+| `StarRating` | Interação específica hover+click em estrelas | Tailwind + `useState` |
+| `SearchMap` | Mapa Leaflet/Mapbox sem equivalente shadcn | Leaflet + Tailwind |
+| `CountdownTimer` | Timer de 72h com `setInterval` | Tailwind + `useEffect` |
+| `MessageBubble` | Layout de bolha de chat (lado esquerdo/direito) | Tailwind (presentational) |
+| `ReputationRadar` | Chart radar de reputação | recharts |
+| `EarningsChart` | Chart de earnings | recharts |
+| `LocationPicker` | Mapa com pin selecionável + geolocation | Leaflet + Tailwind |
