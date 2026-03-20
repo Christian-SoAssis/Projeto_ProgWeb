@@ -111,6 +111,11 @@
 - [ ] 5.8 Job cron de repasse D+2: liberar pagamento ao profissional se não houver disputa, ou reter se `contract.status='disputed'`
 - [ ] 5.9a Notificações (bid_received, bid_accepted, payment_confirmed, payout_completed) via sistema de notificações
 
+### 5.D Disputa — Testes (TDD — escrever antes da implementação)
+- [ ] 5.DT1 Testes unitários: lógica de abertura de disputa (cliente ou profissional), cálculo de response_deadline (NOW + 72h), transição de estados (opened → under_review → resolved), lógica de auto_escalation, cálculo de reembolso (total/parcial/negado)
+- [ ] 5.DT2 Testes de integração (pytest + httpx): POST /contracts/:id/dispute (cliente e profissional), POST /disputes/:id/response, PATCH /admin/disputes/:id (refund_full, refund_partial, refund_denied), GET /admin/disputes — com banco real
+- [ ] 5.DT3 Testes de schema Pydantic: inputs inválidos para DisputeCreate (reason ausente, category inválida), DisputeResponse (message vazio), DisputeResolve (refund_percent fora de range, resolution inválida)
+
 ### 5.D Disputa — Implementação
 - [ ] 5.9 Criar tabela `disputes` (id, contract_id, opened_by, reason, category, evidence_urls, status, resolution, refund_percent, admin_notes, response_deadline, created_at, resolved_at) e migration
 - [ ] 5.10 Endpoint POST /contracts/:id/dispute — abertura por cliente ou profissional com `{ reason, category, evidence_urls[] }`, criação de registro com deadline 72h, atualização de contract.status, notificações
