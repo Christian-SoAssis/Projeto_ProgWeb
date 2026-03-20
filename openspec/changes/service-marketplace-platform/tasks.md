@@ -2,9 +2,9 @@
 
 ## 1. Fundação e Infra
 
-- [ ] 1.1 Configurar monorepo: pasta `apps/web` (Next.js 14) + `apps/api` (Fastify) + `apps/matching` (Python FastAPI)
+- [ ] 1.1 Configurar monorepo: pasta `apps/web` (Next.js 14) + `apps/api` (FastAPI + Matching Module)
 - [ ] 1.1a Setup shadcn/ui no `apps/web`: `npx shadcn@latest init`, instalar 29 componentes via CLI (`alert`, `alert-dialog`, `avatar`, `badge`, `button`, `calendar`, `card`, `carousel`, `checkbox`, `command`, `dialog`, `dropdown-menu`, `form`, `input`, `label`, `popover`, `progress`, `scroll-area`, `select`, `separator`, `sheet`, `skeleton`, `slider`, `switch`, `table`, `tabs`, `textarea`, `tooltip`, `toast`), configurar theme tokens (cores, fontes), verificar import paths
-- [ ] 1.2 Configurar Docker Compose: PostgreSQL 16 + PostGIS + Redis + MinIO + Typesense
+- [ ] 1.2 Configurar Docker Compose: PostgreSQL 16 + PostGIS + Redis (4 containers total)
 - [ ] 1.3 Instalar extensões PostgreSQL: `PostGIS`, `pgvector`, `uuid-ossp`
 - [ ] 1.4 Configurar Alembic: `alembic init`, `env.py` async com SQLAlchemy 2.0, `alembic.ini` apontando para `DATABASE_URL`
 - [ ] 1.4.1 Migration 001: tabela `users` (id, name, email, phone, password_hash, role, avatar_url, is_active, timestamps) + índices
@@ -51,7 +51,7 @@
 - [ ] 2.3 Endpoint POST /auth/login com validação de credenciais
 - [ ] 2.4 Endpoint POST /auth/refresh com rotação de refresh token
 - [ ] 2.5 OAuth2 Google: configurar callback e criação/vinculação de conta
-- [ ] 2.6 Endpoint POST /professionals para cadastro com upload de documentos para S3/MinIO
+- [ ] 2.6 Endpoint POST /professionals para cadastro com upload de documentos para Filesystem Local (StaticFiles)
 - [ ] 2.7 Fluxo de verificação de profissional: admin aprova via PATCH /admin/professionals/:id
 - [ ] 2.8 Middleware de autenticação e autorização por role (client, professional, admin)
 
@@ -67,7 +67,7 @@
 - [ ] 2.9 Criar tabela `consent_logs` (user_id, consent_type, accepted_at, ip_address, user_agent, version) e migration
 - [ ] 2.10 Adicionar campos `consent_terms` e `consent_privacy` obrigatórios nos schemas de registro (RegisterRequest, ProfessionalCreateRequest); rejeitar cadastro se não aceitos
 - [ ] 2.11 Endpoint GET /auth/me/consents — listar consentimentos do usuário autenticado
-- [ ] 2.12 Endpoint DELETE /auth/me — exclusão de conta com confirmação de senha, anonimização de PII, remoção de documentos do S3/MinIO, revogação de tokens, cancelamento de bids pendentes (profissional), remoção do Typesense (profissional)
+- [ ] 2.12 Endpoint DELETE /auth/me — exclusão de conta com confirmação de senha, anonimização de PII, remoção de documentos locais, revogação de tokens, cancelamento de bids pendentes (profissional), atualização de FTS (profissional)
 - [ ] 2.13 Bloquear exclusão se houver contratos com `status='in_progress'` (retornar `409 Conflict`)
 - [ ] 2.14 Middleware de mascaramento de logs: CPF (`***.***.***-XX`), CNPJ (`**.***.****/****-XX`), `Authorization: Bearer [REDACTED]`, file paths do S3 omitidos
 - [ ] 2.15 SpanProcessor customizado no OpenTelemetry para sanitizar PII nos atributos de spans antes de exportar
@@ -88,10 +88,10 @@
 
 ### 3.I Implementação
 - [ ] 3.1 Endpoint POST /requests com geolocalização e urgência
-- [ ] 3.2 Upload de até 5 imagens por pedido (S3/MinIO, limite 10MB cada)
+- [ ] 3.2 Upload de até 5 imagens por pedido (Local Filesystem em `./uploads`, limite 10MB cada)
 - [ ] 3.3 Endpoint GET /requests (listagem paginada por cliente)
 - [ ] 3.4 Endpoint GET /requests/:id (detalhes do pedido com ai_* fields)
-- [ ] 3.5 Configurar worker BullMQ para análise de imagem assíncrona
+- [ ] 3.5 Configurar worker ARQ (Redis) dentro da API para análise de imagem assíncrona
 - [ ] 3.6 Integrar Gemini Vision API no worker com prompt de classificação
 - [ ] 3.7 Salvar output VLM nos campos ai_complexity, ai_urgency, ai_specialties
 - [ ] 3.8 Implementar retry com backoff exponencial (3× max) para falha na VLM
@@ -103,7 +103,7 @@
 
 ### 4.T Testes (TDD — escrever antes da implementação)
 - [ ] 4.T1 Testes unitários: cálculo de geo-radius, scoring por categoria + reputation, lógica de fallback v0, ranking top-10
-- [ ] 4.T2 Testes de integração (pytest + httpx): GET /requests/:id/matches, POST /score (microservice FastAPI) — com banco real e profissionais seed
+- [ ] 4.T2 Testes de integração (pytest + httpx): GET /requests/:id/matches, teste do matching module em `app.matching` — com banco real e profissionais seed
 - [ ] 4.T3 Testes de schema Pydantic (ref: `pydantic-schemas/spec.md`):
   - [ ] 4.T3a `MatchRequest`: request_id inválido, lat/lng fora de range
   - [ ] 4.T3b `ScoreRequest`: features ausentes, tipos errados (string em campo float), campos extra ignorados
@@ -112,8 +112,8 @@
 ### 4.I Implementação
 - [ ] 4.1 Endpoint GET /requests/:id/matches retornando top-10 profissionais
 - [ ] 4.2 Implementar matching v0 por regras: geo-radius + categoria + reputation_score
-- [ ] 4.3 Microservice Python (FastAPI): endpoint POST /score com features LightGBM
-- [ ] 4.4 Integrar microservice de matching no BFF com timeout 3s + fallback v0
+- [ ] 4.3 Implementar Matching Engine (LightGBM) como módulo interno `app.matching`
+- [ ] 4.4 Integrar matching no pipeline de resposta do BFF com timeout 3s + fallback v0
 - [ ] 4.5 Coletar dados de treinamento: logs de impressão e conversão
 - [ ] 4.6 Treinar modelo LightGBM v1 com lambdarank e substituir matching v0
 - [ ] 4.7 Configurar re-treino semanal automatizado (cron job)
@@ -225,7 +225,7 @@
 ### 8.I Implementação
 - [ ] 8.1 Painel do cliente: pedidos ativos, histórico, bids recebidos, favoritos
 - [ ] 8.2 Painel do profissional: agenda, bids pendentes, métricas de earnings e conversão
-- [ ] 8.3 Endpoint PATCH /professionals/me para atualização de perfil + re-indexação Typesense
+- [ ] 8.3 Endpoint PATCH /professionals/me para atualização de perfil + atualização `search_vector` (FTS)
 - [ ] 8.4 Endpoint GET /professionals/me/metrics (earnings, conversão, reputation)
 - [ ] 8.5 Lista de favoritos: POST /favorites e GET /favorites
 - [ ] 8.6 Painel admin: aprovação de profissionais, flags de fraude, KPIs gerais
@@ -242,7 +242,7 @@
 ### 8.P PWA — Implementação
 - [ ] 8.8 Criar `manifest.json` completo (name, short_name, icons 192/512, start_url, display standalone, theme_color, lang pt-BR, categories, screenshots)
 - [ ] 8.9 Registrar Service Worker no Next.js (next-pwa ou custom) com pre-cache do app shell no install
-- [ ] 8.10 Implementar estratégia Cache-First para assets estáticos (`_next/static/`, fontes, ícones) e cache permanente para imagens de S3/MinIO
+- [ ] 8.10 Implementar estratégia Cache-First para assets estáticos (`_next/static/`, fontes, ícones) e cache permanente para imagens locais
 - [ ] 8.11 Implementar estratégia Network-First para chamadas de API (`/api/*`) com fallback para cache offline e TTL de 5 min
 - [ ] 8.12 Tela de fallback offline para `/pedidos`: banner "Você está offline", dados cacheados da última sync, botões de ação desabilitados, auto-reconexão via evento `online`
 - [ ] 8.13 Toast de nova versão do SW: interceptar `updatefound` → exibir "Nova versão disponível — atualize a página"
@@ -261,9 +261,9 @@
 - [ ] 9.T3 Testes de schema Pydantic: inputs inválidos para SearchQuery (radius negativo, coordenadas fora de range, categoria inexistente, paginação inválida)
 
 ### 9.I Implementação
-- [ ] 9.1 Configurar Typesense com schema de profissionais (nome, bio, categorias, geo, scores)
+- [ ] 9.1 Configurar PostgreSQL FTS e PostGIS para profissionais (nome, bio, categorias, geo, scores)
 - [ ] 9.2 Endpoint GET /search/professionals com filtros: q, lat/lng, radius_km, category
-- [ ] 9.3 Worker de indexação automática ao aprovar/atualizar profissional
+- [ ] 9.3 Implementar trigger nativo para atualização do `search_vector`
 - [ ] 9.4 Integrar pgvector (embedding de perfil) para busca por similaridade semântica
 - [ ] 9.5 Página de busca no frontend com mapa interativo (Leaflet.js ou Google Maps)
 - [ ] 9.6 Clustering de pins no mapa para áreas com muitos profissionais
@@ -272,7 +272,7 @@
 
 ## 10. Observabilidade e Go-Live
 
-- [ ] 10.1 OpenTelemetry traces em todos os serviços (BFF, matching, workers)
+- [ ] 10.1 OpenTelemetry traces no BFF e workers (OTEL reservado para v2)
 - [ ] 10.2 Dashboard Grafana: latência de matching, taxa de conversão, MAU, GMV
 - [ ] 10.3 Testes de carga no matching engine (k6) — alvo: < 80ms p99
 - [ ] 10.4 Checklist de segurança: OWASP Top 10, rate limiting, sanitização de inputs

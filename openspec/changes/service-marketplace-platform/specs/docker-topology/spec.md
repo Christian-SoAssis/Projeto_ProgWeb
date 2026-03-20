@@ -12,26 +12,15 @@ graph TB
         WEB["web<br/>Next.js 14<br/>:3000"]
     end
 
-    subgraph backend_net["backend (bridge)"]
-        API["api<br/>FastAPI<br/>:8000"]
-        MATCHING["matching<br/>FastAPI ML<br/>:8001"]
-    end
-
     subgraph data_net["data (bridge)"]
+        API["api<br/>FastAPI<br/>:8000<br/>(+ matching module)"]
         DB["db<br/>PostgreSQL 16<br/>:5432"]
         REDIS["redis<br/>Redis 7<br/>:6379"]
-        MINIO["minio<br/>MinIO<br/>:9000/:9001"]
-        TYPESENSE["typesense<br/>Typesense 27<br/>:8108"]
     end
 
     WEB -->|HTTP| API
-    API -->|HTTP| MATCHING
     API -->|TCP| DB
     API -->|TCP| REDIS
-    API -->|HTTP| MINIO
-    API -->|HTTP| TYPESENSE
-    MATCHING -->|TCP| DB
-    MATCHING -->|TCP| REDIS
 ```
 
 ### Redes
@@ -39,11 +28,10 @@ graph TB
 | Rede | Serviços | Propósito |
 |------|----------|-----------|
 | `frontend` | web, api | Frontend acessa apenas a API |
-| `backend` | api, matching | BFF se comunica com microservice |
-| `data` | api, matching, db, redis, minio, typesense | Acesso a dados e infra |
+| `data` | api, db, redis | Acesso a dados e infra |
 
 > [!IMPORTANT]
-> **`web` NÃO tem acesso direto ao banco, Redis ou MinIO.** Todo acesso a dados passa pela `api`. O `matching` tem acesso direto ao banco para queries de matching.
+> **`web` NÃO tem acesso direto ao banco ou Redis.** Todo acesso a dados passa pela `api`. O matching engine é executado in-process na `api`.
 
 ---
 
@@ -123,74 +111,7 @@ redis:
 
 ---
 
-### 3. `minio` — MinIO (S3-compatible)
-
-```yaml
-minio:
-  image: minio/minio:latest
-  container_name: servicoja-minio
-  restart: unless-stopped
-  ports:
-    - "${MINIO_API_PORT:-9000}:9000"
-    - "${MINIO_CONSOLE_PORT:-9001}:9001"
-  environment:
-    MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
-    MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
-  command: server /data --console-address ":9001"
-  volumes:
-    - miniodata:/data
-  networks:
-    - data
-  healthcheck:
-    test: ["CMD", "mc", "ready", "local"]
-    interval: 10s
-    timeout: 5s
-    retries: 5
-    start_period: 10s
-```
-
-| Item | Valor |
-|------|-------|
-| **Imagem** | `minio/minio:latest` |
-| **Portas** | `9000` (API S3), `9001` (Console web) |
-| **Volume** | `miniodata` |
-| **Healthcheck** | `mc ready local` |
-
----
-
-### 4. `typesense` — Typesense 27
-
-```yaml
-typesense:
-  image: typesense/typesense:27.1
-  container_name: servicoja-typesense
-  restart: unless-stopped
-  ports:
-    - "${TYPESENSE_PORT:-8108}:8108"
-  environment:
-    TYPESENSE_API_KEY: ${TYPESENSE_API_KEY}
-    TYPESENSE_DATA_DIR: /data
-  volumes:
-    - typesensedata:/data
-  networks:
-    - data
-  healthcheck:
-    test: ["CMD", "curl", "-sf", "http://localhost:8108/health"]
-    interval: 10s
-    timeout: 5s
-    retries: 5
-```
-
-| Item | Valor |
-|------|-------|
-| **Imagem** | `typesense/typesense:27.1` |
-| **Porta** | `8108` |
-| **Volume** | `typesensedata` |
-| **Healthcheck** | `curl /health` |
-
----
-
-### 5. `api` — FastAPI Backend
+### 3. `api` — FastAPI Backend (Consolidado)
 
 ```yaml
 api:
@@ -204,15 +125,7 @@ api:
   environment:
     DATABASE_URL: postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
     REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
-    MINIO_ENDPOINT: minio:9000
-    MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
-    MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
-    MINIO_BUCKET: ${MINIO_BUCKET}
-    MINIO_USE_SSL: "false"
-    TYPESENSE_HOST: typesense
-    TYPESENSE_PORT: "8108"
-    TYPESENSE_API_KEY: ${TYPESENSE_API_KEY}
-    MATCHING_SERVICE_URL: http://matching:8001
+    UPLOADS_DIR: /app/uploads
     JWT_SECRET: ${JWT_SECRET}
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: "15"
     JWT_REFRESH_TOKEN_EXPIRE_DAYS: "7"
@@ -222,23 +135,19 @@ api:
     RESEND_API_KEY: ${RESEND_API_KEY}
     VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY}
     VAPID_PRIVATE_KEY: ${VAPID_PRIVATE_KEY}
-    OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
     ENVIRONMENT: development
     LOG_LEVEL: debug
   volumes:
     - ./apps/api:/app
+    - ./uploads:/app/uploads
+    - ./models:/app/models
   depends_on:
     db:
       condition: service_healthy
     redis:
       condition: service_healthy
-    minio:
-      condition: service_healthy
-    typesense:
-      condition: service_healthy
   networks:
     - frontend
-    - backend
     - data
   healthcheck:
     test: ["CMD", "curl", "-sf", "http://localhost:8000/health"]
@@ -248,85 +157,18 @@ api:
     start_period: 15s
 ```
 
-**Dockerfile (`apps/api/Dockerfile`):**
-```dockerfile
-FROM python:3.12-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
-```
-
 | Item | Valor |
 |------|-------|
-| **Imagem** | Custom (Python 3.12-slim) |
+| **Imagem** | Custom (Python 3.12-slim + libgomp1) |
 | **Porta** | `8000` |
-| **Volume** | Bind mount `./apps/api` (hot-reload) |
-| **Redes** | `frontend`, `backend`, `data` |
-| **depends_on** | db ✅, redis ✅, minio ✅, typesense ✅ (todos com healthcheck) |
-| **Healthcheck** | `curl /health` |
-
----
-
-### 6. `matching` — FastAPI ML Microservice
-
-```yaml
-matching:
-  build:
-    context: ./apps/matching
-    dockerfile: Dockerfile
-  container_name: servicoja-matching
-  restart: unless-stopped
-  ports:
-    - "${MATCHING_PORT:-8001}:8001"
-  environment:
-    DATABASE_URL: postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
-    REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/1
-    ENVIRONMENT: development
-    LOG_LEVEL: debug
-  volumes:
-    - ./apps/matching:/app
-    - matchingmodels:/app/models
-  depends_on:
-    db:
-      condition: service_healthy
-    redis:
-      condition: service_healthy
-  networks:
-    - backend
-    - data
-  healthcheck:
-    test: ["CMD", "curl", "-sf", "http://localhost:8001/health"]
-    interval: 10s
-    timeout: 5s
-    retries: 5
-    start_period: 20s
-```
-
-**Dockerfile (`apps/matching/Dockerfile`):**
-```dockerfile
-FROM python:3.12-slim
-WORKDIR /app
-RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 && rm -rf /var/lib/apt/lists/*
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001", "--reload"]
-```
-
-| Item | Valor |
-|------|-------|
-| **Imagem** | Custom (Python 3.12-slim + libgomp1 para LightGBM) |
-| **Porta** | `8001` |
-| **Volumes** | Bind mount `./apps/matching` + `matchingmodels` (modelos treinados) |
-| **Redes** | `backend`, `data` |
+| **Volume** | Bind mounts: code, `./uploads`, `./models` |
+| **Redes** | `frontend`, `data` |
 | **depends_on** | db ✅, redis ✅ |
-| **Redis DB** | `1` (separado da API que usa DB `0`) |
+| **Workers** | VLM, NLP, Indexação (in-process) |
 
 ---
 
-### 7. `web` — Next.js 14 Frontend
+### 4. `web` — Next.js 14 Frontend
 
 ```yaml
 web:
@@ -339,10 +181,10 @@ web:
     - "${WEB_PORT:-3000}:3000"
   environment:
     NEXT_PUBLIC_API_URL: http://localhost:${API_PORT:-8000}
-    NEXT_PUBLIC_MINIO_URL: http://localhost:${MINIO_API_PORT:-9000}
     NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY}
     NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY: ${MERCADOPAGO_PUBLIC_KEY}
     API_INTERNAL_URL: http://api:8000
+    UPLOADS_URL: http://localhost:${API_PORT:-8000}/uploads
   volumes:
     - ./apps/web:/app
     - /app/node_modules
@@ -391,21 +233,14 @@ volumes:
     driver: local
   redisdata:
     driver: local
-  miniodata:
-    driver: local
-  typesensedata:
-    driver: local
-  matchingmodels:
-    driver: local
 ```
 
 | Volume | Serviço | Conteúdo |
 |--------|---------|----------|
 | `pgdata` | db | Dados PostgreSQL |
 | `redisdata` | redis | Snapshots RDB |
-| `miniodata` | minio | Objetos S3 (fotos, docs) |
-| `typesensedata` | typesense | Índices de busca |
-| `matchingmodels` | matching | Modelos LightGBM treinados |
+| `./uploads` | api | Arquivos enviados (bind mount) |
+| `./models` | api | Modelos LightGBM (bind mount) |
 
 ---
 
@@ -414,8 +249,6 @@ volumes:
 ```yaml
 networks:
   frontend:
-    driver: bridge
-  backend:
     driver: bridge
   data:
     driver: bridge
@@ -440,13 +273,27 @@ graph LR
 |-------|---------|-----------|
 | 1 | `db` | — |
 | 2 | `redis` | — |
-| 3 | `minio` | — |
-| 4 | `typesense` | — |
-| 5 | `api` | db ✅, redis ✅, minio ✅, typesense ✅ |
-| 6 | `matching` | db ✅, redis ✅ |
-| 7 | `web` | api ✅ |
+| 3 | `api` | db ✅, redis ✅ |
+| 4 | `web` | api ✅ |
 
 > Todos os `depends_on` usam `condition: service_healthy` — o serviço só inicia quando a dependência passa o healthcheck.
+
+---
+
+## Workers Assíncronos (v1)
+
+Os workers de background (pipeline VLM, indexação Typesense, NLP de reviews) rodam **dentro do container `api`** via `asyncio` background tasks do FastAPI, sem container separado.
+
+| Worker | Trigger | Destino |
+|--------|---------|----------|
+| VLM (Gemini Vision) | Upload de imagem → fila Redis (DB 0) | `requests.ai_*` no PostgreSQL |
+| Indexação FTS | Profissional aprovado/atualizado | `professionals.search_vector` |
+| NLP de reviews | Review criada → fila Redis (DB 0) | `reviews.score_*` no PostgreSQL |
+| Matching Engine | Request via API | In-process execution |
+
+> [!NOTE]
+> **Decisão v1**: Workers in-process (FastAPI background tasks + ARQ sobre Redis) simplificam o deploy inicial sem container adicional.
+> **Path para v2**: Extrair para container `worker` separado com `arq` ou `celery` quando o volume de processamento justificar escala independente da API HTTP.
 
 ---
 
@@ -468,25 +315,15 @@ DB_PORT=5432
 REDIS_PASSWORD=redis_dev_2026
 REDIS_PORT=6379
 
-# ---- MinIO (S3) ----
-MINIO_ACCESS_KEY=minio_dev
-MINIO_SECRET_KEY=minio_secret_dev_2026
-MINIO_BUCKET=servicoja-uploads
-MINIO_API_PORT=9000
-MINIO_CONSOLE_PORT=9001
-
-# ---- Typesense ----
-TYPESENSE_API_KEY=typesense_dev_key_2026
-TYPESENSE_PORT=8108
+# ---- Storage (Filesystem Dev) ----
+UPLOADS_DIR=./uploads
+MODELS_DIR=./models
 
 # ---- API (FastAPI) ----
 API_PORT=8000
 JWT_SECRET=jwt_super_secret_dev_key_change_in_production_2026
 JWT_ACCESS_TOKEN_EXPIRE_MINUTES=15
 JWT_REFRESH_TOKEN_EXPIRE_DAYS=7
-
-# ---- Matching Microservice ----
-MATCHING_PORT=8001
 
 # ---- Frontend (Next.js) ----
 WEB_PORT=3000
@@ -509,9 +346,8 @@ VAPID_PUBLIC_KEY=BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkOs-
 VAPID_PRIVATE_KEY=UUxI4O8-FbRouAevSmBQ6o18hgE4nSG97jN999qUYo4=
 VAPID_MAILTO=mailto:dev@servicoja.local
 
-# ---- OpenTelemetry ----
-OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317
-OTEL_SERVICE_NAME=servicoja-api
+# ---- Monitoramento ----
+OTEL_SDK_DISABLED=true
 
 # ---- Geral ----
 ENVIRONMENT=development
@@ -532,21 +368,8 @@ docker compose up -d --build
 # Ver logs de um serviço
 docker compose logs -f api
 
-# Rodar migrations
-docker compose exec api alembic upgrade head
-
-# Criar migration
-docker compose exec api alembic revision --autogenerate -m "add_table_x"
-
-# Seed de categorias
-docker compose exec api python scripts/seed_categories.py
-
 # Acessar psql
 docker compose exec db psql -U servicoja -d servicoja
-
-# Criar bucket MinIO
-docker compose exec minio mc alias set local http://localhost:9000 minio_dev minio_secret_dev_2026
-docker compose exec minio mc mb local/servicoja-uploads
 
 # Parar tudo
 docker compose down
