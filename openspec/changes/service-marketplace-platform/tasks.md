@@ -92,22 +92,24 @@
 
 ### 5.T Testes (TDD — escrever antes da implementação)
 - [ ] 5.T1 Testes unitários: regras de criação de bid (profissional verificado), lógica de aceite/rejeição, criação automática de contract, cálculo de split-payment
-- [ ] 5.T2 Testes de integração (pytest + httpx): POST /bids, GET /requests/:id/bids, PATCH /bids/:id, webhook de pagamento — com banco real
+- [ ] 5.T2 Testes de integração (pytest + httpx): POST /bids, GET /requests/:id/bids, PATCH /bids/:id — com banco real
 - [ ] 5.T3 Testes de schema Pydantic: inputs inválidos para BidCreate, BidUpdate (valores negativos, status inválido, campos ausentes)
 
-### 5.D Disputa — Testes (TDD — escrever antes da implementação)
-- [ ] 5.DT1 Testes unitários: lógica de abertura de disputa (cliente ou profissional), cálculo de response_deadline (NOW + 72h), transição de estados (opened → under_review → resolved), lógica de auto_escalation, cálculo de reembolso (total/parcial/negado)
-- [ ] 5.DT2 Testes de integração (pytest + httpx): POST /contracts/:id/dispute (cliente e profissional), POST /disputes/:id/response, PATCH /admin/disputes/:id (refund_full, refund_partial, refund_denied), GET /admin/disputes — com banco real
-- [ ] 5.DT3 Testes de schema Pydantic: inputs inválidos para DisputeCreate (reason ausente, category inválida), DisputeResponse (message vazio), DisputeResolve (refund_percent fora de range, resolution inválida)
+### 5.P Pagamento/Webhook — Testes (TDD — escrever antes da implementação)
+- [ ] 5.PT1 Testes unitários: cálculo de `marketplace_fee` com comissão por categoria (5% padrão), fallback para taxa padrão quando categoria sem taxa específica, cálculo de repasse D+2 (dias úteis), lógica de retenção de pagamento em caso de disputa (refund_full/partial/denied)
+- [ ] 5.PT2 Testes de integração (pytest + httpx): POST /webhooks/mercadopago (approved, rejected, assinatura inválida, payment_id duplicado/idempotência), POST /contracts/:id/payment (criação de preferência com marketplace_fee correto) — com banco real
+- [ ] 5.PT3 Testes de schema Pydantic: inputs inválidos para PaymentCreate (contract_id inexistente), WebhookPayload (campos ausentes, status inválido), validação de `X-Signature` HMAC
 
 ### 5.I Implementação
 - [ ] 5.1 Endpoint POST /bids (profissional verificado envia bid)
 - [ ] 5.2 Endpoint GET /requests/:id/bids (cliente visualiza bids recebidos)
 - [ ] 5.3 Endpoint PATCH /bids/:id (cliente aceita/rejeita bid)
 - [ ] 5.4 Criação automática de contracts ao aceitar bid
-- [ ] 5.5 Integração MercadoPago Marketplace: split-payment configurado em sandbox
-- [ ] 5.6 Webhook de confirmação de pagamento → atualiza contract.status='completed'
-- [ ] 5.8 Notificações (bid_received, bid_accepted, payment_confirmed) via sistema de notificações
+- [ ] 5.5 Criar tabela `commission_rates` (category_id nullable, percent, effective_from, effective_until) com seed da taxa padrão de 5%
+- [ ] 5.6 Integração MercadoPago Marketplace: split-payment com `marketplace_fee` calculado a partir de `commission_rates`, `collector_id` do profissional
+- [ ] 5.7 Endpoint POST /webhooks/mercadopago — validação HMAC, idempotência por `payment_id`, transição para `payment_confirmed`, agendamento de repasse D+2
+- [ ] 5.8 Job cron de repasse D+2: liberar pagamento ao profissional se não houver disputa, ou reter se `contract.status='disputed'`
+- [ ] 5.9a Notificações (bid_received, bid_accepted, payment_confirmed, payout_completed) via sistema de notificações
 
 ### 5.D Disputa — Implementação
 - [ ] 5.9 Criar tabela `disputes` (id, contract_id, opened_by, reason, category, evidence_urls, status, resolution, refund_percent, admin_notes, response_deadline, created_at, resolved_at) e migration

@@ -103,37 +103,91 @@ O sistema **SHALL** criar um contrato de forma atômica no momento da aceitaçã
 
 ## Requirement: Pagamento integrado via MercadoPago
 
-O sistema **SHALL** processar pagamento ao concluir o serviço via MercadoPago com split-payment (marketplace mode).
+O sistema **SHALL** processar pagamento ao concluir o serviço via MercadoPago com split-payment (marketplace mode), com comissão por categoria e repasse configurável.
+
+### Comissão por categoria
+
+> [!WARNING]
+> **Valor temporário**: O percentual de comissão padrão de **5%** é provisório e será revisado após validação de mercado. A implementação **MUST** ler o percentual de uma tabela `commission_rates` configurável, nunca hardcoded.
+
+| Categoria | Comissão (%) | Observação |
+|---|---|---|
+| **Padrão (todas)** | **5%** | ⚠️ Temporário — sujeito a revisão |
+| _Futuro: categorias premium_ | _A definir_ | _Configurável por categoria via admin_ |
+
+O sistema **MUST** armazenar as taxas na tabela `commission_rates` com campos: `category_id` (nullable = taxa padrão), `percent`, `effective_from`, `effective_until`. Ao processar um pagamento, **MUST** consultar a taxa ativa para a categoria do serviço; se não houver taxa específica, usar a taxa padrão.
+
+### Lógica de split-payment
+
+O split no MercadoPago Marketplace **MUST** ser configurado como:
+- **Profissional recebe**: `agreed_cents × (1 - commission_percent / 100)`
+- **Plataforma recebe**: `agreed_cents × (commission_percent / 100)`
+
+O `marketplace_fee` (valor da plataforma em centavos) **MUST** ser enviado no campo `marketplace_fee` da preferência de pagamento do MercadoPago.
 
 ### Scenario 1 — Pagamento iniciado pelo cliente
 
 - **GIVEN** que o contrato tem `status='active'` e o cliente confirmou a conclusão do serviço
 - **WHEN** o cliente inicia o pagamento via `POST /contracts/:id/payment`
-- **THEN** o sistema **MUST** criar uma cobrança no MercadoPago com split: `(100-X)%` ao profissional, `X%` à plataforma; retornar URL de checkout ou preferência de pagamento PIX
+- **THEN** o sistema **MUST**:
+  - Consultar `commission_rates` para a categoria do serviço (fallback para taxa padrão)
+  - Calcular `marketplace_fee = agreed_cents × commission_percent / 100`
+  - Criar preferência de pagamento no MercadoPago com `marketplace_fee` e `collector_id` do profissional
+  - Retornar URL de checkout ou preferência de pagamento PIX
 
 ### Scenario 2 — Webhook de confirmação de pagamento recebido
 
-- **GIVEN** que o MercadoPago envia webhook com `status='approved'` para o endpoint `POST /webhooks/mercadopago`
-- **WHEN** o sistema processa e valida a assinatura do webhook
-- **THEN** o sistema **MUST** atualizar `contract.status='completed'`, liberar saldo ao profissional, habilitar fluxo de review, retornar `200 OK` ao MercadoPago
+- **GIVEN** que o MercadoPago envia webhook com `status='approved'` para `POST /webhooks/mercadopago`
+- **WHEN** o sistema processa e valida a assinatura do webhook (`X-Signature` + segredo HMAC)
+- **THEN** o sistema **MUST**:
+  - Atualizar `contract.status='payment_confirmed'`
+  - Registrar `payment_confirmed_at = NOW()`
+  - Agendar repasse ao profissional para **D+2** (2 dias úteis após confirmação)
+  - Habilitar fluxo de review para o cliente
+  - Notificar profissional: `"Pagamento confirmado — repasse previsto para DD/MM/AAAA"`
+  - Retornar `200 OK` ao MercadoPago
 
-### Scenario 3 — Assinatura de webhook inválida
+### Scenario 3 — Repasse ao profissional (D+2)
 
-- **GIVEN** que o `X-Signature` do webhook não corresponde ao segredo configurado
+- **GIVEN** que o contrato tem `status='payment_confirmed'` e `payout_scheduled_at <= NOW()` e não há disputa aberta
+- **WHEN** o job de repasse (cron diário) executa
+- **THEN** o sistema **MUST**:
+  - Atualizar `contract.status='completed'`
+  - Registrar `payout_completed_at = NOW()`
+  - Notificar profissional: `"Repasse de R$ X,XX liberado na sua conta"`
+
+### Scenario 4 — Disputa aberta retém pagamento
+
+- **GIVEN** que o contrato tem `status='payment_confirmed'` e uma disputa é aberta antes de D+2
+- **WHEN** o job de repasse executa e detecta `contract.status='disputed'`
+- **THEN** o sistema **MUST NOT** liberar o repasse; o saldo **MUST** permanecer retido até resolução da disputa:
+  - Se `refund_full` → reembolso total ao cliente, profissional não recebe
+  - Se `refund_partial` → reembolso parcial ao cliente, profissional recebe restante
+  - Se `refund_denied` → repasse integral ao profissional, atualizar `contract.status='completed'`
+
+### Scenario 5 — Assinatura de webhook inválida
+
+- **GIVEN** que o `X-Signature` do webhook não corresponde ao segredo HMAC configurado
 - **WHEN** o sistema valida o webhook
-- **THEN** o sistema **MUST** retornar `401 Unauthorized` e descartar o evento sem processar
+- **THEN** o sistema **MUST** retornar `401 Unauthorized`, logar o evento como alerta de segurança, descartar sem processar
 
-### Scenario 4 — Pagamento recusado
+### Scenario 6 — Pagamento recusado
 
 - **GIVEN** que o MercadoPago envia webhook com `status='rejected'`
 - **WHEN** o sistema processa o webhook
-- **THEN** o sistema **MUST** manter `contract.status='active'`, notificar cliente para tentar novamente
+- **THEN** o sistema **MUST** manter `contract.status='active'`, notificar cliente: `"Pagamento não aprovado — tente novamente ou use outro método"`
 
-### Scenario 5 — MercadoPago API indisponível
+### Scenario 7 — MercadoPago API indisponível
 
-- **GIVEN** que a API do MercadoPago não responde em 10 s
+- **GIVEN** que a API do MercadoPago não responde em 10s
 - **WHEN** o sistema tenta criar a cobrança
 - **THEN** o sistema **MUST** retornar `503 Service Unavailable` ao cliente; **MUST NOT** alterar o status do contrato
+
+### Scenario 8 — Webhook com payment_id duplicado (idempotência)
+
+- **GIVEN** que o MercadoPago reenvia webhook com mesmo `payment_id` já processado
+- **WHEN** o sistema recebe o webhook
+- **THEN** o sistema **MUST** retornar `200 OK` sem reprocessar (idempotente); **MUST NOT** duplicar registros
 
 ---
 
