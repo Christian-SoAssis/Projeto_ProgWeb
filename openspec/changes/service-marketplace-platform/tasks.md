@@ -5,7 +5,23 @@
 - [ ] 1.1 Configurar monorepo: pasta `apps/web` (Next.js 14) + `apps/api` (Fastify) + `apps/matching` (Python FastAPI)
 - [ ] 1.2 Configurar Docker Compose: PostgreSQL 16 + PostGIS + Redis + MinIO + Typesense
 - [ ] 1.3 Instalar extensões PostgreSQL: `PostGIS`, `pgvector`, `uuid-ossp`
-- [ ] 1.4 Executar migrations do schema principal (tabelas do design.md)
+- [ ] 1.4 Configurar Alembic: `alembic init`, `env.py` async com SQLAlchemy 2.0, `alembic.ini` apontando para `DATABASE_URL`
+- [ ] 1.4.1 Migration 001: tabela `users` (id, name, email, phone, password_hash, role, avatar_url, is_active, timestamps) + índices
+- [ ] 1.4.2 Migration 002: tabela `professionals` (FK users ON DELETE CASCADE, bio, location GEOMETRY, service_radius_km, reputation_score, is_verified, profile_embedding vector(1536)) + índices GiST e IVFFlat
+- [ ] 1.4.3 Migration 003: tabela `categories` (id, name, slug UNIQUE, parent_id self-ref ON DELETE SET NULL, sort_order, is_active)
+- [ ] 1.4.4 Migration 004: tabela `professional_categories` (PK composta, FK professionals + categories ON DELETE CASCADE)
+- [ ] 1.4.5 Migration 005: tabela `requests` (FK users, FK categories ON DELETE RESTRICT, location GEOMETRY, urgency CHECK, status CHECK, ai_* fields) + índices GiST e compostos
+- [ ] 1.4.6 Migration 006: tabela `request_images` (FK requests ON DELETE CASCADE, content_type CHECK, size_bytes CHECK ≤ 10MB)
+- [ ] 1.4.7 Migration 007: tabela `bids` (FK requests + professionals ON DELETE CASCADE, price_cents CHECK > 0, UNIQUE request+professional)
+- [ ] 1.4.8 Migration 008: tabela `contracts` (FK requests UNIQUE + professionals + users ON DELETE RESTRICT, status CHECK com 7 estados, timestamps de pagamento/repasse)
+- [ ] 1.4.9 Migration 009: tabela `reviews` (FK contracts UNIQUE ON DELETE RESTRICT, FK users, rating CHECK 1-5, scores NLP CHECK 0-1)
+- [ ] 1.4.10 Migration 010: tabela `messages` (FK contracts + users ON DELETE CASCADE, content CHECK length ≥ 1) + índice cursor-based
+- [ ] 1.4.11 Migration 011: tabela `notifications` (FK users ON DELETE CASCADE, type CHECK enum, payload JSONB) + índice parcial não-lidas
+- [ ] 1.4.12 Migration 012: tabela `disputes` (FK contracts UNIQUE + users ON DELETE RESTRICT, category CHECK enum, status CHECK, resolution CHECK, refund_percent CHECK 1-99) + índice de deadline
+- [ ] 1.4.13 Migration 013: tabela `commission_rates` (FK categories ON DELETE CASCADE nullable, percent NUMERIC(5,2) CHECK, effective_from/until com validação) + seed taxa padrão 5%
+- [ ] 1.4.14 Migration 014: tabela `consent_logs` (FK users ON DELETE RESTRICT, consent_type CHECK, ip_address INET, version)
+- [ ] 1.4.15 Migration 015: tabela `push_subscriptions` (FK users ON DELETE CASCADE, endpoint UNIQUE, keys p256dh/auth)
+- [ ] 1.4.16 Migration 016: tabela `favorites` (FK users + professionals ON DELETE CASCADE, UNIQUE client+professional)
 - [ ] 1.5 Seed inicial de categorias (~20 categorias com hierarquia)
 - [ ] 1.6 Configurar variáveis de ambiente (`.env.example` para cada app)
 - [ ] 1.7 Pipeline CI básica: lint + type-check + testes (GitHub Actions)
@@ -20,7 +36,13 @@
 ### 2.T Testes (TDD — escrever antes da implementação)
 - [ ] 2.T1 Testes unitários: regras de hash bcrypt, geração/validação de JWT, rotação de refresh token, lógica de roles
 - [ ] 2.T2 Testes de integração (pytest + httpx): POST /auth/register, POST /auth/login, POST /auth/refresh, POST /professionals, PATCH /admin/professionals/:id — com banco real
-- [ ] 2.T3 Testes de schema Pydantic: inputs inválidos para RegisterRequest, LoginRequest, RefreshRequest, ProfessionalCreateRequest (campos ausentes, tipos errados, e-mail inválido, senha fraca)
+- [ ] 2.T3 Testes de schema Pydantic (ref: `pydantic-schemas/spec.md` §1, §2, §16):
+  - [ ] 2.T3a `UserCreate`: name <2 chars, email inválido, phone sem +55, password <8 chars, consent_terms=false, consent_privacy ausente
+  - [ ] 2.T3b `ProfessionalCreate`: latitude >90, longitude >180, service_radius_km=0, hourly_rate_cents negativo, category_ids vazio/>10, document_type inválido, bio >1000 chars
+  - [ ] 2.T3c `UserUpdate`: name >100 chars, phone com letras
+  - [ ] 2.T3d `ProfessionalUpdate`: service_radius_km >200, hourly_rate_cents=0
+  - [ ] 2.T3e `LoginRequest`: email inválido, password vazio
+  - [ ] 2.T3f `RefreshRequest`: refresh_token vazio
 
 ### 2.I Implementação
 - [ ] 2.1 Implementar JWT (access token 15min + refresh token rotation 7d)
@@ -35,7 +57,10 @@
 ### 2.L LGPD — Testes (TDD — escrever antes da implementação)
 - [ ] 2.LT1 Testes unitários: lógica de anonimização de PII (name, email, phone, cpf → valores anônimos), validação de contratos ativos bloqueando exclusão, mascaramento de CPF/CNPJ (regex), sanitização de logs
 - [ ] 2.LT2 Testes de integração (pytest + httpx): DELETE /auth/me (sucesso, senha errada, contratos ativos), GET /auth/me/consents, validação de consent_logs após registro — com banco real
-- [ ] 2.LT3 Testes de schema Pydantic: inputs inválidos para DeleteAccountRequest (senha ausente), ConsentPayload (consent_terms=false, campo ausente), verificação de campos mascarados no response
+- [ ] 2.LT3 Testes de schema Pydantic (ref: `pydantic-schemas/spec.md` §13, §16):
+  - [ ] 2.LT3a `DeleteAccountRequest`: password vazio, campo ausente
+  - [ ] 2.LT3b `ConsentPayload`: consent_terms=false, consent_privacy=false, campos ausentes
+  - [ ] 2.LT3c `ConsentResponse`: validar from_attributes, campos computed
 
 ### 2.L LGPD — Implementação
 - [ ] 2.9 Criar tabela `consent_logs` (user_id, consent_type, accepted_at, ip_address, user_agent, version) e migration
@@ -54,7 +79,11 @@
 ### 3.T Testes (TDD — escrever antes da implementação)
 - [ ] 3.T1 Testes unitários: validação de geolocalização, cálculo de urgência, lógica de retry com backoff, parsing de output VLM (ai_complexity, ai_urgency, ai_specialties)
 - [ ] 3.T2 Testes de integração (pytest + httpx): POST /requests, GET /requests, GET /requests/:id, GET /categories — com banco real e upload de imagens mockado
-- [ ] 3.T3 Testes de schema Pydantic: inputs inválidos para ServiceRequestCreate (coordenadas fora de range, urgência inválida, campos ausentes, imagens acima do limite)
+- [ ] 3.T3 Testes de schema Pydantic (ref: `pydantic-schemas/spec.md` §3, §4, §5):
+  - [ ] 3.T3a `RequestCreate`: title <5 chars, title >200 chars, description >2000 chars, urgency="urgent", budget_cents=0, latitude >90, category_id inválido
+  - [ ] 3.T3b `RequestUpdate`: title <5 chars com campo presente, budget_cents negativo
+  - [ ] 3.T3c `CategoryCreate` (admin): slug com espaços/uppercase, name vazio, sort_order negativo
+  - [ ] 3.T3d `RequestResponse`/`CategoryResponse`: validar from_attributes, nested relations corretas
 
 ### 3.I Implementação
 - [ ] 3.1 Endpoint POST /requests com geolocalização e urgência
@@ -74,7 +103,10 @@
 ### 4.T Testes (TDD — escrever antes da implementação)
 - [ ] 4.T1 Testes unitários: cálculo de geo-radius, scoring por categoria + reputation, lógica de fallback v0, ranking top-10
 - [ ] 4.T2 Testes de integração (pytest + httpx): GET /requests/:id/matches, POST /score (microservice FastAPI) — com banco real e profissionais seed
-- [ ] 4.T3 Testes de schema Pydantic: inputs inválidos para MatchRequest, ScoreRequest (features ausentes, tipos errados, lat/lng inválidos)
+- [ ] 4.T3 Testes de schema Pydantic (ref: `pydantic-schemas/spec.md`):
+  - [ ] 4.T3a `MatchRequest`: request_id inválido, lat/lng fora de range
+  - [ ] 4.T3b `ScoreRequest`: features ausentes, tipos errados (string em campo float), campos extra ignorados
+  - [ ] 4.T3c `ProfessionalResponse` (nested no match): validar serialização de categories e reputation_score
 
 ### 4.I Implementação
 - [ ] 4.1 Endpoint GET /requests/:id/matches retornando top-10 profissionais
@@ -93,12 +125,18 @@
 ### 5.T Testes (TDD — escrever antes da implementação)
 - [ ] 5.T1 Testes unitários: regras de criação de bid (profissional verificado), lógica de aceite/rejeição, criação automática de contract, cálculo de split-payment
 - [ ] 5.T2 Testes de integração (pytest + httpx): POST /bids, GET /requests/:id/bids, PATCH /bids/:id — com banco real
-- [ ] 5.T3 Testes de schema Pydantic: inputs inválidos para BidCreate, BidUpdate (valores negativos, status inválido, campos ausentes)
+- [ ] 5.T3 Testes de schema Pydantic (ref: `pydantic-schemas/spec.md` §6, §7):
+  - [ ] 5.T3a `BidCreate`: price_cents=0, price_cents negativo, estimated_hours=0, message >500 chars, request_id inválido, campo ausente
+  - [ ] 5.T3b `BidUpdate`: status="pending" (inválido no update), status="cancelled" (inválido)
+  - [ ] 5.T3c `ContractResponse`: validar from_attributes, nested professional e dispute
 
 ### 5.P Pagamento/Webhook — Testes (TDD — escrever antes da implementação)
 - [ ] 5.PT1 Testes unitários: cálculo de `marketplace_fee` com comissão por categoria (5% padrão), fallback para taxa padrão quando categoria sem taxa específica, cálculo de repasse D+2 (dias úteis), lógica de retenção de pagamento em caso de disputa (refund_full/partial/denied)
 - [ ] 5.PT2 Testes de integração (pytest + httpx): POST /webhooks/mercadopago (approved, rejected, assinatura inválida, payment_id duplicado/idempotência), POST /contracts/:id/payment (criação de preferência com marketplace_fee correto) — com banco real
-- [ ] 5.PT3 Testes de schema Pydantic: inputs inválidos para PaymentCreate (contract_id inexistente), WebhookPayload (campos ausentes, status inválido), validação de `X-Signature` HMAC
+- [ ] 5.PT3 Testes de schema Pydantic (ref: `pydantic-schemas/spec.md` §7, §12):
+  - [ ] 5.PT3a `PaymentCreate`: validar schema vazio (body-less)
+  - [ ] 5.PT3b `WebhookPayload`: campos ausentes, status inválido, payment_id inválido
+  - [ ] 5.PT3c `CommissionRateCreate`: percent=0, percent=100, effective_until anterior a effective_from
 
 ### 5.I Implementação
 - [ ] 5.1 Endpoint POST /bids (profissional verificado envia bid)
@@ -114,7 +152,10 @@
 ### 5.D Disputa — Testes (TDD — escrever antes da implementação)
 - [ ] 5.DT1 Testes unitários: lógica de abertura de disputa (cliente ou profissional), cálculo de response_deadline (NOW + 72h), transição de estados (opened → under_review → resolved), lógica de auto_escalation, cálculo de reembolso (total/parcial/negado)
 - [ ] 5.DT2 Testes de integração (pytest + httpx): POST /contracts/:id/dispute (cliente e profissional), POST /disputes/:id/response, PATCH /admin/disputes/:id (refund_full, refund_partial, refund_denied), GET /admin/disputes — com banco real
-- [ ] 5.DT3 Testes de schema Pydantic: inputs inválidos para DisputeCreate (reason ausente, category inválida), DisputeResponse (message vazio), DisputeResolve (refund_percent fora de range, resolution inválida)
+- [ ] 5.DT3 Testes de schema Pydantic (ref: `pydantic-schemas/spec.md` §11):
+  - [ ] 5.DT3a `DisputeCreate`: reason <10 chars, reason vazio, category inválida, evidence_urls >10 itens
+  - [ ] 5.DT3b `DisputeResponseAction`: message <10 chars, message vazio, evidence_urls >10
+  - [ ] 5.DT3c `DisputeResolve`: refund_partial sem refund_percent, refund_full com refund_percent, refund_percent=0, refund_percent=100, admin_notes <5 chars, resolution inválida
 
 ### 5.D Disputa — Implementação
 - [ ] 5.9 Criar tabela `disputes` (id, contract_id, opened_by, reason, category, evidence_urls, status, resolution, refund_percent, admin_notes, response_deadline, created_at, resolved_at) e migration
@@ -133,7 +174,10 @@
 ### 6.T Testes (TDD — escrever antes da implementação)
 - [ ] 6.T1 Testes unitários: autenticação de socket via JWT, lógica de detecção de desintermediação (regex WhatsApp/telefone/e-mail), persistência de mensagens
 - [ ] 6.T2 Testes de integração (pytest + httpx): GET /contracts/:id/messages (paginação com cursor), criação de alertas de admin ao detectar padrão suspeito — com banco real
-- [ ] 6.T3 Testes de schema Pydantic: inputs inválidos para MessageCreate, MessageQuery (cursor inválido, contrato inexistente, conteúdo vazio)
+- [ ] 6.T3 Testes de schema Pydantic (ref: `pydantic-schemas/spec.md` §9):
+  - [ ] 6.T3a `MessageCreate`: content vazio, content >5000 chars
+  - [ ] 6.T3b `MessageQuery`: limit=0, limit negativo, limit >100, cursor formato inválido
+  - [ ] 6.T3c `MessageResponse`: validar from_attributes, sender_name computed
 
 ### 6.I Implementação
 - [ ] 6.1 Configurar Socket.io no BFF com Redis Adapter para escalonamento horizontal
@@ -151,7 +195,9 @@
 ### 7.T Testes (TDD — escrever antes da implementação)
 - [ ] 7.T1 Testes unitários: cálculo de reputation_score ponderado, lógica de is_authentic, extração de scores por dimensão (pontualidade, qualidade, limpeza, comunicação), regra de >= 3 reviews
 - [ ] 7.T2 Testes de integração (pytest + httpx): POST /reviews (apenas após pagamento confirmado), recálculo de reputation_score após insert — com banco real
-- [ ] 7.T3 Testes de schema Pydantic: inputs inválidos para ReviewCreate (rating fora de range, texto vazio, contrato não completado, dimensões ausentes)
+- [ ] 7.T3 Testes de schema Pydantic (ref: `pydantic-schemas/spec.md` §8):
+  - [ ] 7.T3a `ReviewCreate`: rating=0, rating=6, rating negativo, rating float, text <10 chars, text >2000 chars, text vazio, contract_id inválido
+  - [ ] 7.T3b `ReviewResponse`: validar from_attributes, score_* entre 0-1, is_authentic default true
 
 ### 7.I Implementação
 - [ ] 7.1 Endpoint POST /reviews (após pagamento confirmado)
@@ -169,7 +215,11 @@
 ### 8.T Testes (TDD — escrever antes da implementação)
 - [ ] 8.T1 Testes unitários: cálculo de métricas (earnings, conversão, reputation), lógica de favoritos, filtros de KPIs admin
 - [ ] 8.T2 Testes de integração (pytest + httpx): PATCH /professionals/me, GET /professionals/me/metrics, POST /favorites, GET /favorites — com banco real
-- [ ] 8.T3 Testes de schema Pydantic: inputs inválidos para ProfessionalUpdate, FavoriteCreate (profissional inexistente, campos obrigatórios ausentes, tipos errados)
+- [ ] 8.T3 Testes de schema Pydantic (ref: `pydantic-schemas/spec.md` §10, §15):
+  - [ ] 8.T3a `NotificationResponse`: validar from_attributes, type enum, payload dict
+  - [ ] 8.T3b `NotificationMarkRead`: notification_ids vazio, >100 itens, UUIDs inválidos
+  - [ ] 8.T3c `FavoriteCreate`: professional_id UUID inválido
+  - [ ] 8.T3d `ProfessionalUpdate`: validar campos Optional, bio >1000 chars
 
 ### 8.I Implementação
 - [ ] 8.1 Painel do cliente: pedidos ativos, histórico, bids recebidos, favoritos
@@ -183,7 +233,10 @@
 ### 8.P PWA — Testes (TDD — escrever antes da implementação)
 - [ ] 8.PT1 Testes unitários: lógica de seleção de estratégia de cache (cache-first vs network-first por URL pattern), construção do payload de push notification, parsing de manifest.json, detecção de estado online/offline
 - [ ] 8.PT2 Testes de integração: Service Worker registration e lifecycle (install → activate → fetch), interceptação de requests com resposta de cache, fallback offline para /pedidos, POST /push/subscribe com subscription válida — via vitest + MSW
-- [ ] 8.PT3 Testes de schema: validação de PushSubscription payload (endpoint, keys.p256dh, keys.auth obrigatórios), manifest.json contra schema W3C (icons, start_url, display obrigatórios)
+- [ ] 8.PT3 Testes de schema (ref: `pydantic-schemas/spec.md` §14):
+  - [ ] 8.PT3a `PushSubscribeCreate`: endpoint vazio/<10 chars, keys.p256dh ausente, keys.auth ausente, device_label >100 chars
+  - [ ] 8.PT3b `PushKeysSchema`: campos vazios, < 10 chars
+  - [ ] 8.PT3c Validação de `manifest.json` contra schema W3C (icons, start_url, display obrigatórios)
 
 ### 8.P PWA — Implementação
 - [ ] 8.8 Criar `manifest.json` completo (name, short_name, icons 192/512, start_url, display standalone, theme_color, lang pt-BR, categories, screenshots)
