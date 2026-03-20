@@ -32,6 +32,21 @@
 - [ ] 2.7 Fluxo de verificação de profissional: admin aprova via PATCH /admin/professionals/:id
 - [ ] 2.8 Middleware de autenticação e autorização por role (client, professional, admin)
 
+### 2.L LGPD — Testes (TDD — escrever antes da implementação)
+- [ ] 2.LT1 Testes unitários: lógica de anonimização de PII (name, email, phone, cpf → valores anônimos), validação de contratos ativos bloqueando exclusão, mascaramento de CPF/CNPJ (regex), sanitização de logs
+- [ ] 2.LT2 Testes de integração (pytest + httpx): DELETE /auth/me (sucesso, senha errada, contratos ativos), GET /auth/me/consents, validação de consent_logs após registro — com banco real
+- [ ] 2.LT3 Testes de schema Pydantic: inputs inválidos para DeleteAccountRequest (senha ausente), ConsentPayload (consent_terms=false, campo ausente), verificação de campos mascarados no response
+
+### 2.L LGPD — Implementação
+- [ ] 2.9 Criar tabela `consent_logs` (user_id, consent_type, accepted_at, ip_address, user_agent, version) e migration
+- [ ] 2.10 Adicionar campos `consent_terms` e `consent_privacy` obrigatórios nos schemas de registro (RegisterRequest, ProfessionalCreateRequest); rejeitar cadastro se não aceitos
+- [ ] 2.11 Endpoint GET /auth/me/consents — listar consentimentos do usuário autenticado
+- [ ] 2.12 Endpoint DELETE /auth/me — exclusão de conta com confirmação de senha, anonimização de PII, remoção de documentos do S3/MinIO, revogação de tokens, cancelamento de bids pendentes (profissional), remoção do Typesense (profissional)
+- [ ] 2.13 Bloquear exclusão se houver contratos com `status='in_progress'` (retornar `409 Conflict`)
+- [ ] 2.14 Middleware de mascaramento de logs: CPF (`***.***.***-XX`), CNPJ (`**.***.****/****-XX`), `Authorization: Bearer [REDACTED]`, file paths do S3 omitidos
+- [ ] 2.15 SpanProcessor customizado no OpenTelemetry para sanitizar PII nos atributos de spans antes de exportar
+- [ ] 2.16 Job de retenção de dados (cron diário): anonimizar contas inativas > 12 meses, remover mensagens de chat > 24 meses, limpar logs com PII > 90 dias; enviar e-mail de aviso 30 dias antes da anonimização
+
 ---
 
 ## 3. Pedidos de Serviço + Análise de Imagem (VLM)
