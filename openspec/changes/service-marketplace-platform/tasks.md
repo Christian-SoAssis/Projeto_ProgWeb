@@ -92,8 +92,13 @@
 
 ### 5.T Testes (TDD — escrever antes da implementação)
 - [ ] 5.T1 Testes unitários: regras de criação de bid (profissional verificado), lógica de aceite/rejeição, criação automática de contract, cálculo de split-payment
-- [ ] 5.T2 Testes de integração (pytest + httpx): POST /bids, GET /requests/:id/bids, PATCH /bids/:id, POST /contracts/:id/dispute, webhook de pagamento — com banco real
-- [ ] 5.T3 Testes de schema Pydantic: inputs inválidos para BidCreate, BidUpdate, DisputeCreate (valores negativos, status inválido, campos ausentes)
+- [ ] 5.T2 Testes de integração (pytest + httpx): POST /bids, GET /requests/:id/bids, PATCH /bids/:id, webhook de pagamento — com banco real
+- [ ] 5.T3 Testes de schema Pydantic: inputs inválidos para BidCreate, BidUpdate (valores negativos, status inválido, campos ausentes)
+
+### 5.D Disputa — Testes (TDD — escrever antes da implementação)
+- [ ] 5.DT1 Testes unitários: lógica de abertura de disputa (cliente ou profissional), cálculo de response_deadline (NOW + 72h), transição de estados (opened → under_review → resolved), lógica de auto_escalation, cálculo de reembolso (total/parcial/negado)
+- [ ] 5.DT2 Testes de integração (pytest + httpx): POST /contracts/:id/dispute (cliente e profissional), POST /disputes/:id/response, PATCH /admin/disputes/:id (refund_full, refund_partial, refund_denied), GET /admin/disputes — com banco real
+- [ ] 5.DT3 Testes de schema Pydantic: inputs inválidos para DisputeCreate (reason ausente, category inválida), DisputeResponse (message vazio), DisputeResolve (refund_percent fora de range, resolution inválida)
 
 ### 5.I Implementação
 - [ ] 5.1 Endpoint POST /bids (profissional verificado envia bid)
@@ -102,8 +107,17 @@
 - [ ] 5.4 Criação automática de contracts ao aceitar bid
 - [ ] 5.5 Integração MercadoPago Marketplace: split-payment configurado em sandbox
 - [ ] 5.6 Webhook de confirmação de pagamento → atualiza contract.status='completed'
-- [ ] 5.7 Endpoint POST /contracts/:id/dispute para abertura de disputa
 - [ ] 5.8 Notificações (bid_received, bid_accepted, payment_confirmed) via sistema de notificações
+
+### 5.D Disputa — Implementação
+- [ ] 5.9 Criar tabela `disputes` (id, contract_id, opened_by, reason, category, evidence_urls, status, resolution, refund_percent, admin_notes, response_deadline, created_at, resolved_at) e migration
+- [ ] 5.10 Endpoint POST /contracts/:id/dispute — abertura por cliente ou profissional com `{ reason, category, evidence_urls[] }`, criação de registro com deadline 72h, atualização de contract.status, notificações
+- [ ] 5.11 Endpoint POST /disputes/:id/response — parte contrária responde com `{ message, evidence_urls[], proposed_resolution }`, transição para `under_review`, notificações
+- [ ] 5.12 Job cron de expiração de disputas: escalar automaticamente disputas sem resposta após 72h (`opened → auto_escalated`), notificar admin e parte não responsiva
+- [ ] 5.13 Endpoint PATCH /admin/disputes/:id — admin resolve com `{ resolution: 'refund_full' | 'refund_partial' | 'refund_denied', refund_percent?, admin_notes }`
+- [ ] 5.14 Integrar reembolso via MercadoPago API: total (100%), parcial (refund_percent%), ou negado (sem ação financeira); atualizar contract.status correspondente
+- [ ] 5.15 Endpoint GET /admin/disputes — listagem paginada com filtro por status, ordenação por created_at
+- [ ] 5.16 Notificações em cada transição de estado da disputa (abertura, resposta, escalação, resolução) via WebSocket/push para ambas as partes
 
 ---
 

@@ -137,24 +137,106 @@ O sistema **SHALL** processar pagamento ao concluir o serviço via MercadoPago c
 
 ---
 
-## Requirement: Disputa de contrato
+## Requirement: Disputa de contrato — Fluxo completo
 
-O sistema **SHALL** suportar abertura de disputa em contratos ativos com encaminhamento para revisão pelo admin.
+O sistema **SHALL** suportar um fluxo de disputa completo com abertura por qualquer parte (cliente ou profissional), prazo de resposta, arbitragem pelo admin e critérios claros de reembolso. O fluxo **MUST** gerar notificações em cada transição de estado.
+
+### Estados da disputa
+
+```
+opened → awaiting_response (72h) → under_review (admin) → resolved (refund_full | refund_partial | refund_denied)
+                                  ↘ auto_escalated (se 72h expiram sem resposta)
+```
 
 ### Scenario 1 — Cliente abre disputa
 
 - **GIVEN** que o contrato tem `status='active'` e pertence ao cliente autenticado
-- **WHEN** o cliente envia `POST /contracts/:id/dispute` com `{ reason: '...' }`
-- **THEN** o sistema **MUST** atualizar `contract.status='disputed'`, notificar admin, retornar `200 OK`
+- **WHEN** o cliente envia `POST /contracts/:id/dispute` com `{ reason, category, evidence_urls[] }`
+- **THEN** o sistema **MUST**:
+  - Criar registro em `disputes` com `status='opened'`, `opened_by='client'`, `response_deadline = NOW() + 72h`
+  - Atualizar `contract.status='disputed'`
+  - Notificar o profissional via WebSocket/push: `"O cliente abriu uma disputa. Você tem 72h para responder."`
+  - Notificar o admin via painel: nova disputa pendente
+  - Retornar `201 Created` com `dispute_id` e `response_deadline`
 
-### Scenario 2 — Disputa em contrato já concluído ou cancelado
+### Scenario 2 — Profissional abre disputa
 
-- **GIVEN** que o contrato tem `status='completed'` ou `status='cancelled'`
-- **WHEN** o cliente tenta abrir disputa
+- **GIVEN** que o contrato tem `status='active'` e pertence ao profissional autenticado
+- **WHEN** o profissional envia `POST /contracts/:id/dispute` com `{ reason, category, evidence_urls[] }`
+- **THEN** o sistema **MUST** executar o mesmo fluxo do Scenario 1 com `opened_by='professional'`, notificando o cliente para responder em 72h
+
+### Scenario 3 — Parte contrária responde dentro de 72h
+
+- **GIVEN** que a disputa tem `status='opened'` e o `response_deadline` não expirou
+- **WHEN** a parte contrária envia `POST /disputes/:id/response` com `{ message, evidence_urls[], proposed_resolution }`
+- **THEN** o sistema **MUST**:
+  - Salvar a resposta vinculada à disputa
+  - Atualizar `dispute.status='under_review'`
+  - Notificar admin: `"Disputa #ID pronta para arbitragem — ambas as partes se manifestaram"`
+  - Notificar a parte que abriu: `"A outra parte respondeu à sua disputa"`
+  - Retornar `200 OK`
+
+### Scenario 4 — Prazo de 72h expira sem resposta
+
+- **GIVEN** que a disputa tem `status='opened'` e `NOW() > response_deadline`
+- **WHEN** o job de expiração de disputas (cron) executa
+- **THEN** o sistema **MUST**:
+  - Atualizar `dispute.status='auto_escalated'`
+  - Notificar admin: `"Disputa #ID escalada automaticamente — sem resposta em 72h"`
+  - Notificar a parte não responsiva: `"O prazo de resposta expirou. A disputa foi encaminhada para análise."`
+
+### Scenario 5 — Admin resolve com reembolso total
+
+- **GIVEN** que a disputa tem `status='under_review'` ou `status='auto_escalated'`
+- **WHEN** admin envia `PATCH /admin/disputes/:id` com `{ resolution: 'refund_full', admin_notes }` 
+- **THEN** o sistema **MUST**:
+  - Atualizar `dispute.status='resolved'`, `dispute.resolution='refund_full'`
+  - Acionar reembolso total via MercadoPago API (100% do `contract.agreed_cents`)
+  - Atualizar `contract.status='refunded'`
+  - Notificar cliente: `"Disputa resolvida — reembolso total aprovado"`
+  - Notificar profissional: `"Disputa resolvida — reembolso total ao cliente"`
+
+### Scenario 6 — Admin resolve com reembolso parcial
+
+- **GIVEN** que a disputa está em `under_review` ou `auto_escalated`
+- **WHEN** admin envia `PATCH /admin/disputes/:id` com `{ resolution: 'refund_partial', refund_percent, admin_notes }`
+- **THEN** o sistema **MUST**:
+  - Validar `1 <= refund_percent <= 99`
+  - Atualizar `dispute.status='resolved'`, `dispute.resolution='refund_partial'`, `dispute.refund_percent`
+  - Acionar reembolso parcial via MercadoPago API (`refund_percent%` do `agreed_cents`)
+  - Atualizar `contract.status='partially_refunded'`
+  - Notificar ambas as partes com o percentual e motivo
+
+### Scenario 7 — Admin nega reembolso
+
+- **GIVEN** que a disputa está em `under_review` ou `auto_escalated`
+- **WHEN** admin envia `PATCH /admin/disputes/:id` com `{ resolution: 'refund_denied', admin_notes }`
+- **THEN** o sistema **MUST**:
+  - Atualizar `dispute.status='resolved'`, `dispute.resolution='refund_denied'`
+  - Manter `contract.status='active'` (serviço deve continuar ou ser concluído)
+  - Notificar ambas as partes: `"Disputa analisada — reembolso não concedido"` com `admin_notes`
+
+### Scenario 8 — Disputa em contrato já concluído, cancelado ou já disputado
+
+- **GIVEN** que o contrato tem `status` em `['completed', 'cancelled', 'disputed', 'refunded']`
+- **WHEN** qualquer parte tenta abrir disputa
 - **THEN** o sistema **MUST** retornar `409 Conflict` com mensagem `"Disputa não pode ser aberta neste status"`
 
-### Scenario 3 — Motivo da disputa ausente
+### Scenario 9 — Motivo ou categoria ausente
 
-- **GIVEN** que o campo `reason` é omitido ou vazio
+- **GIVEN** que o campo `reason` é omitido/vazio ou `category` não é uma das opções válidas (`quality`, `no_show`, `overcharge`, `damage`, `other`)
 - **WHEN** a requisição chega ao FastAPI
 - **THEN** o sistema **MUST** retornar `422 Unprocessable Entity`
+
+### Scenario 10 — Usuário não-admin tenta resolver disputa
+
+- **GIVEN** que o token JWT pertence a um usuário com `role != 'admin'`
+- **WHEN** envia `PATCH /admin/disputes/:id`
+- **THEN** o sistema **MUST** retornar `403 Forbidden`
+
+### Scenario 11 — Consulta de disputas pelo admin
+
+- **GIVEN** que admin autenticado deseja listar disputas
+- **WHEN** envia `GET /admin/disputes?status=opened|under_review|auto_escalated`
+- **THEN** o sistema **MUST** retornar lista paginada com `dispute_id`, `contract_id`, `opened_by`, `reason`, `category`, `status`, `response_deadline`, `created_at`
+
