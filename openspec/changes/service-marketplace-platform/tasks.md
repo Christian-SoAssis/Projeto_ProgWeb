@@ -180,6 +180,23 @@
 - [ ] 8.6 Painel admin: aprovação de profissionais, flags de fraude, KPIs gerais
 - [ ] 8.7 Sistema de notificações: in-app via WebSocket + push PWA (Service Worker)
 
+### 8.P PWA — Testes (TDD — escrever antes da implementação)
+- [ ] 8.PT1 Testes unitários: lógica de seleção de estratégia de cache (cache-first vs network-first por URL pattern), construção do payload de push notification, parsing de manifest.json, detecção de estado online/offline
+- [ ] 8.PT2 Testes de integração: Service Worker registration e lifecycle (install → activate → fetch), interceptação de requests com resposta de cache, fallback offline para /pedidos, POST /push/subscribe com subscription válida — via vitest + MSW
+- [ ] 8.PT3 Testes de schema: validação de PushSubscription payload (endpoint, keys.p256dh, keys.auth obrigatórios), manifest.json contra schema W3C (icons, start_url, display obrigatórios)
+
+### 8.P PWA — Implementação
+- [ ] 8.8 Criar `manifest.json` completo (name, short_name, icons 192/512, start_url, display standalone, theme_color, lang pt-BR, categories, screenshots)
+- [ ] 8.9 Registrar Service Worker no Next.js (next-pwa ou custom) com pre-cache do app shell no install
+- [ ] 8.10 Implementar estratégia Cache-First para assets estáticos (`_next/static/`, fontes, ícones) e cache permanente para imagens de S3/MinIO
+- [ ] 8.11 Implementar estratégia Network-First para chamadas de API (`/api/*`) com fallback para cache offline e TTL de 5 min
+- [ ] 8.12 Tela de fallback offline para `/pedidos`: banner "Você está offline", dados cacheados da última sync, botões de ação desabilitados, auto-reconexão via evento `online`
+- [ ] 8.13 Toast de nova versão do SW: interceptar `updatefound` → exibir "Nova versão disponível — atualize a página"
+- [ ] 8.14 Endpoint POST /push/subscribe (backend): salvar subscription (endpoint, keys) vinculada ao user_id e device
+- [ ] 8.15 Integrar Web Push API no backend: enviar push para eventos `bid_received`, `new_message`, `dispute_opened` com título, body e deep link; skip se destinatário online no WebSocket
+- [ ] 8.16 Gerar ícones PWA (192×192, 512×512) maskable + any, screenshots para install prompt
+- [ ] 8.17 Interceptar `beforeinstallprompt` e exibir banner A2HS customizado a partir da segunda visita
+
 ---
 
 ## 9. Busca e Descoberta
