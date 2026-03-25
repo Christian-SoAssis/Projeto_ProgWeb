@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Painel do Profissional - ServiçoJá</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "outline-variant": "#c9c5cc",
+              "error": "#ba1a1a",
+              "secondary-fixed": "#e5e1e8",
+              "tertiary": "#655e4a",
+              "background": "#d0ccdc",
+              "inverse-on-surface": "#f3eeff",
+              "inverse-primary": "#6cdab6",
+              "on-secondary": "#ffffff",
+              "outline": "#78767c",
+              "primary-fixed-dim": "#6cdab6",
+              "on-tertiary": "#ffffff",
+              "surface-variant": "#e5e0f1",
+              "secondary-container": "#e2dee5",
+              "on-tertiary-fixed-variant": "#4d4634",
+              "on-primary-fixed": "#002117",
+              "primary-fixed": "#89f7d1",
+              "surface-container-high": "#eae6f6",
+              "on-tertiary-fixed": "#201b0c",
+              "surface-tint": "#006c53",
+              "on-secondary-fixed": "#1c1b20",
+              "primary": "#1a9878",
+              "secondary": "#5f5d63",
+              "tertiary-fixed": "#ede1c9",
+              "surface-container": "#f0ecfc",
+              "on-primary-container": "#00644d",
+              "on-surface-variant": "#47464c",
+              "on-primary-fixed-variant": "#00513e",
+              "secondary-fixed-dim": "#c9c5cc",
+              "on-secondary-fixed-variant": "#47464c",
+              "surface-container-low": "#f6f1ff",
+              "surface-container-lowest": "#ffffff",
+              "on-error-container": "#93000a",
+              "surface-container-highest": "#e5e0f1",
+              "tertiary-fixed-dim": "#d0c6ae",
+              "on-error": "#ffffff",
+              "error-container": "#ffdad6",
+              "primary-container": "#74e2be",
+              "surface-dim": "#dcd8e8",
+              "surface": "#d0ccdc",
+              "surface-bright": "#fcf8ff",
+              "on-primary": "#ffffff",
+              "inverse-surface": "#302f3b",
+              "on-tertiary-container": "#5e5744",
+              "on-secondary-container": "#646268",
+              "on-surface": "#1b1a26",
+              "tertiary-container": "#d8cdb5",
+              "on-background": "#1b1a26"
+            },
+            fontFamily: {
+              "headline": ["Plus Jakarta Sans"],
+              "body": ["Plus Jakarta Sans"],
+              "mono": ["DM Mono"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #d0ccdc;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .neomorph-elevated {
+            box-shadow: -8px -8px 16px rgba(255, 255, 255, 0.7), 8px 8px 16px rgba(184, 180, 197, 1);
+        }
+        .neomorph-inset {
+            box-shadow: inset -4px -4px 10px #ffffff, inset 4px 4px 10px #b8b4c5;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .mint-gradient {
+            background: linear-gradient(135deg, #006c53 0%, #1a9878 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-surface">
+<!-- Desktop Navigation Drawer -->
+<aside class="fixed inset-y-0 left-0 z-[60] py-8 flex flex-col hidden md:flex h-full w-[280px] rounded-r-[2rem] bg-[#d0ccdc] shadow-[10px_0_30px_rgba(184,180,197,0.5)]">
+<div class="px-8 mb-10">
+<h1 class="text-[#1a9878] font-bold text-2xl tracking-tighter">ServiçoJá</h1>
+</div>
+<div class="px-6 mb-8 flex items-center gap-4">
+<div class="w-12 h-12 rounded-full neomorph-elevated p-1 overflow-hidden bg-background">
+<img alt="Avatar" class="w-full h-full object-cover rounded-full" data-alt="professional male electrician smiling profile photo high quality studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBihxUS6kImizF9YTB_CWxKvR-UJre5GWXZKOjtLi7N0nj_OvUrFTut3_4JOoUCJbRJWz-zYsisoJFtmGtWp6kNyiSEpRzJfROpHI6gXzGd60754NswNuxOiDXSswakE0eEu0QcP5hfY6Mhrbiv68aTHaxvsuI146xPqrdPpUlHsSQE0TuY7bJ5VCw60AGglP7WGQ4ws36EpmQaMc41uf84HVPtLDtJH8XJiXK7v2UXrLD4UpwQSdNFPqdACbt9xsV5pR8nulZYy6U"/>
+</div>
+<div>
+<p class="font-bold text-on-surface leading-tight">Joao Silva</p>
+<p class="text-xs text-on-surface-variant font-medium">Eletricista Premium</p>
+</div>
+</div>
+<nav class="flex-1 space-y-4">
+<a class="flex items-center gap-4 py-3 px-6 text-[#1a9878] neomorph-inset rounded-lg mx-2 transition-transform active:opacity-70" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-medium">Visão Geral</span>
+</a>
+<a class="flex items-center gap-4 py-3 px-6 text-on-surface-variant hover:translate-x-1 transition-transform mx-2" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-medium">Meus Ganhos</span>
+</a>
+<a class="flex items-center gap-4 py-3 px-6 text-on-surface-variant hover:translate-x-1 transition-transform mx-2" href="#">
+<span class="material-symbols-outlined">chat</span>
+<span class="font-medium">Mensagens</span>
+</a>
+<a class="flex items-center gap-4 py-3 px-6 text-on-surface-variant hover:translate-x-1 transition-transform mx-2" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-medium">Configurações</span>
+</a>
+</nav>
+<div class="px-2 mt-auto">
+<a class="flex items-center gap-4 py-3 px-6 text-on-surface-variant hover:translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-medium">Sair</span>
+</a>
+</div>
+</aside>
+<!-- Mobile Top App Bar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16 md:hidden bg-[#d0ccdc] shadow-[-8px_-8px_16px_rgba(255,255,255,0.7),8px_8px_16px_rgba(184,180,197,1)]">
+<span class="material-symbols-outlined text-[#1b1a26]">menu</span>
+<h2 class="font-headline font-bold tracking-tight text-[#1b1a26] text-xl">Painel</h2>
+<div class="w-8 h-8 rounded-full overflow-hidden neomorph-elevated">
+<img alt="Profile" data-alt="close up professional headshot of a service provider with friendly expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8pZpm53Fx4bgJN_Q3UoR01EzCoS3t7YTGCnIeKZXh7r2SveEnvrymvltjou8X8f4FlAUWSxCPER6Ua7TkquKk5lFFHgJ7c7b3NR1R8WXmGlueedlgT9LJkXr2NexlUNUdRnORlVCmPdtTL_sCyWclmyFtn3Kny4o8yRIbduyq0YAC9_a96xQwzeySbuX7AXAPXbrG7FJEolWDgXkwYnZg_JkYaUqKidbz49aJ9k6b5oMlBHUjJFFrnkSL4tvRJ1fWUf70J8faUkA"/>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="md:ml-[280px] pt-20 md:pt-10 pb-28 px-6 md:px-12 max-w-7xl mx-auto">
+<!-- Header Section -->
+<section class="mb-12">
+<p class="text-on-surface-variant font-medium mb-1">Bem-vindo de volta,</p>
+<h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-on-surface">Resumo Profissional</h1>
+</section>
+<!-- Stats Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+<!-- Card Ganhos -->
+<div class="neomorph-elevated p-8 rounded-xl bg-background relative overflow-hidden">
+<div class="flex justify-between items-start mb-6">
+<span class="material-symbols-outlined p-3 neomorph-inset rounded-full text-primary">payments</span>
+<span class="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant bg-surface-dim px-2 py-1 rounded">Mensal</span>
+</div>
+<h3 class="text-on-surface-variant font-semibold text-sm mb-2">Ganhos</h3>
+<p class="font-mono text-3xl font-medium text-primary tracking-tight">R$ 1.540,00</p>
+</div>
+<!-- Card Lances -->
+<div class="neomorph-elevated p-8 rounded-xl bg-background">
+<div class="flex justify-between items-start mb-6">
+<span class="material-symbols-outlined p-3 neomorph-inset rounded-full text-primary">rocket_launch</span>
+<span class="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant bg-surface-dim px-2 py-1 rounded">Ativos</span>
+</div>
+<h3 class="text-on-surface-variant font-semibold text-sm mb-2">Lances</h3>
+<p class="font-mono text-3xl font-medium text-primary tracking-tight">12</p>
+</div>
+<!-- Card Reputação -->
+<div class="neomorph-elevated p-8 rounded-xl bg-background">
+<div class="flex justify-between items-start mb-6">
+<span class="material-symbols-outlined p-3 neomorph-inset rounded-full text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant bg-surface-dim px-2 py-1 rounded">Elite</span>
+</div>
+<h3 class="text-on-surface-variant font-semibold text-sm mb-2">Reputação</h3>
+<p class="font-mono text-3xl font-medium text-primary tracking-tight">4.8/5</p>
+</div>
+</section>
+<!-- Data Visualization & Progress Section -->
+<section class="grid grid-cols-1 lg:grid-cols-5 gap-12 mb-16">
+<!-- Earnings Chart (Inset Area) -->
+<div class="lg:col-span-3 space-y-6">
+<h2 class="text-xl font-bold px-2">Desempenho Semanal</h2>
+<div class="neomorph-inset rounded-xl p-8 bg-surface-dim h-[320px] relative overflow-hidden flex flex-col justify-end">
+<!-- Placeholder for the chart line -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+<span class="material-symbols-outlined text-[120px]">show_chart</span>
+</div>
+<div class="relative w-full h-full flex items-end gap-2 md:gap-4 px-2">
+<div class="flex-1 bg-primary/20 rounded-t-lg transition-all hover:bg-primary/40" style="height: 40%"></div>
+<div class="flex-1 bg-primary/20 rounded-t-lg transition-all hover:bg-primary/40" style="height: 65%"></div>
+<div class="flex-1 bg-primary/20 rounded-t-lg transition-all hover:bg-primary/40" style="height: 45%"></div>
+<div class="flex-1 bg-primary/20 rounded-t-lg transition-all hover:bg-primary/40" style="height: 90%"></div>
+<div class="flex-1 mint-gradient rounded-t-lg transition-all shadow-[0_0_20px_rgba(26,152,120,0.4)]" style="height: 75%"></div>
+<div class="flex-1 bg-primary/20 rounded-t-lg transition-all hover:bg-primary/40" style="height: 55%"></div>
+<div class="flex-1 bg-primary/20 rounded-t-lg transition-all hover:bg-primary/40" style="height: 30%"></div>
+</div>
+<div class="flex justify-between mt-6 px-2 font-mono text-[10px] text-on-surface-variant uppercase tracking-widest">
+<span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sab</span><span>Dom</span>
+</div>
+</div>
+</div>
+<!-- Reputation Progress Tracks -->
+<div class="lg:col-span-2 space-y-8">
+<h2 class="text-xl font-bold px-2">Métricas de Qualidade</h2>
+<div class="space-y-8 p-8 neomorph-elevated rounded-xl bg-background">
+<div class="space-y-3">
+<div class="flex justify-between items-end">
+<span class="text-sm font-semibold text-on-surface-variant">Pontualidade</span>
+<span class="font-mono text-sm text-primary">98%</span>
+</div>
+<div class="h-3 w-full neomorph-inset rounded-full overflow-hidden p-0.5">
+<div class="h-full mint-gradient rounded-full shadow-[0_0_10px_rgba(26,152,120,0.3)]" style="width: 98%"></div>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-end">
+<span class="text-sm font-semibold text-on-surface-variant">Comunicação</span>
+<span class="font-mono text-sm text-primary">92%</span>
+</div>
+<div class="h-3 w-full neomorph-inset rounded-full overflow-hidden p-0.5">
+<div class="h-full mint-gradient rounded-full shadow-[0_0_10px_rgba(26,152,120,0.3)]" style="width: 92%"></div>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-end">
+<span class="text-sm font-semibold text-on-surface-variant">Resolução de Problemas</span>
+<span class="font-mono text-sm text-primary">85%</span>
+</div>
+<div class="h-3 w-full neomorph-inset rounded-full overflow-hidden p-0.5">
+<div class="h-full mint-gradient rounded-full shadow-[0_0_10px_rgba(26,152,120,0.3)]" style="width: 85%"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Job List Section -->
+<section class="space-y-6">
+<div class="flex justify-between items-center px-2">
+<h2 class="text-2xl font-bold tracking-tight">Próximos Trabalhos</h2>
+<button class="text-primary font-bold text-sm hover:underline">Ver Agenda Completa</button>
+</div>
+<div class="space-y-6">
+<!-- Job Card 1 -->
+<div class="neomorph-elevated p-6 rounded-xl bg-background flex flex-col md:flex-row md:items-center gap-6 group hover:scale-[1.01] transition-transform">
+<div class="h-16 w-16 md:h-20 md:w-20 rounded-xl neomorph-inset p-1 overflow-hidden shrink-0">
+<img alt="Eletricidade" class="w-full h-full object-cover rounded-lg" data-alt="close up of high quality electrical fuse box with professional wiring neat organization" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIBn1PiECA9XaWKL5QQnlQqR_fh-rlAQxW08EnM22D0L3ORTuAvE4_pPM65q6DUB7GGLw-BfYbOhnloHaFLgo9fE5aYfeXWG6s0BQmBeARi32pLQKTtrp5T3EX9vKEhzlIB9xzfcuiCn7xMmhDohaE83bAaR-Re4x29AW6TV9mf-yWsOmH1NTBADyUjcEyzH_Jzb0rB4q4VgeSSW448zL2I3j6WTC9WgXKBAhFqwEqSDi9ad4SNIMg89s9QHst91AUAYYA3iLBUeI"/>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-1">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-primary/10 text-primary tracking-wider">Elétrica</span>
+<span class="font-mono text-xs text-on-surface-variant">#29481</span>
+</div>
+<h4 class="text-lg font-bold">Troca de Quadro de Energia</h4>
+<p class="text-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">location_on</span>
+                            Cond. Vila Real, Bloco B - São Paulo, SP
+                        </p>
+</div>
+<div class="md:text-right shrink-0">
+<p class="font-mono font-medium text-lg text-primary">Amanhã, 09:00</p>
+<p class="text-xs text-on-surface-variant font-semibold">Valor Estimado: R$ 450,00</p>
+</div>
+<button class="neomorph-elevated px-6 py-3 rounded-lg text-sm font-bold text-on-surface active:scale-95 transition-all group-hover:text-primary">
+                        Detalhes
+                    </button>
+</div>
+<!-- Job Card 2 -->
+<div class="neomorph-elevated p-6 rounded-xl bg-background flex flex-col md:flex-row md:items-center gap-6 group hover:scale-[1.01] transition-transform">
+<div class="h-16 w-16 md:h-20 md:w-20 rounded-xl neomorph-inset p-1 overflow-hidden shrink-0">
+<img alt="Manutenção" class="w-full h-full object-cover rounded-lg" data-alt="professional electrician tool belt with pliers screwdriver and multimeter on a wooden surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3xFd-aM0Vt6vC47F7vAd7a4rq-AZGuZjnInQJeDzOMudlZ3Wsx-IcjIkgzya82JmBZ9IrHk4chz0V4-OrfVbrlfKxH2w859QKUl-aUFQpgW5CdLvVLYARk09LN5f_stqA0IBR6JQH-jAt4M-_yWEI-5mfETk36aGOPT717CUZc-TcaC21Mkq9qgPo2W2J9z3KbYZlvmUqGh3WgLtfBe1BVqgTcmxuco9XlIB1L-4buA0n5sywtZH9T79LuWqOTaRPLocyhDbx9pU"/>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-1">
+<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-primary/10 text-primary tracking-wider">Instalação</span>
+<span class="font-mono text-xs text-on-surface-variant">#29502</span>
+</div>
+<h4 class="text-lg font-bold">Instalação de Ar-Condicionado (Split)</h4>
+<p class="text-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-sm">location_on</span>
+                            Av. Paulista, 1200 - São Paulo, SP
+                        </p>
+</div>
+<div class="md:text-right shrink-0">
+<p class="font-mono font-medium text-lg text-primary">24 Out, 14:30</p>
+<p class="text-xs text-on-surface-variant font-semibold">Valor Estimado: R$ 380,00</p>
+</div>
+<button class="neomorph-elevated px-6 py-3 rounded-lg text-sm font-bold text-on-surface active:scale-95 transition-all group-hover:text-primary">
+                        Detalhes
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Mobile Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 md:hidden bg-[#d0ccdc] rounded-t-[1.5rem] shadow-[-8px_-8px_16px_rgba(255,255,255,0.7),8px_8px_16px_rgba(184,180,197,1)]">
+<a class="flex flex-col items-center justify-center text-[#1a9878] shadow-[inset_-4px_-4px_10px_#ffffff,inset_4px_4px_10px_#b8b4c5] rounded-xl p-3 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold mt-1">Início</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:opacity-80 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold mt-1">Agenda</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:opacity-80 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">construction</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold mt-1">Serviços</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:opacity-80 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold mt-1">Perfil</span>
+</a>
+</nav>
+</body></html>
