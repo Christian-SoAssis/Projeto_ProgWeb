@@ -13,7 +13,7 @@ O sistema **SHALL** retornar lista rankeada de até 10 profissionais compatívei
 
 - **GIVEN** que o pedido existe, pertence ao cliente autenticado e o microservice LTR está acessível
 - **WHEN** o cliente envia `GET /requests/:id/matches`
-- **THEN** o sistema **MUST** retornar lista de até 10 profissionais rankeados com `score`, features principais e distância em km, em menos de 80 ms
+- **THEN** o sistema **MUST** executar o matching module internamente e retornar lista de até 10 profissionais rankeados com `score`, features principais e distância em km, em menos de 80 ms
 
 ### Scenario 2 — Pedido com campos `ai_*` ainda nulos (análise VLM pendente)
 
@@ -65,33 +65,24 @@ O sistema **SHALL** usar matching baseado em regras enquanto o modelo LTR não p
 
 ---
 
-## Requirement: Microservice Python LTR (FastAPI)
+## Requirement: Matching Engine (Módulo Python Interno)
 
-O sistema **SHALL** expor endpoint de scoring LightGBM via FastAPI (Python microservice isolado).
+O sistema **SHALL** expor interface de scoring LightGBM via módulo `app.matching` invocado assincronamente pelo BFF.
 
 ### Scenario 1 — Scoring LTR bem-sucedido
+- **GIVEN** que o BFF invoca a função de scoring com features válidas
+- **WHEN** o processamento é concluído
+- **THEN** o módulo **MUST** retornar scores rankeados em menos de 50 ms; os dados **MUST** ser validados por Pydantic v2
 
-- **GIVEN** que o microservice está em execução e o BFF envia features válidas
-- **WHEN** o BFF envia `POST /score` com lista de features de até 50 profissionais candidatos
-- **THEN** o microservice **MUST** retornar scores rankeados em menos de 50 ms; a resposta **MUST** ser validada por Pydantic v2 antes de ser enviada ao BFF
+### Scenario 2 — Falha na validação de features
+- **GIVEN** que o BFF passa dados que violam o schema Pydantic v2 do módulo
+- **WHEN** a função é invocada
+- **THEN** o módulo **MUST** levantar `ValidationError`; o BFF **MUST** capturar a exceção e fazer fallback para matching v0 por regras
 
-### Scenario 2 — Payload de features com campo faltando
-
-- **GIVEN** que o BFF omite um campo de feature esperado pelo schema Pydantic v2 do microservice
-- **WHEN** a requisição chega ao microservice
-- **THEN** o microservice **MUST** retornar `422 Unprocessable Entity` com detalhe do campo; o BFF **MUST** fazer fallback para matching v0 por regras
-
-### Scenario 3 — Microservice LTR indisponível (timeout)
-
-- **GIVEN** que o microservice Python não responde em 3 s (container down, overload)
-- **WHEN** o BFF aguarda a resposta
-- **THEN** o BFF **MUST** fazer fallback para matching v0 por regras; **MUST** logar o evento com nível `WARNING`; **MUST NOT** retornar erro ao cliente
-
-### Scenario 4 — Microservice retorna resposta malformada
-
-- **GIVEN** que o microservice responde fora do schema esperado
-- **WHEN** o BFF tenta deserializar a resposta
-- **THEN** o BFF **MUST** tratar como falha de comunicação e acionar o fallback por regras
+### Scenario 3 — Erro interno no processamento de ML
+- **GIVEN** que o LightGBM falha (ex: modelo corrompido ou erro de memória)
+- **WHEN** o scoring é executado
+- **THEN** o sistema **MUST** capturar o erro, logar com nível `CRITICAL` e fazer fallback para matching v0 por regras; **MUST NOT** retornar erro 500 ao cliente
 
 ---
 

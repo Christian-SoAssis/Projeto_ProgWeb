@@ -13,7 +13,7 @@ O sistema **SHALL** permitir busca de profissionais por localização geográfic
 
 - **GIVEN** que profissionais verificados existem dentro do raio e da categoria informada
 - **WHEN** o usuário envia `GET /search/professionals?lat=-23.5&lng=-46.6&category=encanamento&radius_km=20`
-- **THEN** o sistema **MUST** retornar lista de profissionais com `is_verified=true` dentro do raio, ordenados por relevância (Typesense score + `reputation_score`); resposta **MUST** incluir `distance_km` por profissional
+- **THEN** o sistema **MUST** retornar lista de profissionais com `is_verified=true` dentro do raio, ordenados por relevância (PostgreSQL FTS score + `reputation_score`); resposta **MUST** incluir `distance_km` por profissional
 
 ### Scenario 2 — Busca sem resultados
 
@@ -27,35 +27,28 @@ O sistema **SHALL** permitir busca de profissionais por localização geográfic
 - **WHEN** a requisição chega ao FastAPI
 - **THEN** o sistema **MUST** retornar `422 Unprocessable Entity` com detalhe nos campos inválidos
 
-### Scenario 4 — Typesense indisponível
-
-- **GIVEN** que o serviço Typesense não responde
-- **WHEN** a busca é encaminhada ao Typesense
-- **THEN** o sistema **MUST** retornar `503 Service Unavailable`; **MAY** fazer fallback para query PostgreSQL com PostGIS como degradação graceful, logando o evento
-
-### Scenario 5 — PostgreSQL indisponível (sem fallback disponível)
-
-- **GIVEN** que tanto o Typesense quanto o PostgreSQL estão inacessíveis
+### Scenario 4 — PostgreSQL indisponível
+- **GIVEN** que o banco de dados PostgreSQL está inacessível
 - **WHEN** a busca é executada
-- **THEN** o sistema **MUST** retornar `503 Service Unavailable`
+- **THEN** o sistema **MUST** retornar `503 Service Unavailable`; **MAY** logar o evento para monitoramento
 
 ---
 
 ## Requirement: Busca full-text em PT-BR
 
-O sistema **SHALL** indexar `name`, `bio` e `specialties` dos profissionais verificados no Typesense com suporte a variações morfológicas em português.
+O sistema **SHALL** indexar `name`, `bio` e `specialties` dos profissionais verificados no PostgreSQL (`tsvector`) com suporte a variações morfológicas em português.
 
 ### Scenario 1 — Busca por texto livre com resultado
 
 - **GIVEN** que profissionais indexados possuem o termo (ou variação) em seus campos
 - **WHEN** o usuário envia `GET /search/professionals?q=hidráulica`
-- **THEN** o Typesense **MUST** retornar profissionais com correspondência no `name`, `bio` ou `categories`, com highlight nos termos encontrados; profissionais com `is_verified=false` **MUST NOT** aparecer nos resultados
+- **THEN** o sistema **MUST** retornar profissionais com correspondência no `name`, `bio` ou `categories`, com highlight nos termos encontrados (`ts_headline`); profissionais com `is_verified=false` **MUST NOT** aparecer nos resultados
 
 ### Scenario 2 — Busca com termo sem correspondência
 
 - **GIVEN** que nenhum profissional indexado possui o termo pesquisado
 - **WHEN** a busca é executada
-- **THEN** o sistema **MUST** retornar lista vazia; **SHOULD** sugerir termos relacionados se disponíveis via Typesense
+- **THEN** o sistema **MUST** retornar lista vazia; **SHOULD** sugerir termos relacionados via trigramas (`pg_trgm`) se disponíveis
 
 ---
 
@@ -77,30 +70,16 @@ O sistema **SHALL** exibir profissionais disponíveis em mapa com clustering, co
 
 ---
 
-## Requirement: Indexação em tempo real (Typesense)
+## Requirement: Indexação Automática (PostgreSQL)
 
-O sistema **SHALL** atualizar o índice do Typesense sempre que um profissional for aprovado ou atualizar seu perfil.
+O sistema **SHALL** atualizar o `search_vector` (`tsvector`) sempre que um profissional for aprovado ou atualizar seu perfil.
 
-### Scenario 1 — Profissional aprovado pelo admin
+### Scenario 1 — Profissional aprovado ou atualizado
+- **GIVEN** que os dados de um profissional são inseridos ou alterados no PostgreSQL
+- **WHEN** a transação é commitada
+- **THEN** o banco **MUST** atualizar o `search_vector` via trigger SQL nativa; a mudança **MUST** ser refletida imediatamente em buscas subsequentes
 
-- **GIVEN** que o admin aprova profissional com `is_verified=false`
-- **WHEN** o status é atualizado para `is_verified=true` no PostgreSQL
-- **THEN** o sistema **MUST** enfileirar job de indexação; o worker **MUST** indexar o profissional no Typesense com localização, categorias e `reputation_score` em até 5 s
-
-### Scenario 2 — Profissional atualiza bio, localização ou categorias
-
-- **GIVEN** que o profissional autenticado envia `PATCH /professionals/me` com dados atualizados
-- **WHEN** a atualização é persistida no PostgreSQL
-- **THEN** o worker **MUST** atualizar o documento no Typesense em até 5 s
-
-### Scenario 3 — Typesense indisponível durante indexação
-
-- **GIVEN** que o Typesense não responde ao request de indexação
-- **WHEN** o worker tenta indexar
-- **THEN** o worker **MUST** retentar até 3× com backoff exponencial; após falhas, **MUST** logar o evento para reprocessamento; a atualização no PostgreSQL **MUST** ter sido persistida independentemente da falha de indexação
-
-### Scenario 4 — Profissional desativado ou rejeitado após indexação
-
-- **GIVEN** que um profissional previamente indexado é desativado ou rejeitado pelo admin
-- **WHEN** o status é atualizado no PostgreSQL
-- **THEN** o sistema **MUST** remover o documento do Typesense em até 5 s; o profissional **MUST NOT** aparecer em resultados de busca após remoção
+### Scenario 2 — Remoção de busca
+- **GIVEN** que um profissional é desativado ou rejeitado
+- **WHEN** o status é atualizado para `is_verified=false`
+- **THEN** o profissional **MUST** ser excluído automaticamente de resultados de busca (filtro WHERE ativo no SQL)

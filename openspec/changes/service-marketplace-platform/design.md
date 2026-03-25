@@ -33,26 +33,17 @@ Plataforma marketplace de serviços locais no Brasil, conectando clientes a prof
                          └──────────┬──────────┘
                                     │ HTTPS
                          ┌──────────▼──────────┐
-                         │    API Gateway /     │
-                         │  BFF (Backend For    │
-                         │     Frontend)        │
+                         │    API Consolidade   │
+                         │  (FastAPI + Matching │
+                         │     + Storage FS)    │
                          └──────────┬──────────┘
-            ┌──────────────────────┬┴─────────────────────┐
+            ┌──────────────────────┼┴─────────────────────┐
             ▼                      ▼                       ▼
-  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
-  │  Auth Service    │  │ Matching Service │  │  Media/AI Service│
-  │  (JWT + OAuth2)  │  │  (LTR Engine)    │  │  (VLM + NLP)     │
-  └──────────────────┘  └──────────────────┘  └──────────────────┘
-            │                      │                       │
-            └──────────────────────┴───────────────────────┘
-                                    │
-                    ┌───────────────┼───────────────┐
-                    ▼               ▼               ▼
-            ┌─────────────┐ ┌──────────┐  ┌──────────────┐
-            │ PostgreSQL  │ │  Redis   │  │   S3/MinIO   │
-            │ + PostGIS   │ │ (cache + │  │  (fotos,     │
-            │ + pgvector  │ │  pub/sub)│  │   docs)      │
-            └─────────────┘ └──────────┘  └──────────────┘
+   ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
+   │    PostgreSQL    │  │      Redis       │  │    Filesystem    │
+   │  (FTS + PostGIS  │  │ (cache +         │  │    (Uploads)     │
+   │   + pgvector)    │  │  pub/sub)        │  │                  │
+   └──────────────────┘  └──────────────────┘  └──────────────────┘
 ```
 
 ---
@@ -63,49 +54,49 @@ Plataforma marketplace de serviços locais no Brasil, conectando clientes a prof
 |-------------------|----------------------------------|--------------------------------------------------------|
 | **Frontend**      | Next.js 14 (App Router) + TS     | SSR p/ SEO, componentes server, routing built-in      |
 | **UI**            | Tailwind CSS + Radix UI          | Design system consistente, acessível                  |
-| **Backend (BFF)** | Node.js + Fastify (REST)         | Baixa latência, schema validation nativa (json-schema)|
+| **Backend (BFF)** | Python + FastAPI (REST)          | Pydantic v2 para validação; runtime Python compartilhado com o matching service; async nativo com asyncpg |
 | **Matching ML**   | Python + FastAPI                 | LightGBM nativo em Python; microservice isolado       |
 | **Auth**          | JWT + OAuth2 (Google)            | Stateless, refresh token rotation                     |
 | **DB Principal**  | PostgreSQL 16 + PostGIS          | Geo-queries nativas, ACID, maturidade                 |
 | **Vetorial**      | pgvector (extensão Postgres)     | Embeddings sem infraestrutura adicional               |
-| **Cache / Fila**  | Redis (Upstash ou self-hosted)   | Sessions, pub/sub notificações, job queues (BullMQ)   |
-| **Busca**         | Typesense                        | Full-text PT-BR + geo-search, simples de operar       |
-| **Blob Storage**  | MinIO (self-hosted) ou S3        | Fotos do problema, documentos de certificação         |
+| **Cache / Fila**  | Redis (self-hosted)              | Sessions, pub/sub notificações, job queues (arq)      |
+| **Busca**         | PostgreSQL FTS + PostGIS         | Full-text PT-BR + geo-search integrado no banco       |
+| **Blob Storage**  | Filesystem Local (Dev) / S3      | Fotos do problema, docs; abstração de storage local   |
 | **IA - Imagens**  | Google Gemini Vision API         | Zero fine-tuning, custo controlado por token          |
 | **IA - NLP**      | BERTimbau (HuggingFace) via API  | Pré-treinado em PT-BR, sentimento + extração          |
-| **ML Matching**   | LightGBM (Python microservice)   | LTR com features tabulares, explainability            |
+| **ML Matching**   | LightGBM (Módulo Python Interno) | LTR integrado ao backend principal para v1             |
 | **Pagamento**     | MercadoPago (BR)                 | PIX nativo, suporte split-payment (marketplace)       |
 | **Email/SMS**     | Resend (email) + Twilio (SMS)    | Transacionais: confirmações, alertas                  |
-| **Deploy**        | Docker + Docker Compose          | Portável; evolui para Kubernetes se necessário        |
-| **Monitoramento** | OpenTelemetry + Grafana          | Traces, logs, métricas de latência de matching        |
+| **Deploy**        | Docker + Docker Compose (4 cont) | Topologia enxuta: db, redis, api, web                 |
+| **Monitoramento** | Structured Logging (Uvicorn)      | Logs JSON estruturados; OTEL reservado para v2        |
 
 ---
 
 ## Decisões Técnicas
 
-### D1: Fastify como BFF em vez de Express/NestJS
-- **Escolha**: Fastify
-- **Alternativas**: Express (mais popular), NestJS (mais estruturado)
-- **Razão**: Validação de schema nativa com JSON Schema (sem middleware extra), melhor throughput, e integração direta com BullMQ para filas
+### D1: FastAPI como BFF em vez de Fastify/Express
+- **Escolha**: FastAPI (Python)
+- **Alternativas**: Fastify (Node.js), NestJS, Express
+- **Razão**: Compartilha runtime Python com o matching service, eliminando um segundo runtime (Node.js) no backend; Pydantic v2 para validação de schema end-to-end; `async def` + `asyncpg` para I/O não-bloqueante; workers assíncronos via ARQ (Python) em vez de BullMQ (Node.js)
 
 ### D2: pgvector em vez de Pinecone/Weaviate para embeddings de perfil
 - **Escolha**: pgvector como extensão do PostgreSQL
 - **Alternativas**: Pinecone, Weaviate, Qdrant
 - **Razão**: Evita infra adicional no v1; PostgreSQL já é o banco principal; embeddings de ~1536 dims com IVFFlat são suficientes para milhares de profissionais
 
-### D3: Microservice Python isolado para matching LTR
-- **Escolha**: FastAPI separado do BFF Node.js
-- **Alternativas**: Re-escrever LightGBM em JS (onnx-runtime), fazer matching no BFF
-- **Razão**: LightGBM tem bindings Python nativos e excelente performance; não queremos dependência de runtime Python no BFF
+### D3: Matching Engine como Módulo Interno
+- **Escolha**: Módulo `app.matching` dentro da API FastAPI
+- **Alternativas**: Microserviço separado (D3 original), processamento no Worker
+- **Razão**: Latência zero de rede; compartilhamento de runtime Python e modelos de dados Pydantic; simplificação operacional da v1. Extensível para microserviço se necessário no futuro.
 
-### D4: Typesense em vez de Elasticsearch
-- **Escolha**: Typesense
-- **Alternativas**: Elasticsearch, Meilisearch
-- **Razão**: Operacionalmente muito mais simples (single binary), suporte nativo a geo-search, PT-BR funciona bem com tokenização padrão. Elasticsearch seria over-engineering para v1.
+### D4: PostgreSQL FTS em vez de Typesense
+- **Escolha**: PostgreSQL Full-Text Search + PostGIS
+- **Alternativas**: Typesense, Elasticsearch
+- **Razão**: Remove um container de infraestrutura e a necessidade de sincronizar índices externos; PostgreSQL FTS com dicionário PT-BR é suficiente para a escala da v1.
 
 ### D5: Redis pub/sub para WebSocket horizontal
-- **Escolha**: Socket.io + Redis Adapter
-- **Razão**: Permite múltiplas instâncias do BFF sem perder mensagens de chat; Redis já está na infra para filas
+- **Escolha**: `python-socketio` + Redis Adapter (`aioredis`)
+- **Razão**: Mesmo padrão do Socket.io mas em Python nativo; permite múltiplas instâncias do BFF sem perder mensagens de chat; Redis já está na infra para filas e workers ARQ; elimina dependência de Node.js no backend
 
 ---
 
