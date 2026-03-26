@@ -86,6 +86,72 @@
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
             vertical-align: middle;
         }
+        /* ── Cores fixas por categoria de serviço ── */
+        :root {
+          --c-hidro:       #2e7bc4;
+          --c-hidro-l:     rgba(46,123,196,.14);
+          --c-hidro-tx:    #2e7bc4;
+
+          --c-eletro:      #d4a00a;
+          --c-eletro-l:    rgba(212,160,10,.14);
+          --c-eletro-tx:   #c49000;
+
+          --c-gas:         #e06820;
+          --c-gas-l:       rgba(224,104,32,.14);
+          --c-gas-tx:      #d05810;
+
+          --c-civil:       #b04020;
+          --c-civil-l:     rgba(176,64,32,.14);
+          --c-civil-tx:    #a03818;
+
+          --c-verde:       #2a8c50;
+          --c-verde-l:     rgba(42,140,80,.14);
+          --c-verde-tx:    #268848;
+
+          --c-limpeza:     #18a0a0;
+          --c-limpeza-l:   rgba(24,160,160,.14);
+          --c-limpeza-tx:  #148888;
+
+          --c-pintura:     #9050c0;
+          --c-pintura-l:   rgba(144,80,192,.14);
+          --c-pintura-tx:  #8840b8;
+
+          --c-marcen:      #8a5c28;
+          --c-marcen-l:    rgba(138,92,40,.14);
+          --c-marcen-tx:   #7a4e20;
+
+          --c-frio:        #4898d8;
+          --c-frio-l:      rgba(72,152,216,.14);
+          --c-frio-tx:     #3888c8;
+
+          --c-seg:         #384880;
+          --c-seg-l:       rgba(56,72,128,.14);
+          --c-seg-tx:      #304070;
+
+          --c-tec:         #20a870;
+          --c-tec-l:       rgba(32,168,112,.14);
+          --c-tec-tx:      #189860;
+
+          --c-refor:       #c06840;
+          --c-refor-l:     rgba(192,104,64,.14);
+          --c-refor-tx:    #b05830;
+
+          --c-saude:       #d04080;
+          --c-saude-l:     rgba(208,64,128,.14);
+          --c-saude-tx:    #c03070;
+
+          --c-jur:         #485870;
+          --c-jur-l:       rgba(72,88,112,.14);
+          --c-jur-tx:      #405068;
+
+          --c-edu:         #e08820;
+          --c-edu-l:       rgba(224,136,32,.14);
+          --c-edu-tx:      #d07810;
+
+          --c-pet:         #d85020;
+          --c-pet-l:       rgba(216,80,32,.14);
+          --c-pet-tx:      #c84818;
+        }
         body {
             background-color: #d0ccdc;
             color: #1b1a26;
@@ -163,17 +229,18 @@
 <div class="grid grid-cols-1 gap-8">
 <!-- Card 1 -->
 <div class="sculpted-elevated bg-[#d0ccdc] rounded-xl overflow-hidden flex flex-col group transition-transform duration-300 hover:scale-[1.02]">
-<div class="h-1 bg-[#1a9878]"></div> <!-- Category Color -->
+<div class="h-[3px]" style="background:var(--c-hidro)"></div>
+ <!-- Category Color -->
 <div class="p-5 flex gap-4">
-<div class="w-16 h-16 rounded-lg sculpted-inset flex-shrink-0 overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="portrait of a focused professional plumber in blue uniform with tools in background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCat2C5PzBv5R0ghPowoWPU_14qGY1QI8GTlkCyLuem2KEwsvoR3gPA2iowZ0ACkXNb3LFFNStg87odjH-joXGiMT0fhcSKGyaDhDpMzX7tdDeDYoLSH3gpxElgjYNaCyT-IAge08IImTMcvB4AL7EfsBNKlr203tgyA9yGOLeSdXpJ0T-azZ7lM9hHaz2WQoqRioJn0AuDv9SuXOVTYa5qDjuWuPRVgR-D30VD9iYFGpX_5ug3DvqqFAq3gfY_mRhRJyv7JW-s9ug"/>
+<div class="w-12 h-12 rounded-full overflow-hidden neo-inset-sm flex-shrink-0" style="background:var(--c-hidro-l)">
+<img alt="Marcos Silva" class="w-full h-full object-cover mix-blend-multiply opacity-80" src="https://images.unsplash.com/photo-1595841696677-542036735626?auto=format&amp;fit=crop&amp;q=80&amp;w=150"/>
 </div>
 <div class="flex-grow">
 <div class="flex justify-between items-start">
 <h3 class="font-headline font-bold text-[#1b1a26]">Marcos Silva</h3>
 <div class="flex items-center gap-1">
 <span class="material-symbols-outlined text-[#1a9878] text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
-<span class="font-mono text-xs font-bold">4.9</span>
+<span class="font-mono text-[9px] font-bold px-2 py-0.5 rounded-full" style="background:var(--c-hidro-l);color:var(--c-hidro-tx)">IA #1</span>
 </div>
 </div>
 <p class="text-xs text-[#5a5666] mb-2 font-body">Encanador Hidráulico • 2km</p>
@@ -186,17 +253,18 @@
 </div>
 <!-- Card 2 -->
 <div class="sculpted-elevated bg-[#d0ccdc] rounded-xl overflow-hidden flex flex-col group transition-transform duration-300 hover:scale-[1.02]">
-<div class="h-1 bg-tertiary"></div> <!-- Category Color -->
+<div class="h-[3px]" style="background:var(--c-limpeza)"></div>
+ <!-- Category Color -->
 <div class="p-5 flex gap-4">
-<div class="w-16 h-16 rounded-lg sculpted-inset flex-shrink-0 overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="professional house cleaner in specialized uniform holding cleaning equipment in a modern bright home" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2-V-D88SEuqRIPIBB3RWFsPHHNKk7H_umbMQqzkubmLfEuf29LS-29rb-aAfwMR9VIo3J1U6QkRM2glHFssuArowyN7rAHkkDp0_h8qHoYHtn8_S-a-LB-ji-9TvJMbEsu9gHCYNN6tP41hDiJb7obGTPsPGUf-ybscOVYHpXBA74Ijc_6hCWWttv6CzCYqOFjSM2-zpHs0ev60q2zb6Cs_7BDpTwckS4KQ9igwDWUMnWLU2eKnV87g-Lich3YTOOYDYo10_c7e8"/>
+<div class="w-12 h-12 rounded-full overflow-hidden neo-inset-sm flex-shrink-0" style="background:var(--c-limpeza-l)">
+<img alt="Ana Oliveira" class="w-full h-full object-cover mix-blend-multiply opacity-80" src="https://images.unsplash.com/photo-1581578731548-adab44ab4ac6?auto=format&amp;fit=crop&amp;q=80&amp;w=150"/>
 </div>
 <div class="flex-grow">
 <div class="flex justify-between items-start">
 <h3 class="font-headline font-bold text-[#1b1a26]">Ana Oliveira</h3>
 <div class="flex items-center gap-1">
 <span class="material-symbols-outlined text-[#1a9878] text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
-<span class="font-mono text-xs font-bold">5.0</span>
+<span class="font-mono text-[9px] font-bold px-2 py-0.5 rounded-full" style="background:var(--c-limpeza-l);color:var(--c-limpeza-tx)">IA #2</span>
 </div>
 </div>
 <p class="text-xs text-[#5a5666] mb-2 font-body">Limpeza Residencial • 3.5km</p>
@@ -209,10 +277,11 @@
 </div>
 <!-- Card 3 -->
 <div class="sculpted-elevated bg-[#d0ccdc] rounded-xl overflow-hidden flex flex-col group transition-transform duration-300 hover:scale-[1.02]">
-<div class="h-1 bg-on-secondary-container"></div> <!-- Category Color -->
+<div class="h-[3px]" style="background:var(--c-eletro)"></div>
+ <!-- Category Color -->
 <div class="p-5 flex gap-4">
-<div class="w-16 h-16 rounded-lg sculpted-inset flex-shrink-0 overflow-hidden">
-<img class="w-full h-full object-cover" data-alt="electrician working on a fuse box with professional tools in a residential environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNR7MCI9b-VQ7qFYtVlebhDmutCoNCu7b0VeBdwZsF2Yew6oAr9xlRnpW7Q5H8Vln3Xd2e3SFLvZvjZ8Z0wtc6-eZyL7R7Hzgh8weuGAl1kbSTVDpqwhcKWJcHHbpHa_hHBQBdc9IvV7kbsN0GVRt_9lhwzLlJz6TD6LstSJxBdIMzB1oIhFgM2IxoHyTsIhhggbpRbv9F3pRH8YPBBKqj5FAUIUZpNjYwZEe3qCw6Asx75j4gOOCHCphnGyIWyFt74QmLx-sHOiU"/>
+<div class="w-12 h-12 rounded-full overflow-hidden neo-inset-sm flex-shrink-0" style="background:var(--c-eletro-l)">
+<img alt="Ricardo Mello" class="w-full h-full object-cover mix-blend-multiply opacity-80" src="https://images.unsplash.com/photo-1621905251918-287778bdf58c?auto=format&amp;fit=crop&amp;q=80&amp;w=150"/>
 </div>
 <div class="flex-grow">
 <div class="flex justify-between items-start">

@@ -53,6 +53,72 @@
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
+        /* ── Cores fixas por categoria de serviço ── */
+        :root {
+          --c-hidro:       #2e7bc4;
+          --c-hidro-l:     rgba(46,123,196,.14);
+          --c-hidro-tx:    #2e7bc4;
+
+          --c-eletro:      #d4a00a;
+          --c-eletro-l:    rgba(212,160,10,.14);
+          --c-eletro-tx:   #c49000;
+
+          --c-gas:         #e06820;
+          --c-gas-l:       rgba(224,104,32,.14);
+          --c-gas-tx:      #d05810;
+
+          --c-civil:       #b04020;
+          --c-civil-l:     rgba(176,64,32,.14);
+          --c-civil-tx:    #a03818;
+
+          --c-verde:       #2a8c50;
+          --c-verde-l:     rgba(42,140,80,.14);
+          --c-verde-tx:    #268848;
+
+          --c-limpeza:     #18a0a0;
+          --c-limpeza-l:   rgba(24,160,160,.14);
+          --c-limpeza-tx:  #148888;
+
+          --c-pintura:     #9050c0;
+          --c-pintura-l:   rgba(144,80,192,.14);
+          --c-pintura-tx:  #8840b8;
+
+          --c-marcen:      #8a5c28;
+          --c-marcen-l:    rgba(138,92,40,.14);
+          --c-marcen-tx:   #7a4e20;
+
+          --c-frio:        #4898d8;
+          --c-frio-l:      rgba(72,152,216,.14);
+          --c-frio-tx:     #3888c8;
+
+          --c-seg:         #384880;
+          --c-seg-l:       rgba(56,72,128,.14);
+          --c-seg-tx:      #304070;
+
+          --c-tec:         #20a870;
+          --c-tec-l:       rgba(32,168,112,.14);
+          --c-tec-tx:      #189860;
+
+          --c-refor:       #c06840;
+          --c-refor-l:     rgba(192,104,64,.14);
+          --c-refor-tx:    #b05830;
+
+          --c-saude:       #d04080;
+          --c-saude-l:     rgba(208,64,128,.14);
+          --c-saude-tx:    #c03070;
+
+          --c-jur:         #485870;
+          --c-jur-l:       rgba(72,88,112,.14);
+          --c-jur-tx:      #405068;
+
+          --c-edu:         #e08820;
+          --c-edu-l:       rgba(224,136,32,.14);
+          --c-edu-tx:      #d07810;
+
+          --c-pet:         #d85020;
+          --c-pet-l:       rgba(216,80,32,.14);
+          --c-pet-tx:      #c84818;
+        }
     </style>
 <style>
     body {
@@ -118,7 +184,9 @@
 </div>
 </section>
 <!-- IA Analysis Card -->
-<section class="neo-elevated rounded-xl p-6 bg-[#d0ccdc] space-y-6">
+<section class="neo-elevated rounded-xl overflow-hidden bg-[#d0ccdc] space-y-6">
+<div style="height:3px;background:var(--c-limpeza)"></div>
+<div class="p-6 pt-2 space-y-6">
 <div class="flex items-center justify-between">
 <div class="flex items-center gap-3">
 <div class="p-2 neo-inset-sm rounded-lg">
@@ -134,9 +202,9 @@
 </div>
 <!-- Category Badges -->
 <div class="flex flex-wrap gap-3">
-<div class="px-3 py-2 neo-inset-sm rounded-lg flex items-center gap-2">
-<span class="material-symbols-outlined text-[14px] text-primary">category</span>
-<span class="text-[10px] font-bold uppercase tracking-wider text-primary">Limpeza</span>
+<div class="px-3 py-2 neo-inset-sm rounded-lg flex items-center gap-2" style="background:var(--c-limpeza-l);color:var(--c-limpeza-tx)">
+<span class="material-symbols-outlined text-[14px]">category</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Limpeza</span>
 </div>
 <div class="px-3 py-2 neo-elevated rounded-lg flex items-center gap-2">
 <span class="material-symbols-outlined text-[14px] text-primary">priority_high</span>
