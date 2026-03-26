@@ -53,7 +53,7 @@
               "primary-container": "#74e2be",
               "surface-dim": "#dcd8e8",
               "surface": "#d0ccdc",
-              "surface-bright": "#fcf8ff",
+              "surface-bright": "#f4f0ff",
               "on-primary": "#ffffff",
               "inverse-surface": "#302f3b",
               "on-tertiary-container": "#5e5744",
@@ -63,8 +63,8 @@
               "on-background": "#1b1a26"
             },
             fontFamily: {
-              "headline": ["Plus Jakarta Sans"],
-              "body": ["Plus Jakarta Sans"],
+              "headline": ["DM Sans"],
+              "body": ["DM Sans"],
               "mono": ["DM Mono"]
             },
             borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "1.5rem", "full": "9999px"},
@@ -75,7 +75,7 @@
 <style>
         body {
             background-color: #d0ccdc;
-            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-family: 'DM Sans', sans-serif;
         }
         .neomorph-elevated {
             box-shadow: -8px -8px 16px rgba(255, 255, 255, 0.7), 8px 8px 16px rgba(184, 180, 197, 1);
@@ -85,6 +85,72 @@
         }
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* ── Cores fixas por categoria de serviço ── */
+        :root {
+          --c-hidro:       #2e7bc4;
+          --c-hidro-l:     rgba(46,123,196,.14);
+          --c-hidro-tx:    #2e7bc4;
+
+          --c-eletro:      #d4a00a;
+          --c-eletro-l:    rgba(212,160,10,.14);
+          --c-eletro-tx:   #c49000;
+
+          --c-gas:         #e06820;
+          --c-gas-l:       rgba(224,104,32,.14);
+          --c-gas-tx:      #d05810;
+
+          --c-civil:       #b04020;
+          --c-civil-l:     rgba(176,64,32,.14);
+          --c-civil-tx:    #a03818;
+
+          --c-verde:       #2a8c50;
+          --c-verde-l:     rgba(42,140,80,.14);
+          --c-verde-tx:    #268848;
+
+          --c-limpeza:     #18a0a0;
+          --c-limpeza-l:   rgba(24,160,160,.14);
+          --c-limpeza-tx:  #148888;
+
+          --c-pintura:     #9050c0;
+          --c-pintura-l:   rgba(144,80,192,.14);
+          --c-pintura-tx:  #8840b8;
+
+          --c-marcen:      #8a5c28;
+          --c-marcen-l:    rgba(138,92,40,.14);
+          --c-marcen-tx:   #7a4e20;
+
+          --c-frio:        #4898d8;
+          --c-frio-l:      rgba(72,152,216,.14);
+          --c-frio-tx:     #3888c8;
+
+          --c-seg:         #384880;
+          --c-seg-l:       rgba(56,72,128,.14);
+          --c-seg-tx:      #304070;
+
+          --c-tec:         #20a870;
+          --c-tec-l:       rgba(32,168,112,.14);
+          --c-tec-tx:      #189860;
+
+          --c-refor:       #c06840;
+          --c-refor-l:     rgba(192,104,64,.14);
+          --c-refor-tx:    #b05830;
+
+          --c-saude:       #d04080;
+          --c-saude-l:     rgba(208,64,128,.14);
+          --c-saude-tx:    #c03070;
+
+          --c-jur:         #485870;
+          --c-jur-l:       rgba(72,88,112,.14);
+          --c-jur-tx:      #405068;
+
+          --c-edu:         #e08820;
+          --c-edu-l:       rgba(224,136,32,.14);
+          --c-edu-tx:      #d07810;
+
+          --c-pet:         #d85020;
+          --c-pet-l:       rgba(216,80,32,.14);
+          --c-pet-tx:      #c84818;
         }
         .mint-gradient {
             background: linear-gradient(135deg, #006c53 0%, #1a9878 100%);
@@ -118,7 +184,7 @@
 </a>
 <a class="flex items-center gap-4 py-3 px-6 text-on-surface-variant hover:translate-x-1 transition-transform mx-2" href="#">
 <span class="material-symbols-outlined">payments</span>
-<span class="font-medium">Meus Ganhos</span>
+<span class="font-medium">Ganhos</span>
 </a>
 <a class="flex items-center gap-4 py-3 px-6 text-on-surface-variant hover:translate-x-1 transition-transform mx-2" href="#">
 <span class="material-symbols-outlined">chat</span>
@@ -126,7 +192,7 @@
 </a>
 <a class="flex items-center gap-4 py-3 px-6 text-on-surface-variant hover:translate-x-1 transition-transform mx-2" href="#">
 <span class="material-symbols-outlined">settings</span>
-<span class="font-medium">Configurações</span>
+<span class="font-medium">Ajustes</span>
 </a>
 </nav>
 <div class="px-2 mt-auto">
@@ -247,7 +313,8 @@
 </div>
 <div class="space-y-6">
 <!-- Job Card 1 -->
-<div class="neomorph-elevated p-6 rounded-xl bg-background flex flex-col md:flex-row md:items-center gap-6 group hover:scale-[1.01] transition-transform">
+<div class="neomorph-elevated p-6 rounded-xl bg-background flex flex-col md:flex-row md:items-center gap-6 group hover:scale-[1.01] transition-transform overflow-hidden relative">
+<div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c-eletro)"></div>
 <div class="h-16 w-16 md:h-20 md:w-20 rounded-xl neomorph-inset p-1 overflow-hidden shrink-0">
 <img alt="Eletricidade" class="w-full h-full object-cover rounded-lg" data-alt="close up of high quality electrical fuse box with professional wiring neat organization" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIBn1PiECA9XaWKL5QQnlQqR_fh-rlAQxW08EnM22D0L3ORTuAvE4_pPM65q6DUB7GGLw-BfYbOhnloHaFLgo9fE5aYfeXWG6s0BQmBeARi32pLQKTtrp5T3EX9vKEhzlIB9xzfcuiCn7xMmhDohaE83bAaR-Re4x29AW6TV9mf-yWsOmH1NTBADyUjcEyzH_Jzb0rB4q4VgeSSW448zL2I3j6WTC9WgXKBAhFqwEqSDi9ad4SNIMg89s9QHst91AUAYYA3iLBUeI"/>
 </div>
@@ -271,7 +338,8 @@
                     </button>
 </div>
 <!-- Job Card 2 -->
-<div class="neomorph-elevated p-6 rounded-xl bg-background flex flex-col md:flex-row md:items-center gap-6 group hover:scale-[1.01] transition-transform">
+<div class="neomorph-elevated p-6 rounded-xl bg-background flex flex-col md:flex-row md:items-center gap-6 group hover:scale-[1.01] transition-transform overflow-hidden relative">
+<div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c-frio)"></div>
 <div class="h-16 w-16 md:h-20 md:w-20 rounded-xl neomorph-inset p-1 overflow-hidden shrink-0">
 <img alt="Manutenção" class="w-full h-full object-cover rounded-lg" data-alt="professional electrician tool belt with pliers screwdriver and multimeter on a wooden surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3xFd-aM0Vt6vC47F7vAd7a4rq-AZGuZjnInQJeDzOMudlZ3Wsx-IcjIkgzya82JmBZ9IrHk4chz0V4-OrfVbrlfKxH2w859QKUl-aUFQpgW5CdLvVLYARk09LN5f_stqA0IBR6JQH-jAt4M-_yWEI-5mfETk36aGOPT717CUZc-TcaC21Mkq9qgPo2W2J9z3KbYZlvmUqGh3WgLtfBe1BVqgTcmxuco9XlIB1L-4buA0n5sywtZH9T79LuWqOTaRPLocyhDbx9pU"/>
 </div>
@@ -301,19 +369,19 @@
 <nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 md:hidden bg-[#d0ccdc] rounded-t-[1.5rem] shadow-[-8px_-8px_16px_rgba(255,255,255,0.7),8px_8px_16px_rgba(184,180,197,1)]">
 <a class="flex flex-col items-center justify-center text-[#1a9878] shadow-[inset_-4px_-4px_10px_#ffffff,inset_4px_4px_10px_#b8b4c5] rounded-xl p-3 active:scale-90 transition-transform" href="#">
 <span class="material-symbols-outlined">dashboard</span>
-<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold mt-1">Início</span>
+<span class="font-['DM_Sans'] text-[10px] font-semibold mt-1">Início</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:opacity-80 active:scale-90 transition-transform" href="#">
 <span class="material-symbols-outlined">calendar_today</span>
-<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold mt-1">Agenda</span>
+<span class="font-['DM_Sans'] text-[10px] font-semibold mt-1">Agenda</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:opacity-80 active:scale-90 transition-transform" href="#">
 <span class="material-symbols-outlined">construction</span>
-<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold mt-1">Serviços</span>
+<span class="font-['DM_Sans'] text-[10px] font-semibold mt-1">Serviços</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:opacity-80 active:scale-90 transition-transform" href="#">
 <span class="material-symbols-outlined">person</span>
-<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold mt-1">Perfil</span>
+<span class="font-['DM_Sans'] text-[10px] font-semibold mt-1">Perfil</span>
 </a>
 </nav>
 </body></html>
