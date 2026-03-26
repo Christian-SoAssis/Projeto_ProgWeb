@@ -93,6 +93,72 @@
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
             vertical-align: middle;
         }
+        /* ── Cores fixas por categoria de serviço ── */
+        :root {
+          --c-hidro:       #2e7bc4;
+          --c-hidro-l:     rgba(46,123,196,.14);
+          --c-hidro-tx:    #2e7bc4;
+
+          --c-eletro:      #d4a00a;
+          --c-eletro-l:    rgba(212,160,10,.14);
+          --c-eletro-tx:   #c49000;
+
+          --c-gas:         #e06820;
+          --c-gas-l:       rgba(224,104,32,.14);
+          --c-gas-tx:      #d05810;
+
+          --c-civil:       #b04020;
+          --c-civil-l:     rgba(176,64,32,.14);
+          --c-civil-tx:    #a03818;
+
+          --c-verde:       #2a8c50;
+          --c-verde-l:     rgba(42,140,80,.14);
+          --c-verde-tx:    #268848;
+
+          --c-limpeza:     #18a0a0;
+          --c-limpeza-l:   rgba(24,160,160,.14);
+          --c-limpeza-tx:  #148888;
+
+          --c-pintura:     #9050c0;
+          --c-pintura-l:   rgba(144,80,192,.14);
+          --c-pintura-tx:  #8840b8;
+
+          --c-marcen:      #8a5c28;
+          --c-marcen-l:    rgba(138,92,40,.14);
+          --c-marcen-tx:   #7a4e20;
+
+          --c-frio:        #4898d8;
+          --c-frio-l:      rgba(72,152,216,.14);
+          --c-frio-tx:     #3888c8;
+
+          --c-seg:         #384880;
+          --c-seg-l:       rgba(56,72,128,.14);
+          --c-seg-tx:      #304070;
+
+          --c-tec:         #20a870;
+          --c-tec-l:       rgba(32,168,112,.14);
+          --c-tec-tx:      #189860;
+
+          --c-refor:       #c06840;
+          --c-refor-l:     rgba(192,104,64,.14);
+          --c-refor-tx:    #b05830;
+
+          --c-saude:       #d04080;
+          --c-saude-l:     rgba(208,64,128,.14);
+          --c-saude-tx:    #c03070;
+
+          --c-jur:         #485870;
+          --c-jur-l:       rgba(72,88,112,.14);
+          --c-jur-tx:      #405068;
+
+          --c-edu:         #e08820;
+          --c-edu-l:       rgba(224,136,32,.14);
+          --c-edu-tx:      #d07810;
+
+          --c-pet:         #d85020;
+          --c-pet-l:       rgba(216,80,32,.14);
+          --c-pet-tx:      #c84818;
+        }
     </style>
 </head>
 <body class="antialiased selection:bg-brand-mint selection:text-white">
@@ -182,64 +248,64 @@
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
 <!-- Category Item 1 -->
 <div class="p-8 rounded-xl shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] hover:shadow-[inset_-4px_-4px_10px_#f4f0ff,inset_4px_4px_10px_#aca8b8] transition-all cursor-pointer group">
-<div class="w-12 h-12 mb-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-<span class="material-symbols-outlined text-brand-mint">handyman</span>
+<div class="w-12 h-12 mb-6 rounded-lg flex items-center justify-center" style="background:var(--c-hidro-l)">
+<span class="material-symbols-outlined" style="color:var(--c-hidro-tx)">plumbing</span>
 </div>
 <div class="text-lg font-bold mb-1">Reparos Gerais</div>
 <div class="font-label text-brand-mint text-xs">1,240 SERVIÇOS</div>
 </div>
 <!-- Category Item 2 -->
 <div class="p-8 rounded-xl shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] hover:shadow-[inset_-4px_-4px_10px_#f4f0ff,inset_4px_4px_10px_#aca8b8] transition-all cursor-pointer group">
-<div class="w-12 h-12 mb-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-<span class="material-symbols-outlined text-brand-mint">brush</span>
+<div class="w-12 h-12 mb-6 rounded-lg flex items-center justify-center" style="background:var(--c-pintura-l)">
+<span class="material-symbols-outlined" style="color:var(--c-pintura-tx)">format_paint</span>
 </div>
 <div class="text-lg font-bold mb-1">Pintura</div>
 <div class="font-label text-brand-mint text-xs">842 SERVIÇOS</div>
 </div>
 <!-- Category Item 3 -->
 <div class="p-8 rounded-xl shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] hover:shadow-[inset_-4px_-4px_10px_#f4f0ff,inset_4px_4px_10px_#aca8b8] transition-all cursor-pointer group">
-<div class="w-12 h-12 mb-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-<span class="material-symbols-outlined text-brand-mint">yard</span>
+<div class="w-12 h-12 mb-6 rounded-lg flex items-center justify-center" style="background:var(--c-verde-l)">
+<span class="material-symbols-outlined" style="color:var(--c-verde-tx)">yard</span>
 </div>
 <div class="text-lg font-bold mb-1">Jardinagem</div>
 <div class="font-label text-brand-mint text-xs">512 SERVIÇOS</div>
 </div>
 <!-- Category Item 4 -->
 <div class="p-8 rounded-xl shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] hover:shadow-[inset_-4px_-4px_10px_#f4f0ff,inset_4px_4px_10px_#aca8b8] transition-all cursor-pointer group">
-<div class="w-12 h-12 mb-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-<span class="material-symbols-outlined text-brand-mint">ac_unit</span>
+<div class="w-12 h-12 mb-6 rounded-lg flex items-center justify-center" style="background:var(--c-frio-l)">
+<span class="material-symbols-outlined" style="color:var(--c-frio-tx)">ac_unit</span>
 </div>
 <div class="text-lg font-bold mb-1">Climatização</div>
 <div class="font-label text-brand-mint text-xs">315 SERVIÇOS</div>
 </div>
 <!-- Category Item 5 -->
 <div class="p-8 rounded-xl shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] hover:shadow-[inset_-4px_-4px_10px_#f4f0ff,inset_4px_4px_10px_#aca8b8] transition-all cursor-pointer group">
-<div class="w-12 h-12 mb-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-<span class="material-symbols-outlined text-brand-mint">kitchen</span>
+<div class="w-12 h-12 mb-6 rounded-lg flex items-center justify-center" style="background:var(--c-tec-l)">
+<span class="material-symbols-outlined" style="color:var(--c-tec-tx)">kitchen</span>
 </div>
 <div class="text-lg font-bold mb-1">Eletrodomésticos</div>
 <div class="font-label text-brand-mint text-xs">921 SERVIÇOS</div>
 </div>
 <!-- Category Item 6 -->
 <div class="p-8 rounded-xl shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] hover:shadow-[inset_-4px_-4px_10px_#f4f0ff,inset_4px_4px_10px_#aca8b8] transition-all cursor-pointer group">
-<div class="w-12 h-12 mb-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-<span class="material-symbols-outlined text-brand-mint">construction</span>
+<div class="w-12 h-12 mb-6 rounded-lg flex items-center justify-center" style="background:var(--c-marcen-l)">
+<span class="material-symbols-outlined" style="color:var(--c-marcen-tx)">carpenter</span>
 </div>
 <div class="text-lg font-bold mb-1">Marchetaria</div>
 <div class="font-label text-brand-mint text-xs">402 SERVIÇOS</div>
 </div>
 <!-- Category Item 7 -->
 <div class="p-8 rounded-xl shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] hover:shadow-[inset_-4px_-4px_10px_#f4f0ff,inset_4px_4px_10px_#aca8b8] transition-all cursor-pointer group">
-<div class="w-12 h-12 mb-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-<span class="material-symbols-outlined text-brand-mint">security</span>
+<div class="w-12 h-12 mb-6 rounded-lg flex items-center justify-center" style="background:var(--c-seg-l)">
+<span class="material-symbols-outlined" style="color:var(--c-seg-tx)">security</span>
 </div>
 <div class="text-lg font-bold mb-1">Segurança</div>
 <div class="font-label text-brand-mint text-xs">158 SERVIÇOS</div>
 </div>
 <!-- Category Item 8 -->
 <div class="p-8 rounded-xl shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] hover:shadow-[inset_-4px_-4px_10px_#f4f0ff,inset_4px_4px_10px_#aca8b8] transition-all cursor-pointer group">
-<div class="w-12 h-12 mb-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-<span class="material-symbols-outlined text-brand-mint">moving</span>
+<div class="w-12 h-12 mb-6 rounded-lg flex items-center justify-center" style="background:var(--c-refor-l)">
+<span class="material-symbols-outlined" style="color:var(--c-refor-tx)">local_shipping</span>
 </div>
 <div class="text-lg font-bold mb-1">Fretes &amp; Mudanças</div>
 <div class="font-label text-brand-mint text-xs">2,104 SERVIÇOS</div>
