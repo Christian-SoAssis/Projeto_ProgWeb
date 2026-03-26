@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Aparência - ServiçoJá</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "on-secondary-container": "#456c5e",
+                "surface-bright": "#f4f0ff",
+                "surface-variant": "#e5e0f1",
+                "primary-container": "#008467",
+                "on-surface": "#1b1a26",
+                "surface-tint": "#006c53",
+                "on-secondary": "#ffffff",
+                "error": "#ba1a1a",
+                "surface": "#f4f0ff",
+                "background": "#f4f0ff",
+                "secondary-container": "#c1ecda",
+                "surface-dim": "#dcd8e8",
+                "primary": "#006951",
+                "secondary": "#3f6658"
+              },
+              fontFamily: {
+                "headline": ["DM Sans", "sans-serif"],
+                "body": ["DM Sans", "sans-serif"],
+                "label": ["DM Mono", "monospace"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"}
+            },
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: #d0ccdc;
+            font-family: 'DM Sans', sans-serif;
+            color: #1b1a26;
+        }
+        .neo-elevated {
+            box-shadow: -6px -6px 14px #f4f0ff, 6px 6px 14px #aca8b8;
+        }
+        .neo-inset {
+            box-shadow: inset -6px -6px 14px #f4f0ff, inset 6px 6px 14px #aca8b8;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="p-6">
+<div class="max-w-[480px] mx-auto space-y-8">
+<header class="flex items-center gap-4">
+<button class="w-10 h-10 rounded-xl neo-elevated flex items-center justify-center">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="text-xl font-bold">Aparência</h1>
+</header>
+<section class="space-y-6">
+<div class="neo-inset p-1 rounded-2xl flex">
+<button class="flex-1 py-3 rounded-xl bg-[#d0ccdc] neo-elevated text-primary font-bold text-sm">Claro</button>
+<button class="flex-1 py-3 rounded-xl text-slate-500 font-medium text-sm">Escuro</button>
+</div>
+<div class="space-y-4">
+<h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest px-2">Temas Disponíveis</h3>
+<div class="grid grid-cols-2 gap-4">
+<div class="p-4 rounded-2xl neo-elevated border-2 border-primary space-y-3">
+<div class="w-full h-12 rounded-lg bg-[#d0ccdc] neo-inset"></div>
+<span class="text-xs font-bold block text-center">Lavanda Pó</span>
+</div>
+<div class="p-4 rounded-2xl neo-elevated space-y-3 grayscale opacity-60">
+<div class="w-full h-12 rounded-lg bg-slate-800"></div>
+<span class="text-xs font-bold block text-center">Menta Escuro</span>
+</div>
+</div>
+</div>
+<div class="p-6 rounded-2xl neo-elevated space-y-4">
+<div class="flex justify-between items-center">
+<span class="text-sm font-medium">Auto-ajuste de contraste</span>
+<div class="w-12 h-6 rounded-full neo-inset p-1 flex justify-end bg-primary/20">
+<div class="w-4 h-4 rounded-full bg-primary shadow-sm"></div>
+</div>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-sm font-medium">Reduzir animações</span>
+<div class="w-12 h-6 rounded-full neo-inset p-1">
+<div class="w-4 h-4 rounded-full bg-slate-400 shadow-sm"></div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</body></html>

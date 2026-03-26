@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/><title>Busca - ServiçoJá</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+  body { background: #d0ccdc; font-family: 'DM Sans', sans-serif; }
+  .neo-elevated { box-shadow: -6px -6px 14px #f4f0ff, 6px 6px 14px #aca8b8; }
+  .neo-inset { box-shadow: inset -6px -6px 14px #f4f0ff, inset 6px 6px 14px #aca8b8; }
+</style>
+</head>
+<body class="p-6 space-y-8">
+  <header class="flex justify-between items-center">
+    <h1 class="text-xl font-bold text-[#1a9878]">ServiçoJá</h1>
+  </header>
+  <div class="neo-inset p-4 rounded-xl flex items-center">
+    <input class="bg-transparent border-none w-full text-sm" placeholder="O que você precisa?"/>
+  </div>
+  <div class="flex gap-4 overflow-x-auto">
+    <button class="neo-elevated px-4 py-2 rounded-full text-xs font-bold text-[#1a9878]">Perto de mim</button>
+    <button class="neo-elevated px-4 py-2 rounded-full text-xs">Limpeza</button>
+    <button class="neo-elevated px-4 py-2 rounded-full text-xs">Reparos</button>
+  </div>
+  <div class="space-y-6">
+    <div class="neo-elevated rounded-xl overflow-hidden bg-[#d0ccdc]">
+      <div style="height:3px;background:#2e7bc4"></div>
+      <div class="p-4 flex gap-4">
+        <div class="w-12 h-12 rounded-full bg-blue-100 flex-shrink-0"></div>
+        <div><h3 class="font-bold">Marcos Silva</h3><p class="text-xs text-slate-500">Encanador</p></div>
+      </div>
+    </div>
+    <div class="neo-elevated rounded-xl overflow-hidden bg-[#d0ccdc]">
+      <div style="height:3px;background:#18a0a0"></div>
+      <div class="p-4 flex gap-4">
+        <div class="w-12 h-12 rounded-full bg-teal-100 flex-shrink-0"></div>
+        <div><h3 class="font-bold">Ana Oliveira</h3><p class="text-xs text-slate-500">Limpeza</p></div>
+      </div>
+    </div>
+  </div>
+</body></html>

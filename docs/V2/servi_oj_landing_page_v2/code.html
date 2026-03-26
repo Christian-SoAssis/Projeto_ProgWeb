@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ServiçoJá ⚡ - Profissionais Verificados</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&amp;family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;family=Space+Grotesk:wght@300..700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-tertiary-container": "#fffbff",
+              "on-secondary-container": "#456c5e",
+              "on-tertiary": "#ffffff",
+              "error": "#ba1a1a",
+              "on-error": "#ffffff",
+              "outline-variant": "#bccac2",
+              "on-primary-fixed-variant": "#00513e",
+              "on-primary": "#ffffff",
+              "tertiary-fixed-dim": "#ffb4a8",
+              "primary-fixed-dim": "#6cdab6",
+              "surface-bright": "#fcf8ff",
+              "on-secondary-fixed-variant": "#274e41",
+              "surface-variant": "#e5e0f1",
+              "on-tertiary-fixed": "#400201",
+              "surface-container-lowest": "#ffffff",
+              "secondary": "#3f6658",
+              "inverse-on-surface": "#f3eeff",
+              "outline": "#6d7a74",
+              "on-secondary-fixed": "#002117",
+              "primary": "#006951",
+              "inverse-surface": "#302f3b",
+              "surface": "#fcf8ff",
+              "primary-container": "#008467",
+              "on-primary-container": "#f5fff8",
+              "tertiary": "#964236",
+              "tertiary-container": "#b5594c",
+              "on-error-container": "#93000a",
+              "surface-container-highest": "#e5e0f1",
+              "secondary-fixed-dim": "#a6cfbe",
+              "on-surface": "#1b1a26",
+              "secondary-container": "#c1ecda",
+              "inverse-primary": "#6cdab6",
+              "on-secondary": "#ffffff",
+              "surface-container-high": "#eae6f6",
+              "on-tertiary-fixed-variant": "#7b2d23",
+              "on-surface-variant": "#3d4944",
+              "error-container": "#ffdad6",
+              "surface-tint": "#006c53",
+              "surface-container": "#f0ecfc",
+              "surface-dim": "#dcd8e8",
+              "secondary-fixed": "#c1ecda",
+              "primary-fixed": "#89f7d1",
+              "on-primary-fixed": "#002117",
+              "on-background": "#1b1a26",
+              "surface-container-low": "#f6f1ff",
+              "background": "#fcf8ff",
+              "tertiary-fixed": "#ffdad5",
+              "brand-mint": "#1a9878",
+              "lavender-powder": "#d0ccdc"
+            },
+            fontFamily: {
+              "headline": ["DM Sans", "sans-serif"],
+              "body": ["DM Sans", "sans-serif"],
+              "label": ["DM Mono", "monospace"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+            boxShadow: {
+              'neo-elevated': '-6px -6px 14px #f4f0ff, 6px 6px 14px #aca8b8',
+              'neo-inset': 'inset -6px -6px 14px #f4f0ff, inset 6px 6px 14px #aca8b8',
+              'neo-hover': 'inset -2px -2px 5px #f4f0ff, inset 2px 2px 5px #aca8b8'
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #d0ccdc;
+            color: #1b1a26;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .neo-elevated { shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8]; }
+        .neo-inset { shadow-[inset_-6px_-6px_14px_#f4f0ff,inset_6px_6px_14px_#aca8b8]; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-mint selection:text-white">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-8 py-4 bg-[#d0ccdc] dark:bg-slate-800 shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] dark:shadow-none">
+<div class="text-xl font-bold text-[#1a9878] dark:text-[#1a9878]">ServiçoJá ⚡</div>
+<div class="hidden md:flex space-x-8 items-center">
+<a class="text-[#1a9878] font-bold text-sm" href="#">Início</a>
+<a class="text-slate-600 dark:text-slate-300 hover:shadow-[inset_-2px_-2px_5px_#f4f0ff,inset_2px_2px_5px_#aca8b8] transition-all px-3 py-1 rounded-lg text-sm" href="#">Serviços</a>
+<a class="text-slate-600 dark:text-slate-300 hover:shadow-[inset_-2px_-2px_5px_#f4f0ff,inset_2px_2px_5px_#aca8b8] transition-all px-3 py-1 rounded-lg text-sm" href="#">Profissionais</a>
+<a class="text-slate-600 dark:text-slate-300 hover:shadow-[inset_-2px_-2px_5px_#f4f0ff,inset_2px_2px_5px_#aca8b8] transition-all px-3 py-1 rounded-lg text-sm" href="#">Como Funciona</a>
+</div>
+<div class="flex items-center space-x-6">
+<button class="text-slate-600 dark:text-slate-300 px-6 py-2 rounded-lg text-sm font-medium shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] active:scale-95 duration-200 transition-transform">Entrar</button>
+<button class="bg-[#d0ccdc] text-[#1a9878] px-6 py-2 rounded-lg text-sm font-bold shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] active:scale-95 duration-200 transition-transform">Cadastrar</button>
+</div>
+</nav>
+<!-- Hero & Search Section -->
+<header class="pt-32 pb-20 px-8 flex flex-col items-center justify-center text-center">
+<div class="max-w-4xl mx-auto">
+<h1 class="text-4xl md:text-6xl font-bold tracking-tight text-on-surface mb-8">
+                Encontre profissionais verificados <br class="hidden md:block"/> perto de você
+            </h1>
+<!-- Inset Search Bar -->
+<div class="relative w-full max-w-2xl mx-auto mb-12">
+<div class="flex items-center shadow-[inset_-6px_-6px_14px_#f4f0ff,inset_6px_6px_14px_#aca8b8] rounded-xl px-6 py-5 bg-transparent group">
+<span class="material-symbols-outlined text-slate-400 mr-4">search</span>
+<input class="bg-transparent border-none focus:ring-0 w-full text-lg placeholder-slate-400 font-body outline-none" placeholder="Que serviço você precisa?" type="text"/>
+<button class="ml-4 bg-[#d0ccdc] shadow-[-4px_-4px_10px_#f4f0ff,4px_4px_10px_#aca8b8] active:shadow-[inset_-2px_-2px_5px_#f4f0ff,inset_2px_2px_5px_#aca8b8] p-3 rounded-lg text-brand-mint flex items-center justify-center transition-all">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Category Pills -->
+<div class="flex flex-wrap justify-center gap-4">
+<button class="flex items-center gap-2 px-5 py-2.5 bg-lavender-powder rounded-full shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] hover:shadow-[inset_-2px_-2px_5px_#f4f0ff,inset_2px_2px_5px_#aca8b8] transition-all text-sm font-medium">
+<span class="material-symbols-outlined text-[#1a9878]">carpenter</span> 🔨 Hidráulica
+                </button>
+<button class="flex items-center gap-2 px-5 py-2.5 bg-lavender-powder rounded-full shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] hover:shadow-[inset_-2px_-2px_5px_#f4f0ff,inset_2px_2px_5px_#aca8b8] transition-all text-sm font-medium">
+<span class="material-symbols-outlined text-[#1a9878]">bolt</span> ⚡ Elétrica
+                </button>
+<button class="flex items-center gap-2 px-5 py-2.5 bg-lavender-powder rounded-full shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] hover:shadow-[inset_-2px_-2px_5px_#f4f0ff,inset_2px_2px_5px_#aca8b8] transition-all text-sm font-medium">
+<span class="material-symbols-outlined text-[#1a9878]">mop</span> 🧹 Limpeza
+                </button>
+<button class="flex items-center gap-2 px-5 py-2.5 bg-lavender-powder rounded-full shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] hover:shadow-[inset_-2px_-2px_5px_#f4f0ff,inset_2px_2px_5px_#aca8b8] transition-all text-sm font-medium text-brand-mint">
+<span class="material-symbols-outlined">add</span> Ver todas
+                </button>
+</div>
+</div>
+</header>
+<!-- Differentials Bento Section -->
+<section class="px-8 py-16 max-w-7xl mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+<!-- Card 1 -->
+<div class="p-10 rounded-xl bg-lavender-powder shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] flex flex-col items-start space-y-4">
+<div class="w-14 h-14 rounded-lg shadow-[inset_-4px_-4px_10px_#f4f0ff,inset_4px_4px_10px_#aca8b8] flex items-center justify-center">
+<span class="material-symbols-outlined text-brand-mint text-3xl">psychology</span>
+</div>
+<h3 class="text-xl font-bold pt-2">IA analisa sua foto</h3>
+<p class="text-slate-600 leading-relaxed text-sm">Nossa inteligência artificial identifica o problema através de fotos e te conecta com o especialista ideal.</p>
+</div>
+<!-- Card 2 -->
+<div class="p-10 rounded-xl bg-lavender-powder shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] flex flex-col items-start space-y-4">
+<div class="w-14 h-14 rounded-lg shadow-[inset_-4px_-4px_10px_#f4f0ff,inset_4px_4px_10px_#aca8b8] flex items-center justify-center">
+<span class="material-symbols-outlined text-brand-mint text-3xl">speed</span>
+</div>
+<h3 class="text-xl font-bold pt-2">Match em 80ms</h3>
+<p class="text-slate-600 leading-relaxed text-sm">Algoritmos de alta performance garantem que você nunca fique esperando por um orçamento.</p>
+</div>
+<!-- Card 3 -->
+<div class="p-10 rounded-xl bg-lavender-powder shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] flex flex-col items-start space-y-4">
+<div class="w-14 h-14 rounded-lg shadow-[inset_-4px_-4px_10px_#f4f0ff,inset_4px_4px_10px_#aca8b8] flex items-center justify-center">
+<span class="material-symbols-outlined text-brand-mint text-3xl">gavel</span>
+</div>
+<h3 class="text-xl font-bold pt-2">LGPD Certificado</h3>
+<p class="text-slate-600 leading-relaxed text-sm">Seus dados e endereço são compartilhados apenas com o profissional escolhido por você.</p>
+</div>
+</div>
+</section>
+<!-- Main Category Grid -->
+<section class="px-8 py-20 bg-lavender-powder">
+<div class="max-w-7xl mx-auto">
+<div class="flex justify-between items-end mb-12">
+<h2 class="text-3xl font-bold">Categorias em Destaque</h2>
+<div class="font-label text-brand-mint text-sm tracking-widest uppercase">Explorar Todas (42)</div>
+</div>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+<!-- Category Item 1 -->
+<div class="p-8 rounded-xl shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] hover:shadow-[inset_-4px_-4px_10px_#f4f0ff,inset_4px_4px_10px_#aca8b8] transition-all cursor-pointer group">
+<div class="w-12 h-12 mb-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-brand-mint">handyman</span>
+</div>
+<div class="text-lg font-bold mb-1">Reparos Gerais</div>
+<div class="font-label text-brand-mint text-xs">1,240 SERVIÇOS</div>
+</div>
+<!-- Category Item 2 -->
+<div class="p-8 rounded-xl shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] hover:shadow-[inset_-4px_-4px_10px_#f4f0ff,inset_4px_4px_10px_#aca8b8] transition-all cursor-pointer group">
+<div class="w-12 h-12 mb-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-brand-mint">brush</span>
+</div>
+<div class="text-lg font-bold mb-1">Pintura</div>
+<div class="font-label text-brand-mint text-xs">842 SERVIÇOS</div>
+</div>
+<!-- Category Item 3 -->
+<div class="p-8 rounded-xl shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] hover:shadow-[inset_-4px_-4px_10px_#f4f0ff,inset_4px_4px_10px_#aca8b8] transition-all cursor-pointer group">
+<div class="w-12 h-12 mb-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-brand-mint">yard</span>
+</div>
+<div class="text-lg font-bold mb-1">Jardinagem</div>
+<div class="font-label text-brand-mint text-xs">512 SERVIÇOS</div>
+</div>
+<!-- Category Item 4 -->
+<div class="p-8 rounded-xl shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] hover:shadow-[inset_-4px_-4px_10px_#f4f0ff,inset_4px_4px_10px_#aca8b8] transition-all cursor-pointer group">
+<div class="w-12 h-12 mb-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-brand-mint">ac_unit</span>
+</div>
+<div class="text-lg font-bold mb-1">Climatização</div>
+<div class="font-label text-brand-mint text-xs">315 SERVIÇOS</div>
+</div>
+<!-- Category Item 5 -->
+<div class="p-8 rounded-xl shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] hover:shadow-[inset_-4px_-4px_10px_#f4f0ff,inset_4px_4px_10px_#aca8b8] transition-all cursor-pointer group">
+<div class="w-12 h-12 mb-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-brand-mint">kitchen</span>
+</div>
+<div class="text-lg font-bold mb-1">Eletrodomésticos</div>
+<div class="font-label text-brand-mint text-xs">921 SERVIÇOS</div>
+</div>
+<!-- Category Item 6 -->
+<div class="p-8 rounded-xl shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] hover:shadow-[inset_-4px_-4px_10px_#f4f0ff,inset_4px_4px_10px_#aca8b8] transition-all cursor-pointer group">
+<div class="w-12 h-12 mb-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-brand-mint">construction</span>
+</div>
+<div class="text-lg font-bold mb-1">Marchetaria</div>
+<div class="font-label text-brand-mint text-xs">402 SERVIÇOS</div>
+</div>
+<!-- Category Item 7 -->
+<div class="p-8 rounded-xl shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] hover:shadow-[inset_-4px_-4px_10px_#f4f0ff,inset_4px_4px_10px_#aca8b8] transition-all cursor-pointer group">
+<div class="w-12 h-12 mb-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-brand-mint">security</span>
+</div>
+<div class="text-lg font-bold mb-1">Segurança</div>
+<div class="font-label text-brand-mint text-xs">158 SERVIÇOS</div>
+</div>
+<!-- Category Item 8 -->
+<div class="p-8 rounded-xl shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] hover:shadow-[inset_-4px_-4px_10px_#f4f0ff,inset_4px_4px_10px_#aca8b8] transition-all cursor-pointer group">
+<div class="w-12 h-12 mb-6 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-brand-mint">moving</span>
+</div>
+<div class="text-lg font-bold mb-1">Fretes &amp; Mudanças</div>
+<div class="font-label text-brand-mint text-xs">2,104 SERVIÇOS</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="w-full flex flex-col items-center justify-center space-y-8 px-4 py-12 bg-[#d0ccdc] dark:bg-slate-800 shadow-[inset_-6px_-6px_14px_#f4f0ff,inset_6px_6px_14px_#aca8b8]">
+<div class="text-lg font-bold text-[#1a9878]">ServiçoJá ⚡</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#1a9878] transition-colors text-sm font-medium" href="#">Termos</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#1a9878] transition-colors text-sm font-medium" href="#">Privacidade</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#1a9878] transition-colors text-sm font-medium" href="#">Ajuda</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-[#1a9878] transition-colors text-sm font-medium" href="#">Contato</a>
+</div>
+<div class="text-slate-500 dark:text-slate-400 text-xs font-label">
+            © 2024 ServiçoJá. Todos os direitos reservados.
+        </div>
+</footer>
+</body></html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Chat Seguro - ServiçoJá</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #d0ccdc;
+            font-family: 'DM Sans', sans-serif;
+            color: #1b1a26;
+        }
+        .neo-elevated {
+            box-shadow: -6px -6px 14px #f4f0ff, 6px 6px 14px #aca8b8;
+        }
+        .neo-inset {
+            box-shadow: inset -6px -6px 14px #f4f0ff, inset 6px 6px 14px #aca8b8;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .chat-bubble-received {
+            background: #d0ccdc;
+            box-shadow: -4px -4px 10px #f4f0ff, 4px 4px 10px #aca8b8;
+            border-radius: 12px 12px 12px 4px;
+        }
+        .chat-bubble-sent {
+            background: #006951;
+            color: white;
+            box-shadow: -4px -4px 10px rgba(244, 240, 255, 0.2), 4px 4px 10px rgba(172, 168, 184, 0.4);
+            border-radius: 12px 12px 4px 12px;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+<header class="p-6 bg-[#d0ccdc] flex justify-between items-center shadow-[-6px_-6px_14px_#f4f0ff,6px_6px_14px_#aca8b8] z-10">
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 rounded-xl neo-elevated flex items-center justify-center">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="w-10 h-10 rounded-full neo-elevated overflow-hidden border-2 border-white">
+<img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1595841696677-542036735626?auto=format&amp;fit=crop&amp;q=80&amp;w=150"/>
+</div>
+<div>
+<h2 class="font-bold text-sm">Marcos Silva</h2>
+<span class="text-[10px] text-primary font-bold uppercase tracking-wider">Online</span>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="w-10 h-10 rounded-xl neo-elevated flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-600">call</span>
+</button>
+<button class="w-10 h-10 rounded-xl neo-elevated flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-600">info</span>
+</button>
+</div>
+</header>
+<main class="flex-grow overflow-y-auto p-6 space-y-6 flex flex-col">
+<div class="self-center py-1 px-3 rounded-full bg-slate-200/50 text-[10px] font-bold text-slate-500 uppercase">Hoje</div>
+<div class="chat-bubble-received p-4 max-w-[80%] self-start text-sm">
+            Olá, Ricardo! Recebi sua solicitação para a manutenção do sifão. Posso ir aí hoje às 14:30?
+        </div>
+<div class="chat-bubble-sent p-4 max-w-[80%] self-end text-sm">
+            Perfeito, Marcos! O endereço é o que está no meu perfil.
+        </div>
+<div class="chat-bubble-received p-4 max-w-[80%] self-start text-sm">
+            Combinado! Já estou separando o material. Em 20 minutos chego aí.
+        </div>
+<div class="self-center neo-inset px-4 py-2 rounded-xl flex items-center gap-2 text-[10px] text-slate-500 font-bold italic">
+<span class="material-symbols-outlined text-sm">lock</span> Chat criptografado de ponta-a-ponta
+        </div>
+</main>
+<footer class="p-6 bg-[#d0ccdc] shadow-[0_-6px_14px_#aca8b8]">
+<div class="flex gap-4 items-center">
+<div class="flex-grow neo-inset bg-[#d0ccdc] rounded-2xl flex items-center px-4 py-2">
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder-slate-400" placeholder="Escreva sua mensagem..." type="text"/>
+<button class="text-slate-400 p-2">
+<span class="material-symbols-outlined">attach_file</span>
+</button>
+</div>
+<button class="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg active:scale-95 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+</footer>
+</body></html>

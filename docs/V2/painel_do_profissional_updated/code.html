@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ServiçoJá - Painel do Profissional</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "on-secondary-container": "#456c5e",
+                "surface-bright": "#f4f0ff",
+                "surface-variant": "#e5e0f1",
+                "primary-container": "#008467",
+                "on-surface": "#1b1a26",
+                "surface-tint": "#006c53",
+                "on-secondary": "#ffffff",
+                "error": "#ba1a1a",
+                "surface": "#f4f0ff",
+                "background": "#f4f0ff",
+                "secondary-container": "#c1ecda",
+                "surface-dim": "#dcd8e8",
+                "primary": "#006951",
+                "secondary": "#3f6658"
+              },
+              fontFamily: {
+                "headline": ["DM Sans", "sans-serif"],
+                "body": ["DM Sans", "sans-serif"],
+                "label": ["DM Mono", "monospace"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"}
+            },
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: #d0ccdc;
+            font-family: 'DM Sans', sans-serif;
+            color: #1b1a26;
+        }
+        .neo-elevated {
+            box-shadow: -6px -6px 14px #f4f0ff, 6px 6px 14px #aca8b8;
+        }
+        .neo-inset {
+            box-shadow: inset -6px -6px 14px #f4f0ff, inset 6px 6px 14px #aca8b8;
+        }
+        .neo-pressed {
+            box-shadow: inset -2px -2px 5px #f4f0ff, inset 2px 2px 5px #aca8b8;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .mono-data {
+            font-family: 'DM Mono', monospace;
+        }
+        /* ── Cores fixas por categoria de serviço ── */
+        :root {
+          --c-hidro:       #2e7bc4;
+          --c-hidro-l:     rgba(46,123,196,.14);
+          --c-hidro-tx:    #2e7bc4;
+
+          --c-eletro:      #d4a00a;
+          --c-eletro-l:    rgba(212,160,10,.14);
+          --c-eletro-tx:   #c49000;
+
+          --c-gas:         #e06820;
+          --c-gas-l:       rgba(224,104,32,.14);
+          --c-gas-tx:      #d05810;
+
+          --c-civil:       #b04020;
+          --c-civil-l:     rgba(176,64,32,.14);
+          --c-civil-tx:    #a03818;
+
+          --c-verde:       #2a8c50;
+          --c-verde-l:     rgba(42,140,80,.14);
+          --c-verde-tx:    #268848;
+
+          --c-limpeza:     #18a0a0;
+          --c-limpeza-l:   rgba(24,160,160,.14);
+          --c-limpeza-tx:  #148888;
+
+          --c-pintura:     #9050c0;
+          --c-pintura-l:   rgba(144,80,192,.14);
+          --c-pintura-tx:  #8840b8;
+
+          --c-marcen:      #8a5c28;
+          --c-marcen-l:    rgba(138,92,40,.14);
+          --c-marcen-tx:   #7a4e20;
+
+          --c-frio:        #4898d8;
+          --c-frio-l:      rgba(72,152,216,.14);
+          --c-frio-tx:     #3888c8;
+
+          --c-seg:         #384880;
+          --c-seg-l:       rgba(56,72,128,.14);
+          --c-seg-tx:      #304070;
+
+          --c-tec:         #20a870;
+          --c-tec-l:       rgba(32,168,112,.14);
+          --c-tec-tx:      #189860;
+
+          --c-refor:       #c06840;
+          --c-refor-l:     rgba(192,104,64,.14);
+          --c-refor-tx:    #b05830;
+
+          --c-saude:       #d04080;
+          --c-saude-l:     rgba(208,64,128,.14);
+          --c-saude-tx:    #c03070;
+
+          --c-jur:         #485870;
+          --c-jur-l:       rgba(72,88,112,.14);
+          --c-jur-tx:      #405068;
+
+          --c-edu:         #e08820;
+          --c-edu-l:       rgba(224,136,32,.14);
+          --c-edu-tx:      #d07810;
+
+          --c-pet:         #d85020;
+          --c-pet-l:       rgba(216,80,32,.14);
+          --c-pet-tx:      #c84818;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased min-h-screen pb-20">
+<!-- Sidebar Layout Context (for Mobile view simulate as full width) -->
+<nav class="fixed top-0 left-0 h-full w-20 bg-[#d0ccdc] flex flex-col items-center py-8 space-y-10 shadow-[6px_0px_14px_#aca8b8] z-50">
+<div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-bold text-xl neo-elevated">
+<span class="material-symbols-outlined" data-icon="bolt">bolt</span>
+</div>
+<div class="flex flex-col space-y-8">
+<a class="w-12 h-12 flex items-center justify-center rounded-xl neo-pressed text-primary" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+</a>
+<a class="w-12 h-12 flex items-center justify-center rounded-xl text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="list_alt">list_alt</span>
+</a>
+<a class="w-12 h-12 flex items-center justify-center rounded-xl text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+</a>
+<a class="w-12 h-12 flex items-center justify-center rounded-xl text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="trending_up">trending_up</span>
+</a>
+</div>
+<div class="mt-auto">
+<a class="w-12 h-12 flex items-center justify-center rounded-xl text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</a>
+</div>
+</nav>
+<main class="ml-20 p-8 space-y-10 max-w-7xl mx-auto">
+<!-- Top Bar -->
+<header class="flex justify-between items-center">
+<div>
+<h1 class="text-3xl font-headline font-bold text-slate-800">Painel do Profissional</h1>
+<p class="text-slate-500 font-body">Bem-vindo de volta, Marcos Silva</p>
+</div>
+<div class="flex items-center space-x-6">
+<div class="neo-inset px-4 py-2 rounded-xl flex items-center space-x-3">
+<div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+<span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Disponível</span>
+</div>
+<div class="w-12 h-12 rounded-xl border-2 border-[#f4f0ff] neo-elevated overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="professional portrait of a professional man in uniform" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDt-YUnFNMwtcnz7AElYURug5zxRWmXRAXq3GwkJimcRaf5xRGPoKYX5tg83UR6kf4Xg0Ky0Hd5Vsqc5IXdY3qxqXeCIO1Tdk5g1MP-cMlZD_0g8cXT0YbtOTpPGRiCK8qgqHpzk2gejH8CuCeTuTojXCN6zT8IGhq5N1cmGKVqLI9KwNXvA1jsroKjq-ig_n3pLU3PxVGKBh7KUcGFPtI3pkB7YDE8T0qfEl9DyhJSY9LU9_OC38h7K-lGgU5c3m8bKxJlrnbZ4Qc"/>
+</div>
+</div>
+</header>
+<!-- Key Metrics Grid -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-8">
+<!-- Metric 1 -->
+<div class="p-6 rounded-2xl neo-elevated bg-[#d0ccdc] space-y-2">
+<p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Saldo disponível</p>
+<div class="flex items-baseline space-x-1">
+<span class="text-xs font-bold text-slate-600">R$</span>
+<span class="text-2xl font-black text-slate-800 mono-data">2.450,00</span>
+</div>
+<div class="pt-2 flex items-center text-[10px] font-bold text-emerald-600">
+<span class="material-symbols-outlined text-sm mr-1">trending_up</span> +12% este mês
+                </div>
+</div>
+<!-- Metric 2 -->
+<div class="p-6 rounded-2xl neo-elevated bg-[#d0ccdc] space-y-2">
+<p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Avaliação média</p>
+<div class="flex items-center space-x-2">
+<span class="text-2xl font-black text-slate-800 mono-data">4.9</span>
+<div class="flex">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1">star</span>
+</div>
+</div>
+<p class="text-[10px] font-bold text-slate-400">Baseado em 128 feedbacks</p>
+</div>
+<!-- Metric 3 -->
+<div class="p-6 rounded-2xl neo-elevated bg-[#d0ccdc] space-y-2">
+<p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Serviços concluídos</p>
+<div class="text-2xl font-black text-slate-800 mono-data">342</div>
+<p class="text-[10px] font-bold text-slate-400">Total acumulado</p>
+</div>
+<!-- Metric 4 -->
+<div class="p-6 rounded-2xl neo-elevated bg-[#d0ccdc] space-y-2">
+<p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Taxa de resposta</p>
+<div class="text-2xl font-black text-slate-800 mono-data">98%</div>
+<p class="text-[10px] font-bold text-emerald-600 underline cursor-pointer">Super Profissional</p>
+</div>
+</section>
+<!-- Main Dashboard Layout -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+<!-- Left: Next Jobs (2/3) -->
+<div class="lg:col-span-2 space-y-6">
+<div class="flex justify-between items-center">
+<h2 class="text-xl font-bold text-slate-800 font-headline">Próximos trabalhos</h2>
+<button class="text-xs font-bold text-primary uppercase tracking-widest">Ver calendário</button>
+</div>
+<div class="space-y-4">
+<!-- Job Card 1 -->
+<div class="p-6 rounded-2xl neo-elevated bg-[#d0ccdc] flex items-center group hover:bg-[#dcd8e8] transition-colors relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-[3px]" style="background:var(--c-limpeza)"></div>
+<div class="w-12 h-12 rounded-xl neo-inset flex items-center justify-center flex-shrink-0 mr-6">
+<span class="material-symbols-outlined text-primary">plumbing</span>
+</div>
+<div class="flex-grow">
+<h4 class="font-bold text-slate-800 font-headline">Manutenção de Sifão</h4>
+<p class="text-xs text-slate-500 font-body">Cliente: Ricardo Mello • <span class="text-primary font-bold">Hoje, 14:30</span></p>
+</div>
+<div class="text-right mr-6">
+<p class="text-xs font-bold text-slate-500 uppercase">Previsão</p>
+<p class="font-black text-slate-800 mono-data">R$ 150</p>
+</div>
+<button class="w-10 h-10 rounded-lg neo-elevated flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+<!-- Job Card 2 -->
+<div class="p-6 rounded-2xl neo-elevated bg-[#d0ccdc] flex items-center group hover:bg-[#dcd8e8] transition-colors relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-[3px]" style="background:var(--c-hidro)"></div>
+<div class="w-12 h-12 rounded-xl neo-inset flex items-center justify-center flex-shrink-0 mr-6">
+<span class="material-symbols-outlined text-primary">water_drop</span>
+</div>
+<div class="flex-grow">
+<h4 class="font-bold text-slate-800 font-headline">Instalação de Chuveiro</h4>
+<p class="text-xs text-slate-500 font-body">Cliente: Ana Oliveira • <span class="font-bold">Amanhã, 09:00</span></p>
+</div>
+<div class="text-right mr-6">
+<p class="text-xs font-bold text-slate-500 uppercase">Previsão</p>
+<p class="font-black text-slate-800 mono-data">R$ 80</p>
+</div>
+<button class="w-10 h-10 rounded-lg neo-elevated flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Right: New Opportunities (1/3) -->
+<div class="space-y-6">
+<h2 class="text-xl font-bold text-slate-800 font-headline">Novas oportunidades</h2>
+<div class="space-y-4">
+<!-- Opportunity 1 -->
+<div class="p-5 rounded-2xl neo-inset bg-[#d0ccdc] border border-transparent hover:border-primary/20 transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-3">
+<span class="px-2 py-0.5 rounded-lg bg-emerald-100 text-emerald-700 text-[10px] font-bold uppercase tracking-wider">Alta Prioridade</span>
+<span class="text-[10px] text-slate-500 mono-data">HÁ 2 MIN</span>
+</div>
+<h5 class="font-bold text-sm mb-1 text-slate-800">Troca de tubulação externa</h5>
+<p class="text-[10px] text-slate-500 line-clamp-2 mb-4 font-body">Preciso de substituição de 5 metros de tubulação de PVC com vazamento aparente...</p>
+<div class="flex items-center justify-between">
+<span class="font-black text-primary mono-data text-sm">R$ 450 - 600</span>
+<button class="text-[10px] font-bold text-primary uppercase tracking-widest flex items-center bg-[#d0ccdc] p-2 rounded-lg neo-elevated px-4">Tenho interesse</button>
+</div>
+</div>
+<!-- Opportunity 2 -->
+<div class="p-5 rounded-2xl neo-inset bg-[#d0ccdc] border border-transparent hover:border-primary/20 transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-3">
+<span class="px-2 py-0.5 rounded-lg bg-slate-200 text-slate-600 text-[10px] font-bold uppercase tracking-wider">Padrão</span>
+<span class="text-[10px] text-slate-500 mono-data">HÁ 15 MIN</span>
+</div>
+<h5 class="font-bold text-sm mb-1 text-slate-800">Instalação de torneira gourmet</h5>
+<p class="text-[10px] text-slate-500 line-clamp-2 mb-4 font-body">Instalação de torneira monocomando em bancada de granito já furada...</p>
+<div class="flex items-center justify-between">
+<span class="font-black text-primary mono-data text-sm">R$ 120 - 150</span>
+<button class="text-[10px] font-bold text-primary uppercase tracking-widest flex items-center bg-[#d0ccdc] p-2 rounded-lg neo-elevated px-4">Tenho interesse</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+</body></html>

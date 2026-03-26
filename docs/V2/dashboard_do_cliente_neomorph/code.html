@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Space+Grotesk:wght@400;500;700&amp;family=DM+Sans:wght@400;500;700&amp;family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #d0ccdc;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #1b1a26;
+        }
+        .neomorph-elevated {
+            box-shadow: -6px -6px 14px #fcf8ff, 6px 6px 14px #aca8b8;
+        }
+        .neomorph-inset {
+            box-shadow: inset -6px -6px 14px #fcf8ff, inset 6px 6px 14px #aca8b8;
+        }
+        .neomorph-nav-active {
+            box-shadow: inset -4px -4px 10px #fcf8ff, inset 4px 4px 10px #aca8b8;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .mono-data {
+            font-family: 'DM Mono', monospace;
+        }
+        /* Hide scrollbar for horizontal nav */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-container": "#456c5e",
+                        "surface-bright": "#fcf8ff",
+                        "surface-variant": "#e5e0f1",
+                        "primary-container": "#008467",
+                        "on-surface": "#1b1a26",
+                        "surface-tint": "#006c53",
+                        "on-secondary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface": "#fcf8ff",
+                        "background": "#fcf8ff",
+                        "secondary-container": "#c1ecda",
+                        "surface-dim": "#dcd8e8",
+                        "primary": "#006951",
+                        "secondary": "#3f6658",
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Plus Jakarta Sans"],
+                        "label": ["Space Grotesk"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="w-full top-0 sticky z-40 bg-[#d0ccdc] flex justify-between items-center px-6 py-4 w-full max-w-[480px] mx-auto no-border shadow-[-6px_-6px_14px_#fcf8ff,6px_6px_14px_#aca8b8]">
+<div class="text-[#1a9878] font-black text-xl flex items-center gap-1">
+<span class="material-symbols-outlined" data-icon="bolt">bolt</span>
+<span class="font-['Plus_Jakarta_Sans'] font-bold text-lg text-[#1a9878]">ServiçoJá</span>
+</div>
+<button class="relative w-10 h-10 flex items-center justify-center rounded-xl neomorph-elevated active:shadow-[inset_-2px_-2px_5px_#fcf8ff,inset_2px_2px_5px_#aca8b8] transition-all duration-200">
+<span class="material-symbols-outlined text-slate-600" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+</header>
+<main class="max-w-[480px] mx-auto px-6 pt-8 space-y-8">
+<!-- Welcome Section -->
+<section>
+<h1 class="text-2xl font-bold text-slate-800 font-headline">Olá, Ricardo</h1>
+<p class="text-sm text-slate-500 font-body mt-1">Gerencie seus pedidos e serviços ativos.</p>
+</section>
+<!-- Stats Row -->
+<section class="grid grid-cols-3 gap-4">
+<div class="neomorph-elevated bg-[#d0ccdc] rounded-xl p-4 flex flex-col items-center justify-center aspect-square">
+<span class="mono-data text-xl font-bold text-primary">02</span>
+<span class="text-[10px] uppercase tracking-wider font-bold text-slate-500 mt-1">Ativos</span>
+</div>
+<div class="neomorph-elevated bg-[#d0ccdc] rounded-xl p-4 flex flex-col items-center justify-center aspect-square">
+<span class="mono-data text-xl font-bold text-slate-700">14</span>
+<span class="text-[10px] uppercase tracking-wider font-bold text-slate-500 mt-1">Concluídos</span>
+</div>
+<div class="neomorph-elevated bg-[#d0ccdc] rounded-xl p-4 flex flex-col items-center justify-center aspect-square">
+<span class="mono-data text-xl font-bold text-slate-700">08</span>
+<span class="text-[10px] uppercase tracking-wider font-bold text-slate-500 mt-1">Favoritos</span>
+</div>
+</section>
+<!-- Category Nav Pills (Horizontal Scroll) -->
+<section>
+<div class="flex gap-4 overflow-x-auto no-scrollbar py-2 px-1">
+<button class="whitespace-nowrap px-6 py-2 rounded-full neomorph-nav-active text-primary font-bold text-sm">Todos</button>
+<button class="whitespace-nowrap px-6 py-2 rounded-full neomorph-elevated text-slate-600 font-medium text-sm hover:text-primary transition-colors">Limpeza</button>
+<button class="whitespace-nowrap px-6 py-2 rounded-full neomorph-elevated text-slate-600 font-medium text-sm hover:text-primary transition-colors">Reparos</button>
+<button class="whitespace-nowrap px-6 py-2 rounded-full neomorph-elevated text-slate-600 font-medium text-sm hover:text-primary transition-colors">Elétrica</button>
+</div>
+</section>
+<!-- Active Orders -->
+<section class="space-y-6">
+<div class="flex justify-between items-end">
+<h2 class="text-lg font-bold text-slate-800 font-headline">Pedidos Ativos</h2>
+<button class="text-xs font-bold text-primary uppercase tracking-widest">Ver mais</button>
+</div>
+<!-- Card 1: Limpeza de Sofá -->
+<div class="neomorph-elevated bg-[#d0ccdc] rounded-2xl overflow-hidden group">
+<div class="h-1.5 w-full bg-primary/40"></div>
+<div class="p-5 space-y-4">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-bold text-slate-800 text-base">Limpeza de Sofá</h3>
+<div class="flex items-center gap-2 mt-1">
+<span class="material-symbols-outlined text-slate-400 text-sm" data-icon="schedule">schedule</span>
+<span class="text-xs text-slate-500 font-body">Hoje, 14:00</span>
+</div>
+</div>
+<span class="neomorph-inset px-3 py-1 rounded-full text-[10px] font-bold text-primary uppercase bg-[#d0ccdc]">Em andamento</span>
+</div>
+<div class="flex items-center gap-3 py-2">
+<div class="w-10 h-10 rounded-full neomorph-elevated overflow-hidden border-2 border-[#fcf8ff]">
+<img class="w-full h-full object-cover" data-alt="portrait of a professional cleaning specialist in uniform with a friendly smile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDt-YUnFNMwtcnz7AElYURug5zxRWmXRAXq3GwkJimcRaf5xRGPoKYX5tg83UR6kf4Xg0Ky0Hd5Vsqc5IXdY3qxqXeCIO1Tdk5g1MP-cMlZD_0g8cXT0YbtOTpPGRiCK8qgqHpzk2gejH8CuCeTuTojXCN6zT8IGhq5N1cmGKVqLI9KwNXvA1jsroKjq-ig_n3pLU3PxVGKBh7KUcGFPtI3pkB7YDE8T0qfEl9DyhJSY9LU9_OC38h7K-lGgU5c3m8bKxJlrnbZ4Qc"/>
+</div>
+<div class="flex-1">
+<p class="text-xs font-bold text-slate-700">Marcos Silva</p>
+<p class="text-[10px] text-slate-500">Especialista Gold</p>
+</div>
+<div class="neomorph-elevated w-8 h-8 flex items-center justify-center rounded-lg text-primary active:scale-95">
+<span class="material-symbols-outlined text-lg" data-icon="chat">chat</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2: Troca de Chuveiro -->
+<div class="neomorph-elevated bg-[#d0ccdc] rounded-2xl overflow-hidden group">
+<div class="h-1.5 w-full bg-slate-400/40"></div>
+<div class="p-5 space-y-4">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-bold text-slate-800 text-base">Troca de Chuveiro</h3>
+<div class="flex items-center gap-2 mt-1">
+<span class="material-symbols-outlined text-slate-400 text-sm" data-icon="event">event</span>
+<span class="text-xs text-slate-500 font-body">Amanhã, 09:00</span>
+</div>
+</div>
+<span class="neomorph-elevated px-3 py-1 rounded-full text-[10px] font-bold text-slate-500 uppercase">Aberto</span>
+</div>
+<div class="flex items-center justify-between gap-3 pt-2">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full neomorph-elevated border-2 border-[#fcf8ff] overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="professional male technician headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4yZDy-xiZ3Z1ADd95cFE9qi8cNrWzKOsH2tgx6FQFmdRpX7uB_05BuTbJaDBEAuLruFnK98QucyrYn5RMG0R6qk0h7_ci4sSsbAFyHh5GxQJED_mode6ARQjvWLr6d1CbJsAmOQMFdCM0FldLa5UwbWPMI73ZQBPN5Tlwlj_3u9lGi09UfJna1KmDZOEmUaSZlMZUfhgMWNmenalU-XEfcAIwTF_5oVti3jRseRNEAChzovf2GL0WnI4-7VvX9K00rHiLtY8zz58"/>
+</div>
+<div class="w-8 h-8 rounded-full neomorph-elevated border-2 border-[#fcf8ff] overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="professional female technician headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7ftBEL-NWVagBbdbxll2z3ul97lcO84xbk72QikmZFrWF-ZvBg9g8hu_q1fE-fFRr2chQAgvQIF2W9DtLAUQim-fM218E4N1s9Tc96u2JZGuBUAFmN2x0OspQD47natG-REwBmPfI9Tmh_ud9CgQEqLFOotwqBFsmwqWDbuD3I5b8oLTEYBjKkhrQB2Pm7PuWjvQzMQ0PL1lpSZOLOAFH9BJks8SBRZF-bj3C2TSSyyuVIdo7RrWdcZ2aoAUoOn3BZfxIgBkmwoo"/>
+</div>
+<div class="w-8 h-8 rounded-full neomorph-elevated bg-[#dcd8e8] border-2 border-[#fcf8ff] flex items-center justify-center text-[10px] font-bold text-slate-500">+3</div>
+</div>
+<p class="text-[10px] text-slate-500 italic">5 profissionais interessados</p>
+</div>
+</div>
+</div>
+</section>
+<!-- New Request Button -->
+<section class="pb-8">
+<button class="w-full py-5 rounded-2xl neomorph-elevated bg-[#d0ccdc] text-primary font-bold text-lg flex items-center justify-center gap-3 active:shadow-[inset_-4px_-4px_10px_#fcf8ff,inset_4px_4px_10px_#aca8b8] transition-all">
+<span class="material-symbols-outlined" data-icon="add_circle" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+                Novo pedido
+            </button>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full max-w-[480px] left-1/2 -translate-x-1/2 rounded-t-[1.5rem] z-50 bg-[#d0ccdc] no-border shadow-[-6px_-6px_28px_#fcf8ff,6px_6px_28px_#aca8b8]">
+<div class="flex justify-around items-center w-full px-4 py-4">
+<!-- Home (Active) -->
+<a class="flex flex-col items-center justify-center text-[#1a9878] shadow-[inset_-4px_-4px_10px_#fcf8ff,inset_4px_4px_10px_#aca8b8] rounded-xl px-4 py-2 transition-transform active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-['Plus_Jakarta_Sans'] font-medium text-[10px] mt-1">Home</span>
+</a>
+<!-- Search -->
+<a class="flex flex-col items-center justify-center text-slate-600 px-4 py-2 hover:text-[#1a9878] transition-colors active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="font-['Plus_Jakarta_Sans'] font-medium text-[10px] mt-1">Search</span>
+</a>
+<!-- Orders -->
+<a class="flex flex-col items-center justify-center text-slate-600 px-4 py-2 hover:text-[#1a9878] transition-colors active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-['Plus_Jakarta_Sans'] font-medium text-[10px] mt-1">Orders</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-slate-600 px-4 py-2 hover:text-[#1a9878] transition-colors active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-['Plus_Jakarta_Sans'] font-medium text-[10px] mt-1">Profile</span>
+</a>
+</div>
+</nav>
+</body></html>
