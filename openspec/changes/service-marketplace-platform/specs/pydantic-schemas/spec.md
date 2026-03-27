@@ -162,6 +162,7 @@ class CategoryResponse(BaseModel):
     id: UUID
     name: str
     slug: str
+    color: str  # Hex color (#RRGGBB) — virá do campo `color` da tabela `categories`
     parent_id: UUID | None
     sort_order: int
     is_active: bool
@@ -172,12 +173,14 @@ class CategoryResponse(BaseModel):
 class CategoryCreate(BaseModel):  # Admin only
     name: str = Field(..., min_length=2, max_length=100)
     slug: str = Field(..., pattern=r"^[a-z0-9-]+$", max_length=100)
+    color: str = Field("#1a9878", pattern=r"^#[0-9a-fA-F]{6}$")
     parent_id: UUID | None = None
     sort_order: int = Field(0, ge=0)
 
 class CategoryUpdate(BaseModel):
     name: str | None = Field(None, min_length=2, max_length=100)
     slug: str | None = Field(None, pattern=r"^[a-z0-9-]+$")
+    color: str | None = Field(None, pattern=r"^#[0-9a-fA-F]{6}$")
     parent_id: UUID | None = None
     sort_order: int | None = Field(None, ge=0)
     is_active: bool | None = None
@@ -187,6 +190,7 @@ class CategoryUpdate(BaseModel):
 - `slug` com espaços, caracteres especiais, uppercase
 - `name` vazio, > 100 chars
 - `sort_order` negativo
+- `color` formato inválido: `"red"`, `"#gg0000"` (chars inválidos), `"123456"` (sem `#`), `"#12345"` (5 dígitos)
 
 ---
 

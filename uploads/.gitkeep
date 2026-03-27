@@ -1,0 +1,2 @@
+# uploads directory — arquivos enviados pelos usuários (bind mount do Docker)
+# Este diretório é versionado vazio; o conteúdo é ignorado pelo .gitignore

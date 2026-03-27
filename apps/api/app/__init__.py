@@ -1,0 +1,1 @@
+# ServiçoJá API — Backend FastAPI

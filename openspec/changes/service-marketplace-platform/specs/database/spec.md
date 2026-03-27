@@ -70,6 +70,7 @@ erDiagram
         UUID id PK
         TEXT name
         TEXT slug
+        VARCHAR color
         UUID parent_id FK
         INT sort_order
         BOOLEAN is_active
@@ -320,19 +321,27 @@ CREATE INDEX idx_professionals_reputation ON professionals (reputation_score DES
 
 ```sql
 CREATE TABLE categories (
-    id          UUID    PRIMARY KEY DEFAULT gen_random_uuid(),
-    name        TEXT    NOT NULL,
-    slug        TEXT    NOT NULL,
-    parent_id   UUID    REFERENCES categories(id) ON DELETE SET NULL,
-    sort_order  INT     NOT NULL DEFAULT 0,
-    is_active   BOOLEAN NOT NULL DEFAULT true,
+    id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    name        TEXT        NOT NULL,
+    slug        TEXT        NOT NULL,
+    color       VARCHAR(7)  NOT NULL DEFAULT '#1a9878',  -- cor hex da categoria (#RRGGBB)
+    parent_id   UUID        REFERENCES categories(id) ON DELETE SET NULL,
+    sort_order  INT         NOT NULL DEFAULT 0,
+    is_active   BOOLEAN     NOT NULL DEFAULT true,
 
-    CONSTRAINT uq_categories_slug UNIQUE (slug)
+    CONSTRAINT uq_categories_slug UNIQUE (slug),
+    CONSTRAINT chk_categories_color_format CHECK (color ~ '^#[0-9a-fA-F]{6}$')
 );
 
 CREATE INDEX idx_categories_parent ON categories (parent_id);
 CREATE INDEX idx_categories_active ON categories (is_active) WHERE is_active = true;
 ```
+
+### Constraints
+- `slug` **MUST** ser único
+- `color` **MUST** ser hex válido (`#RRGGBB`), default `#1a9878` (menta)
+- `parent_id` permite hierarquia de subcategorias (`NULL` = categoria raiz)
+- `is_active` permite soft delete
 
 ---
 

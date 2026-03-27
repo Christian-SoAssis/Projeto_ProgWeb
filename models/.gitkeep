@@ -1,0 +1,2 @@
+# models directory — modelos ML (LightGBM, embeddings) (bind mount do Docker)
+# Este diretório é versionado vazio; o conteúdo é ignorado pelo .gitignore

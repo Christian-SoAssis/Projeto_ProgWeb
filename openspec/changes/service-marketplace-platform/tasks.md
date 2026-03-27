@@ -9,7 +9,7 @@
 - [ ] 1.4 Configurar Alembic: `alembic init`, `env.py` async com SQLAlchemy 2.0, `alembic.ini` apontando para `DATABASE_URL`
 - [ ] 1.4.1 Migration 001: tabela `users` (id, name, email, phone, password_hash, role, avatar_url, is_active, timestamps) + índices
 - [ ] 1.4.2 Migration 002: tabela `professionals` (FK users ON DELETE CASCADE, bio, location GEOMETRY, service_radius_km, reputation_score, is_verified, profile_embedding vector(1536)) + índices GiST e IVFFlat
-- [ ] 1.4.3 Migration 003: tabela `categories` (id, name, slug UNIQUE, parent_id self-ref ON DELETE SET NULL, sort_order, is_active)
+- [ ] 1.4.3 Migration 003: tabela `categories` (id, name, slug UNIQUE, color VARCHAR(7) DEFAULT '#1a9878', parent_id self-ref ON DELETE SET NULL, sort_order, is_active)
 - [ ] 1.4.4 Migration 004: tabela `professional_categories` (PK composta, FK professionals + categories ON DELETE CASCADE)
 - [ ] 1.4.5 Migration 005: tabela `requests` (FK users, FK categories ON DELETE RESTRICT, location GEOMETRY, urgency CHECK, status CHECK, ai_* fields) + índices GiST e compostos
 - [ ] 1.4.6 Migration 006: tabela `request_images` (FK requests ON DELETE CASCADE, content_type CHECK, size_bytes CHECK ≤ 10MB)
@@ -23,7 +23,7 @@
 - [ ] 1.4.14 Migration 014: tabela `consent_logs` (FK users ON DELETE RESTRICT, consent_type CHECK, ip_address INET, version)
 - [ ] 1.4.15 Migration 015: tabela `push_subscriptions` (FK users ON DELETE CASCADE, endpoint UNIQUE, keys p256dh/auth)
 - [ ] 1.4.16 Migration 016: tabela `favorites` (FK users + professionals ON DELETE CASCADE, UNIQUE client+professional)
-- [ ] 1.5 Seed inicial de categorias (~20 categorias com hierarquia)
+- [ ] 1.5 Seed inicial de categorias: executar script que cria 16 categorias conforme `specs/categories-seed/spec.md` (nome, slug, cor hex, sort_order)
 - [ ] 1.6 Configurar variáveis de ambiente (`.env.example` para cada app)
 - [ ] 1.7 Pipeline CI básica: lint + type-check + testes (GitHub Actions)
 - [ ] 1.8 Configurar OpenTelemetry em todos os serviços + Grafana dashboard básico
