@@ -29,3 +29,7 @@ httpx==0.26.0
 
 # Utilit√°rios
 python-dotenv==1.0.0
+
+# Extensıes Geo/Vector
+geoalchemy2==0.14.3
+pgvector==0.2.4
