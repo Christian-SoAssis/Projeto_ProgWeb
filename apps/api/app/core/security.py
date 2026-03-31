@@ -33,7 +33,7 @@ def verify_password(plain: str, hashed: str) -> bool:
 def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)) -> str:
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + expires_delta
-    to_encode.update({"exp": expire})
+    to_encode.update({"exp": expire, "jti": str(uuid4())})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
@@ -41,7 +41,7 @@ def create_refresh_token(data: dict) -> str:
     to_encode = data.copy()
     to_encode.update({"type": "refresh"})
     expire = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
-    to_encode.update({"exp": expire})
+    to_encode.update({"exp": expire, "jti": str(uuid4())})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
@@ -49,9 +49,11 @@ def decode_token(token: str) -> dict:
     return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
 
 async def rotate_refresh_token(old_token: str, db: AsyncSession) -> TokenResponse:
-    # 1. Validar expiracao do old_token e formato (jwt)
+    # 1. Validar e decodificar o token antigo
     try:
         payload = decode_token(old_token)
+        if payload.get("type") != "refresh":
+             raise HTTPException(status_code=401, detail="Token não é do tipo refresh.")
         user_id = payload.get("sub")
     except JWTError:
         raise HTTPException(status_code=401, detail="Refresh token inválido ou expirado.")
@@ -59,30 +61,33 @@ async def rotate_refresh_token(old_token: str, db: AsyncSession) -> TokenRespons
     if not user_id:
         raise HTTPException(status_code=401, detail="Refresh token inválido (sem sub).")
 
-    # 2. Invalida no banco (criar se nao existe table/logic via raw text pra evitar erro de sqlalchemy caso faltem models prontos)
-    # A recomendacao de design foi usar sql puro ou modelo. Usaremos puro para garantir compatibilidade caso falta o model.
+    # 2. Verificar se o token já foi revogado no banco
+    q_check = text("SELECT revoked FROM refresh_tokens WHERE token = :token")
+    res = await db.execute(q_check, {"token": old_token})
+    row = res.fetchone()
+    if row and row._mapping["revoked"]:
+        raise HTTPException(status_code=401, detail="Refresh token já utilizado ou revogado.")
+
+    # 3. Buscar role do usuário para incluir no novo access_token
+    res_user = await db.execute(text("SELECT role FROM users WHERE id = :uid"), {"uid": user_id})
+    user_row = res_user.fetchone()
+    if not user_row:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado.")
+    role = user_row._mapping["role"]
+
+    # 4. Registrar revogação do token atual
+    # Para simplicidade e eficácia: se não existe na tabela, insere como revogado. Se existe, marca.
     query_revoke = text("""
         INSERT INTO refresh_tokens (token, user_id, revoked, expires_at)
-        VALUES (:token, :user_id, true, :exp)
+        VALUES (:token, :uid, true, :exp)
         ON CONFLICT (token) DO UPDATE SET revoked = true
     """)
-    
-    # Check manual existence of table, if not exist this fails. 
-    # Usually it's handled by generic tables or we can create it optionally.
-    # We will assume `refresh_tokens` exists. (If it doesn't, we just catch and ignore or handle correctly).
-    try:
-        await db.execute(query_revoke, {
-            "token": old_token, 
-            "user_id": user_id, 
-            "exp": datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
-        })
-        await db.commit()
-    except Exception as e:
-        # Se a tabela nao existir, so criamos ou rollback (simplificado pra TDD aqui)
-        await db.rollback()
+    expires_at = datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+    await db.execute(query_revoke, {"token": old_token, "uid": user_id, "exp": expires_at})
+    await db.commit()
 
-    # 3. Emitir novo par
-    new_access = create_access_token({"sub": user_id})
+    # 5. Emitir novo par de tokens
+    new_access = create_access_token({"sub": user_id, "role": role})
     new_refresh = create_refresh_token({"sub": user_id})
 
     return TokenResponse(

@@ -18,7 +18,8 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     op.create_table(
         "professionals",
-        sa.Column("id", postgresql.UUID(as_uuid=True), sa.ForeignKey("users.id", ondelete="CASCADE"), primary_key=True),
+        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True),
+        sa.Column("user_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False, unique=True),
         sa.Column("bio", sa.Text(), nullable=True),
         sa.Column("location", geoalchemy2.types.Geometry(geometry_type='POINT', srid=4326, from_text='ST_GeomFromEWKT', name='geometry', spatial_index=False), nullable=True),
         sa.Column("service_radius_km", sa.Float(), nullable=False, server_default="20.0"),
@@ -29,6 +30,8 @@ def upgrade() -> None:
         sa.Column("is_verified", sa.Boolean(), nullable=False, server_default="false"),
         sa.Column("hourly_rate_cents", sa.Integer(), nullable=True),
         sa.Column("profile_embedding", pgvector.sqlalchemy.Vector(1536), nullable=True),
+        sa.Column("document_path", sa.Text(), nullable=True),
+        sa.Column("document_type", sa.String(20), nullable=True),
         sa.Column("verified_at", sa.DateTime(timezone=True), nullable=True),
         sa.CheckConstraint("reputation_score >= 0 AND reputation_score <= 5", name="chk_prof_reputation"),
         sa.CheckConstraint("cancel_rate >= 0 AND cancel_rate <= 1", name="chk_prof_cancel_rate"),

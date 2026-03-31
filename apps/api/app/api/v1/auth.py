@@ -129,26 +129,10 @@ async def refresh_token(
 ) -> TokenResponse:
     """
     Valida o refresh token e emite novo par de tokens (rotação completa).
-    Levanta 401 se o token for inválido ou expirado.
+    Utiliza a lógica de revogação centralizada em security.py.
     """
-    try:
-        payload = decode_token(body.refresh_token)
-        if payload.get("type") != "refresh":
-            raise JWTError()
-        user_id = payload.get("sub")
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Refresh token inválido")
-
-    result = await db.execute(select(User).where(User.id == user_id))
-    user = result.scalar_one_or_none()
-
-    if not user or not user.is_active:
-        raise HTTPException(status_code=401, detail="Usuário inválido")
-
-    return TokenResponse(
-        access_token=create_access_token({"sub": str(user.id), "role": user.role.value}),
-        refresh_token=create_refresh_token({"sub": str(user.id)}),
-    )
+    from app.core.security import rotate_refresh_token
+    return await rotate_refresh_token(body.refresh_token, db)
 
 
 # ─── Me ───────────────────────────────────────────────────────────────────────
