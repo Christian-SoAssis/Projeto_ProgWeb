@@ -39,13 +39,19 @@ def setup_database():
         print("\n✅ Banco de dados de teste inicializado via Alembic.")
 
 
-# ── Event Loop de escopo de sessão ─────────────────────────────────────────
-@pytest.fixture(scope="session")
-def event_loop():
-    policy = asyncio.get_event_loop_policy()
-    loop = policy.new_event_loop()
-    yield loop
-    loop.close()
+@pytest.fixture(autouse=True)
+async def dispose_engine():
+    """
+    Descarta o pool de conexões do engine após cada teste.
+    Isso evita o RuntimeError: "attached to a different loop" ao usar o motor
+    global em testes com loops de evento diferentes (asyncio_mode = auto).
+    """
+    yield
+    from app.core.database import engine
+    await engine.dispose()
+
+
+# event_loop fixture removed - handled by pytest-asyncio auto mode
 
 
 # ── Cliente HTTP assíncrono ─────────────────────────────────────────────────

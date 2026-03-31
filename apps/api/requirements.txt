@@ -16,7 +16,7 @@ email-validator==2.1.0
 # Autenticação
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
-bcrypt==4.1.2
+bcrypt==4.2.0
 
 # Cache e filas
 redis==5.0.1
@@ -24,7 +24,7 @@ hiredis==2.3.2
 
 # Testes
 pytest==7.4.4
-pytest-asyncio==0.23.3
+pytest-asyncio==0.23.6
 httpx==0.26.0
 
 # Utilitários
