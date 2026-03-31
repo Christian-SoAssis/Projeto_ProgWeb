@@ -1,7 +1,9 @@
 
 services:
   db:
-    image: pgvector/pgvector:pg16
+    build:
+      context: .
+      dockerfile: apps/db/Dockerfile
     container_name: servicoja-db
     restart: unless-stopped
     ports:

@@ -22,7 +22,7 @@ def upgrade() -> None:
         sa.Column("category_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("categories.id", ondelete="RESTRICT"), nullable=False),
         sa.Column("title", sa.Text(), nullable=False),
         sa.Column("description", sa.Text(), nullable=True),
-        sa.Column("location", geoalchemy2.types.Geometry(geometry_type='POINT', srid=4326), nullable=False),
+        sa.Column("location", geoalchemy2.types.Geometry(geometry_type='POINT', srid=4326, spatial_index=False), nullable=False),
         sa.Column("urgency", sa.Text(), nullable=False),
         sa.Column("budget_cents", sa.Integer(), nullable=True),
         sa.Column("status", sa.Text(), nullable=False, server_default="open"),

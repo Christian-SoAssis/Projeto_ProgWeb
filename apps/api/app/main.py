@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
 
 
 # Criar instância FastAPI
-app = FastAPI(
+_app = FastAPI(
     title="ServiçoJá API",
     description="Marketplace de serviços locais com IA",
     version="1.0.0",
@@ -31,7 +31,7 @@ app = FastAPI(
 
 # CORS — apenas em desenvolvimento
 if settings.ENVIRONMENT == "development":
-    app.add_middleware(
+    _app.add_middleware(
         CORSMiddleware,
         allow_origins=["http://localhost:3000"],
         allow_credentials=True,
@@ -42,18 +42,14 @@ if settings.ENVIRONMENT == "development":
 # Servir arquivos estáticos (uploads)
 uploads_dir = settings.UPLOADS_DIR
 os.makedirs(uploads_dir, exist_ok=True)
-app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
+_app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
 
 # Routers
-app.include_router(v1_router, prefix="/api/v1", tags=["API v1"])
-app.include_router(auth_router, prefix="/api/v1", tags=["auth"])
-app.include_router(professionals_router, prefix="/api/v1", tags=["professionals"])
-
-# Middlewares LGPD
-app.add_middleware(LogSanitizerMiddleware)
+_app.include_router(v1_router, prefix="/api/v1", tags=["API v1"])
+_app.include_router(professionals_router, prefix="/api/v1")
 
 
-@app.get("/health", tags=["Health"])
+@_app.get("/health", tags=["Health"])
 async def health():
     """Healthcheck endpoint para Docker e load balancers."""
     return {
@@ -61,3 +57,8 @@ async def health():
         "version": "1.0.0",
         "environment": settings.ENVIRONMENT,
     }
+
+
+# Envolver com middleware ASGI puro (após registrar todas as rotas)
+# Usar wrapping direto em vez de add_middleware() para compatibilidade com ASGI puro
+app = LogSanitizerMiddleware(_app)

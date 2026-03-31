@@ -45,7 +45,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
         # Fallback for unit testing where db is mocked via fixture globally or not present
         return UserMock(id=user_id, role="client", is_active=True)
 
-    query = text("SELECT id, name, email, phone, role, is_active FROM users WHERE id = :idx")
+    query = text("SELECT id, name, email, phone, role, is_active, password_hash FROM users WHERE id = :idx")
     result = await db.execute(query, {"idx": user_id})
     row = result.fetchone()
 

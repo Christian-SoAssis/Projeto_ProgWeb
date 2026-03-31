@@ -20,7 +20,7 @@ def upgrade() -> None:
         "professionals",
         sa.Column("id", postgresql.UUID(as_uuid=True), sa.ForeignKey("users.id", ondelete="CASCADE"), primary_key=True),
         sa.Column("bio", sa.Text(), nullable=True),
-        sa.Column("location", geoalchemy2.types.Geometry(geometry_type='POINT', srid=4326, from_text='ST_GeomFromEWKT', name='geometry'), nullable=True),
+        sa.Column("location", geoalchemy2.types.Geometry(geometry_type='POINT', srid=4326, from_text='ST_GeomFromEWKT', name='geometry', spatial_index=False), nullable=True),
         sa.Column("service_radius_km", sa.Float(), nullable=False, server_default="20.0"),
         sa.Column("avg_response_min", sa.Integer(), nullable=True),
         sa.Column("completed_jobs", sa.Integer(), nullable=False, server_default="0"),

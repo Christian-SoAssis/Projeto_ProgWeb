@@ -67,11 +67,11 @@ async def register_professional(
     await db.execute(
         text("""
             INSERT INTO professionals (
-                id, user_id, bio, location, service_radius_km, 
+                id, bio, location, service_radius_km, 
                 hourly_rate_cents, is_verified, document_path, document_type
             )
             VALUES (
-                :pid, :uid, :bio, 
+                :uid, :bio, 
                 ST_GeomFromText(:pt, 4326), 
                 :radius, :rate, false, :doc_path, :doc_type
             )

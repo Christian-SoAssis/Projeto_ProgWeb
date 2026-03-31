@@ -17,6 +17,10 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    # Garantir que as extensões necessárias existam antes de criar as tabelas
+    op.execute("CREATE EXTENSION IF NOT EXISTS postgis")
+    op.execute("CREATE EXTENSION IF NOT EXISTS vector")
+
     # Criar enum type (uma única vez, via SQL puro)
     op.execute("CREATE TYPE userrole AS ENUM ('client', 'professional', 'admin')")
 

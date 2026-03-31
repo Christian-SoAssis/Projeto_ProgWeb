@@ -1,4 +1,5 @@
 """Schemas Pydantic v2 para autenticação (register, login, refresh, tokens)."""
+from datetime import datetime
 from typing import Literal, Optional
 from uuid import UUID
 
@@ -69,3 +70,12 @@ class MeResponse(BaseModel):
 class DeleteAccountRequest(BaseModel):
     """Confirmação de senha para exclusão de conta (LGPD)."""
     password: str = Field(..., min_length=1)
+
+
+class ConsentResponse(BaseModel):
+    """Log de consentimento aceito."""
+    consent_type: str
+    version: str
+    accepted_at: datetime
+
+    model_config = {"from_attributes": True}

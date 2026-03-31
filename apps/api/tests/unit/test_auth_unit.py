@@ -85,4 +85,5 @@ def test_role_middleware_admin():
         is_active = True
         
     # Admin bypasses the requirement
-    assert checker(MockUser()) is None
+    mock_user = MockUser()
+    assert checker(mock_user) is mock_user

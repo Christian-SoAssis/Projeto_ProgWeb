@@ -17,6 +17,7 @@ from app.core.security import (
     hash_password,
     verify_password,
 )
+from sqlalchemy import text
 from app.models.user import User, UserRole
 from app.schemas.v1.auth import (
     DeleteAccountRequest,
@@ -25,7 +26,9 @@ from app.schemas.v1.auth import (
     RefreshRequest,
     RegisterRequest,
     TokenResponse,
+    ConsentResponse,
 )
+from typing import List
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -66,9 +69,20 @@ async def register(
     await db.commit()
     await db.refresh(user)
 
+    # ── Criar logs de consentimento (LGPD) ───────────────────────────────────
+    ip = request.client.host if request.client else "127.0.0.1"
+    ua = request.headers.get("user-agent", "unknown")
+    query_consent = text("""
+        INSERT INTO consent_logs (id, user_id, consent_type, version, ip_address, user_agent)
+        VALUES (:cid, :uid, :ctype, '2026-01', :ip, :ua)
+    """)
+    await db.execute(query_consent, {"cid": uuid.uuid4(), "uid": user.id, "ctype": "terms", "ip": ip, "ua": ua})
+    await db.execute(query_consent, {"cid": uuid.uuid4(), "uid": user.id, "ctype": "privacy", "ip": ip, "ua": ua})
+    await db.commit()
+
     return TokenResponse(
-        access_token=create_access_token(str(user.id), user.role.value),
-        refresh_token=create_refresh_token(str(user.id)),
+        access_token=create_access_token({"sub": str(user.id), "role": user.role.value}),
+        refresh_token=create_refresh_token({"sub": str(user.id)}),
     )
 
 
@@ -101,8 +115,8 @@ async def login(
     await db.commit()
 
     return TokenResponse(
-        access_token=create_access_token(str(user.id), user.role.value),
-        refresh_token=create_refresh_token(str(user.id)),
+        access_token=create_access_token({"sub": str(user.id), "role": user.role.value}),
+        refresh_token=create_refresh_token({"sub": str(user.id)}),
     )
 
 
@@ -132,8 +146,8 @@ async def refresh_token(
         raise HTTPException(status_code=401, detail="Usuário inválido")
 
     return TokenResponse(
-        access_token=create_access_token(str(user.id), user.role.value),
-        refresh_token=create_refresh_token(str(user.id)),
+        access_token=create_access_token({"sub": str(user.id), "role": user.role.value}),
+        refresh_token=create_refresh_token({"sub": str(user.id)}),
     )
 
 
@@ -173,3 +187,23 @@ async def delete_account(
     user.password_hash = hash_password(uuid.uuid4().hex)
 
     await db.commit()
+
+
+# ─── Consents ─────────────────────────────────────────────────────────────────
+
+@router.get("/me/consents", response_model=List[ConsentResponse], summary="Logs de consentimento")
+async def get_consents(
+    user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> List[ConsentResponse]:
+    """Retorna o histórico de consentimentos (LGPD) do usuário."""
+    query = text("SELECT consent_type, version, accepted_at FROM consent_logs WHERE user_id = :uid ORDER BY accepted_at DESC")
+    result = await db.execute(query, {"uid": user.id})
+    # Mapear explicitamente para evitar problemas de compatibilidade Row/Pydantic
+    return [
+        ConsentResponse(
+            consent_type=row._mapping["consent_type"],
+            version=row._mapping["version"],
+            accepted_at=row._mapping["accepted_at"]
+        ) for row in result.fetchall()
+    ]
