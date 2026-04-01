@@ -1,127 +1,83 @@
-"""Router de profissionais — POST /professionals, PATCH /admin/professionals/:id."""
-import os
-import uuid
-from typing import Annotated
-
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
-from sqlalchemy import select
+import json
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
+from pydantic import ValidationError
 
 from app.core.database import get_db
-from app.core.deps import get_current_user, require_role
-from app.models.professional import Professional
-from app.models.user import User, UserRole
-from app.schemas.v1.professionals import (
-    ProfessionalApproval,
-    ProfessionalCreate,
-    ProfessionalResponse,
-)
-from app.core.config import settings
+from app.core.security import create_access_token, create_refresh_token
+from app.models.user import UserRole
+from app.schemas.v1.auth import ProfessionalCreate, UserCreate, ProfessionalResponse, TokenResponse
+from app.services import auth_service
 
-router = APIRouter(tags=["Profissionais"])
+router = APIRouter(prefix="/professionals", tags=["Professionals"])
 
-
-@router.post(
-    "/professionals",
-    response_model=ProfessionalResponse,
-    status_code=status.HTTP_201_CREATED,
-    summary="Cadastrar profissional com upload de documento",
-)
-async def create_professional(
+@router.post("/", response_model=ProfessionalResponse, status_code=status.HTTP_201_CREATED)
+async def register_professional(
+    # Multipart fields
+    name: str = Form(...),
+    email: str = Form(...),
+    phone: str = Form(None),
+    password: str = Form(...),
+    consent_terms: bool = Form(...),
+    consent_privacy: bool = Form(...),
+    
+    # Professional fields
     bio: str = Form(...),
     latitude: float = Form(...),
     longitude: float = Form(...),
     service_radius_km: float = Form(...),
     hourly_rate_cents: int = Form(...),
-    category_ids: str = Form(...),  # JSON string: '["uuid1","uuid2"]'
+    category_ids_json: str = Form(..., description="JSON array de UUIDs de categoria"),
     document_type: str = Form(...),
+    
+    # Upload
     document: UploadFile = File(...),
-    user: Annotated[User, Depends(get_current_user)] = None,
-    db: Annotated[AsyncSession, Depends(get_db)] = None,
-) -> ProfessionalResponse:
-    """
-    Cadastra profissional para o usuário autenticado.
-    - Aceita multipart/form-data com documento (CPF/CNPJ)
-    - Salva arquivo em ./uploads/docs/<user_id>/
-    - Muda role do usuário para professional
-    """
-    import json
-
-    # Validar com Pydantic
+    
+    db: AsyncSession = Depends(get_db)
+):
+    """Cadastro completo de profissional (Usuário + Profissional + Documento)."""
+    
+    # 1. Validar schemas Pydantic manualmente (desde que vem de Form)
     try:
-        ids = json.loads(category_ids)
-        payload = ProfessionalCreate(
-            bio=bio,
-            latitude=latitude,
-            longitude=longitude,
-            service_radius_km=service_radius_km,
-            hourly_rate_cents=hourly_rate_cents,
-            category_ids=ids,
-            document_type=document_type,
+        category_ids = json.loads(category_ids_json)
+        user_in = UserCreate(
+            name=name, email=email, phone=phone, password=password,
+            consent_terms=consent_terms, consent_privacy=consent_privacy
         )
+        prof_in = ProfessionalCreate(
+            bio=bio, latitude=latitude, longitude=longitude,
+            service_radius_km=service_radius_km, hourly_rate_cents=hourly_rate_cents,
+            category_ids=category_ids, document_type=document_type
+        )
+    except (ValidationError, json.JSONDecodeError) as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(e)
+        )
+        
+    # 2. Operação Atômica via Services
+    try:
+        # a) Criar usuário
+        user = await auth_service.create_user_with_consent(
+            db=db, user_in=user_in, role=UserRole.PROFESSIONAL,
+            # Placeholder para IP/UA se necessário
+        )
+        
+        # b) Criar perfil profissional e salvar documento
+        professional = await auth_service.build_professional(
+            db=db, user_id=user.id, prof_in=prof_in, document=document
+        )
+        
+        await db.commit()
+        await db.refresh(professional)
+        return professional
+        
+    except HTTPException:
+        # Relançar exceções HTTP geradas pelos services
+        raise
     except Exception as e:
-        raise HTTPException(status_code=422, detail=str(e))
-
-    # Verificar se já tem perfil
-    existing = await db.execute(
-        select(Professional).where(Professional.user_id == user.id)
-    )
-    if existing.scalar_one_or_none():
-        raise HTTPException(status_code=409, detail="Profissional já cadastrado")
-
-    # Salvar documento
-    docs_dir = os.path.join(settings.UPLOADS_DIR, "docs", str(user.id))
-    os.makedirs(docs_dir, exist_ok=True)
-    doc_ext = os.path.splitext(document.filename or "doc")[1] or ".pdf"
-    doc_path = os.path.join(docs_dir, f"document{doc_ext}")
-    with open(doc_path, "wb") as f:
-        content = await document.read()
-        f.write(content)
-
-    # Criar profissional
-    professional = Professional(
-        id=uuid.uuid4(),
-        user_id=user.id,
-        bio=payload.bio,
-        latitude=payload.latitude,
-        longitude=payload.longitude,
-        service_radius_km=payload.service_radius_km,
-        hourly_rate_cents=payload.hourly_rate_cents,
-        document_type=payload.document_type,
-        document_path=doc_path,
-    )
-    db.add(professional)
-
-    # Mudar role para professional
-    user.role = UserRole.PROFESSIONAL
-    await db.commit()
-    await db.refresh(professional)
-
-    return ProfessionalResponse.model_validate(professional)
-
-
-@router.patch(
-    "/admin/professionals/{professional_id}",
-    response_model=ProfessionalResponse,
-    summary="Aprovar/rejeitar profissional (admin)",
-)
-async def approve_professional(
-    professional_id: uuid.UUID,
-    body: ProfessionalApproval,
-    _admin: Annotated[User, Depends(require_role("admin"))],
-    db: Annotated[AsyncSession, Depends(get_db)],
-) -> ProfessionalResponse:
-    """Admin aprova ou rejeita o cadastro de um profissional."""
-    result = await db.execute(
-        select(Professional).where(Professional.id == professional_id)
-    )
-    prof = result.scalar_one_or_none()
-    if not prof:
-        raise HTTPException(status_code=404, detail="Profissional não encontrado")
-
-    prof.is_verified = body.is_verified
-    prof.rejection_reason = body.rejection_reason
-    await db.commit()
-    await db.refresh(prof)
-
-    return ProfessionalResponse.model_validate(prof)
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erro interno no cadastro: {str(e)}"
+        )

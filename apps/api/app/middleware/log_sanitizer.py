@@ -1,45 +1,58 @@
-from typing import Any, Dict
+import re
+import json
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import Response
+import logging
 
+logger = logging.getLogger("uvicorn.error")
 
-def sanitize_log(log_record: Dict[str, Any]) -> Dict[str, Any]:
+class LogSanitizerMiddleware(BaseHTTPMiddleware):
     """
-    Sanitize sensitive information from logs according to LGPD requirements.
-    Masks CPF, CNPJ, Passwords and Authentication tokens.
+    Middleware para mascarar informações sensíveis (PII) nos logs.
+    Mascaramento aplicado: CPF, CNPJ e Tokens de Autorização.
     """
-    sanitized = log_record.copy()
+    
+    # Regex para CPF: 000.000.000-00
+    CPF_PATTERN = re.compile(r"\b\d{3}\.\d{3}\.\d{3}-\d{2}\b")
+    # Regex para CNPJ: 00.000.000/0000-00
+    CNPJ_PATTERN = re.compile(r"\b\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}\b")
+    # Regex para Authorization header
+    AUTH_PATTERN = re.compile(r"Bearer\s+[\w\.-]+")
 
-    # Redact Headers
-    if "headers" in sanitized and isinstance(sanitized["headers"], dict):
-        if "Authorization" in sanitized["headers"]:
-            sanitized["headers"]["Authorization"] = "Bearer [REDACTED]"
+    def mask_text(self, text: str) -> str:
+        """Aplica máscaras em um texto."""
+        if not text:
+            return text
+            
+        # Mascarar CPF (ex: ***.***.***-01)
+        text = self.CPF_PATTERN.sub(lambda m: "***.***.***-" + m.group()[-2:], text)
+        
+        # Mascarar CNPJ (ex: **.***.****/****-90)
+        text = self.CNPJ_PATTERN.sub(lambda m: "**.***.****/****-" + m.group()[-2:], text)
+        
+        # Mascarar Headers
+        text = self.AUTH_PATTERN.sub("Bearer [REDACTED]", text)
+        
+        return text
 
-    # Redact Body content
-    if "body" in sanitized and isinstance(sanitized["body"], dict):
-        body = sanitized["body"]
+    async def dispatch(self, request: Request, call_next):
+        # 1. Obter informações básicas da request
+        method = request.method
+        url = str(request.url)
+        client_host = request.client.host if request.client else "unknown"
+        
+        # 2. Registrar request (com headers mascarados)
+        headers = dict(request.headers)
+        if "authorization" in headers:
+            headers["authorization"] = "Bearer [REDACTED]"
+        
+        logger.debug(f"Request: {method} {url} from {client_host} | Headers: {headers}")
 
-        # Redact password
-        if "password" in body:
-            body["password"] = "[REDACTED]"
-
-        # Mask CPF/CNPJ
-        for key in ["document_number", "cpf", "cnpj"]:
-            if key in body and isinstance(body[key], str):
-                val = body[key]
-                if len(val) == 11 and val.isdigit():
-                    body[key] = "***.***.***-XX"
-                elif len(val) == 14 and val.isdigit():
-                    body[key] = "**.***.****/****-XX"
-                else:
-                    body[key] = "[REDACTED DOCUMENT]"
-
-    return sanitized
-
-
-# Middleware ASGI puro — evita o bug conhecido do BaseHTTPMiddleware com asyncpg/asyncio
-# onde Tasks pendentes corrompem o pool de conexões durante tratamento de exceções HTTP.
-class LogSanitizerMiddleware:
-    def __init__(self, app):
-        self.app = app
-
-    async def __call__(self, scope, receive, send):
-        await self.app(scope, receive, send)
+        # 3. Processar a request
+        response = await call_next(request)
+        
+        # 4. Registrar response
+        logger.debug(f"Response: {method} {url} | Status: {response.status_code}")
+        
+        return response

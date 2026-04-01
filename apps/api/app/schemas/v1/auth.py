@@ -1,38 +1,67 @@
-"""Schemas Pydantic v2 para autenticação (register, login, refresh, tokens)."""
 from datetime import datetime
-from typing import Literal, Optional
+from typing import List, Optional, Literal
 from uuid import UUID
+from pydantic import BaseModel, EmailStr, Field, field_validator, ConfigDict, model_validator
 
-from pydantic import BaseModel, EmailStr, Field, field_validator
+# --- Base Schemas ---
 
-
-from app.models.user import UserRole
-
-
-class RegisterRequest(BaseModel):
-    """Cadastro de cliente."""
-    name: str = Field(..., min_length=2, max_length=100)
+class UserBase(BaseModel):
     email: EmailStr
+    name: str = Field(..., min_length=2, max_length=100)
     phone: Optional[str] = Field(None, pattern=r"^\+55\d{10,11}$")
+
+    @field_validator("email")
+    @classmethod
+    def normalize_email(cls, v: str) -> str:
+        return v.lower().strip()
+
+class ProfessionalBase(BaseModel):
+    bio: str = Field(..., min_length=10, max_length=1000)
+    latitude: float = Field(..., ge=-90, le=90)
+    longitude: float = Field(..., ge=-180, le=180)
+    service_radius_km: float = Field(..., gt=0, le=200)
+    hourly_rate_cents: int = Field(..., gt=0)
+    category_ids: List[UUID] = Field(..., min_length=1, max_length=10)
+    document_type: Literal["cpf", "cnpj"]
+
+# --- Request Schemas ---
+
+class UserCreate(UserBase):
     password: str = Field(..., min_length=8, max_length=128)
     consent_terms: bool = Field(...)
     consent_privacy: bool = Field(...)
 
-    @field_validator("email")
+    @field_validator("consent_terms")
     @classmethod
-    def normalize_email(cls, v: str) -> str:
-        return v.lower().strip()
-
-    @field_validator("consent_terms", "consent_privacy")
-    @classmethod
-    def must_accept(cls, v: bool, info) -> bool:
-        if not v:
-            raise ValueError(f"Aceite obrigatório de {info.field_name}")
+    def validate_terms(cls, v: bool) -> bool:
+        if v is not True:
+            raise ValueError("Aceite obrigatório dos termos")
         return v
 
+    @field_validator("consent_privacy")
+    @classmethod
+    def validate_privacy(cls, v: bool) -> bool:
+        if v is not True:
+            raise ValueError("Aceite obrigatório da política de privacidade")
+        return v
+
+class ProfessionalCreate(ProfessionalBase):
+    # ProfessionalCreate is used as a nested model in some flows, 
+    # but in POST /professionals it comes as a separate field or multipart.
+    pass
+
+class UserUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=2, max_length=100)
+    phone: Optional[str] = Field(None, pattern=r"^\+55\d{10,11}$")
+    avatar_url: Optional[str] = None
+
+class ProfessionalUpdate(BaseModel):
+    bio: Optional[str] = Field(None, min_length=10, max_length=1000)
+    service_radius_km: Optional[float] = Field(None, gt=0, le=200)
+    hourly_rate_cents: Optional[int] = Field(None, gt=0)
+    category_ids: Optional[List[UUID]] = Field(None, min_length=1, max_length=10)
 
 class LoginRequest(BaseModel):
-    """Credenciais de login."""
     email: EmailStr
     password: str = Field(..., min_length=1)
 
@@ -41,41 +70,34 @@ class LoginRequest(BaseModel):
     def normalize_email(cls, v: str) -> str:
         return v.lower().strip()
 
-
 class RefreshRequest(BaseModel):
-    """Requisição de rotação de refresh token."""
     refresh_token: str = Field(..., min_length=1)
 
-
-class TokenResponse(BaseModel):
-    """Par de tokens retornado após login/refresh."""
-    access_token: str
-    refresh_token: str
-    token_type: Literal["bearer"] = "bearer"
-
-
-class MeResponse(BaseModel):
-    """Perfil do usuário autenticado."""
-    id: UUID
-    name: str
-    email: EmailStr
-    phone: Optional[str]
-    role: UserRole
-    avatar_url: Optional[str]
-    is_active: bool
-
-    model_config = {"from_attributes": True}
-
-
 class DeleteAccountRequest(BaseModel):
-    """Confirmação de senha para exclusão de conta (LGPD)."""
     password: str = Field(..., min_length=1)
 
+# --- Response Schemas ---
 
-class ConsentResponse(BaseModel):
-    """Log de consentimento aceito."""
-    consent_type: str
-    version: str
-    accepted_at: datetime
+class UserResponse(UserBase):
+    id: UUID
+    role: str
+    avatar_url: Optional[str] = None
+    is_active: bool
+    created_at: datetime
+    
+    model_config = ConfigDict(from_attributes=True)
 
-    model_config = {"from_attributes": True}
+class ProfessionalResponse(ProfessionalBase):
+    id: UUID
+    user_id: UUID
+    is_verified: bool
+    reputation_score: float
+    rejection_reason: Optional[str] = None
+    
+    model_config = ConfigDict(from_attributes=True)
+
+class TokenResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    expires_in: int = 900 # 15 minutes in seconds

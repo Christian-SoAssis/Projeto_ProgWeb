@@ -11,12 +11,18 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql+asyncpg://servicoja:servicoja_dev_2026@localhost:5432/servicoja"
 
     # Redis
-    REDIS_URL: str = "redis://:redis_dev_2026@localhost:6379/0"
+    REDIS_URL: str = "redis://:redis_dev_2026@localhost:6379"
+    REDIS_TOKENS_DB: int = 1
+    REDIS_QUEUE_DB: int = 0
 
     # JWT
     JWT_SECRET: str = "jwt_super_secret_dev_key_change_in_production_2026"
+    ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     JWT_REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+
+    # LGPD
+    TERMS_VERSION: str = "2026-01"
 
     # Diretórios
     UPLOADS_DIR: str = "./uploads"

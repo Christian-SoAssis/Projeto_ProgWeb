@@ -2,29 +2,35 @@
 
 ## 1. Fundação e Infra
 
-- [ ] 1.1 Configurar monorepo: pasta `apps/web` (Next.js 14) + `apps/api` (FastAPI + Matching Module)
+> **Nota:** Módulo 1 concluído. Docker Compose consolidado em 4 containers (db, redis, api, web)
+> conforme `reduce-containers`. `apps/db/Dockerfile` customizado resolveu incompatibilidade
+> PostGIS + pgvector (base: `postgis/postgis:16-3.4` + pgvector instalado no topo).
+> Migrations 001–016 aplicadas. Seed de 16 categorias executado.
+> Tasks 1.7, 1.8, 1.9 e 1.10 (CI, OpenTelemetry, OpenAPI export) ficam para o Módulo 10.
+
+- [x] 1.1 Configurar monorepo: pasta `apps/web` (Next.js 14) + `apps/api` (FastAPI + Matching Module)
 - [ ] 1.1a Setup shadcn/ui no `apps/web`: `npx shadcn@latest init`, instalar 29 componentes via CLI (`alert`, `alert-dialog`, `avatar`, `badge`, `button`, `calendar`, `card`, `carousel`, `checkbox`, `command`, `dialog`, `dropdown-menu`, `form`, `input`, `label`, `popover`, `progress`, `scroll-area`, `select`, `separator`, `sheet`, `skeleton`, `slider`, `switch`, `table`, `tabs`, `textarea`, `tooltip`, `toast`), configurar theme tokens (cores, fontes), verificar import paths
-- [ ] 1.2 Configurar Docker Compose: PostgreSQL 16 + PostGIS + Redis (4 containers total)
-- [ ] 1.3 Instalar extensões PostgreSQL: `PostGIS`, `pgvector`, `uuid-ossp`
-- [ ] 1.4 Configurar Alembic: `alembic init`, `env.py` async com SQLAlchemy 2.0, `alembic.ini` apontando para `DATABASE_URL`
-- [ ] 1.4.1 Migration 001: tabela `users` (id, name, email, phone, password_hash, role, avatar_url, is_active, timestamps) + índices
-- [ ] 1.4.2 Migration 002: tabela `professionals` (FK users ON DELETE CASCADE, bio, location GEOMETRY, service_radius_km, reputation_score, is_verified, profile_embedding vector(1536)) + índices GiST e IVFFlat
-- [ ] 1.4.3 Migration 003: tabela `categories` (id, name, slug UNIQUE, color VARCHAR(7) DEFAULT '#1a9878', parent_id self-ref ON DELETE SET NULL, sort_order, is_active)
-- [ ] 1.4.4 Migration 004: tabela `professional_categories` (PK composta, FK professionals + categories ON DELETE CASCADE)
-- [ ] 1.4.5 Migration 005: tabela `requests` (FK users, FK categories ON DELETE RESTRICT, location GEOMETRY, urgency CHECK, status CHECK, ai_* fields) + índices GiST e compostos
-- [ ] 1.4.6 Migration 006: tabela `request_images` (FK requests ON DELETE CASCADE, content_type CHECK, size_bytes CHECK ≤ 10MB)
-- [ ] 1.4.7 Migration 007: tabela `bids` (FK requests + professionals ON DELETE CASCADE, price_cents CHECK > 0, UNIQUE request+professional)
-- [ ] 1.4.8 Migration 008: tabela `contracts` (FK requests UNIQUE + professionals + users ON DELETE RESTRICT, status CHECK com 7 estados, timestamps de pagamento/repasse)
-- [ ] 1.4.9 Migration 009: tabela `reviews` (FK contracts UNIQUE ON DELETE RESTRICT, FK users, rating CHECK 1-5, scores NLP CHECK 0-1)
-- [ ] 1.4.10 Migration 010: tabela `messages` (FK contracts + users ON DELETE CASCADE, content CHECK length ≥ 1) + índice cursor-based
-- [ ] 1.4.11 Migration 011: tabela `notifications` (FK users ON DELETE CASCADE, type CHECK enum, payload JSONB) + índice parcial não-lidas
-- [ ] 1.4.12 Migration 012: tabela `disputes` (FK contracts UNIQUE + users ON DELETE RESTRICT, category CHECK enum, status CHECK, resolution CHECK, refund_percent CHECK 1-99) + índice de deadline
-- [ ] 1.4.13 Migration 013: tabela `commission_rates` (FK categories ON DELETE CASCADE nullable, percent NUMERIC(5,2) CHECK, effective_from/until com validação) + seed taxa padrão 5%
-- [ ] 1.4.14 Migration 014: tabela `consent_logs` (FK users ON DELETE RESTRICT, consent_type CHECK, ip_address INET, version)
-- [ ] 1.4.15 Migration 015: tabela `push_subscriptions` (FK users ON DELETE CASCADE, endpoint UNIQUE, keys p256dh/auth)
-- [ ] 1.4.16 Migration 016: tabela `favorites` (FK users + professionals ON DELETE CASCADE, UNIQUE client+professional)
-- [ ] 1.5 Seed inicial de categorias: executar script que cria 16 categorias conforme `specs/categories-seed/spec.md` (nome, slug, cor hex, sort_order)
-- [ ] 1.6 Configurar variáveis de ambiente (`.env.example` para cada app)
+- [x] 1.2 Configurar Docker Compose: PostgreSQL 16 + PostGIS + Redis (4 containers total)
+- [x] 1.3 Instalar extensões PostgreSQL: `PostGIS`, `pgvector`, `uuid-ossp`
+- [x] 1.4 Configurar Alembic: `alembic init`, `env.py` async com SQLAlchemy 2.0, `alembic.ini` apontando para `DATABASE_URL`
+- [x] 1.4.1 Migration 001: tabela `users` (id, name, email, phone, password_hash, role, avatar_url, is_active, timestamps) + índices
+- [x] 1.4.2 Migration 002: tabela `professionals` (FK users ON DELETE CASCADE, bio, location GEOMETRY, service_radius_km, reputation_score, is_verified, profile_embedding vector(1536)) + índices GiST e IVFFlat
+- [x] 1.4.3 Migration 003: tabela `categories` (id, name, slug UNIQUE, color VARCHAR(7) DEFAULT '#1a9878', parent_id self-ref ON DELETE SET NULL, sort_order, is_active)
+- [x] 1.4.4 Migration 004: tabela `professional_categories` (PK composta, FK professionals + categories ON DELETE CASCADE)
+- [x] 1.4.5 Migration 005: tabela `requests` (FK users, FK categories ON DELETE RESTRICT, location GEOMETRY, urgency CHECK, status CHECK, ai_* fields) + índices GiST e compostos
+- [x] 1.4.6 Migration 006: tabela `request_images` (FK requests ON DELETE CASCADE, content_type CHECK, size_bytes CHECK ≤ 10MB)
+- [x] 1.4.7 Migration 007: tabela `bids` (FK requests + professionals ON DELETE CASCADE, price_cents CHECK > 0, UNIQUE request+professional)
+- [x] 1.4.8 Migration 008: tabela `contracts` (FK requests UNIQUE + professionals + users ON DELETE RESTRICT, status CHECK com 7 estados, timestamps de pagamento/repasse)
+- [x] 1.4.9 Migration 009: tabela `reviews` (FK contracts UNIQUE ON DELETE RESTRICT, FK users, rating CHECK 1-5, scores NLP CHECK 0-1)
+- [x] 1.4.10 Migration 010: tabela `messages` (FK contracts + users ON DELETE CASCADE, content CHECK length ≥ 1) + índice cursor-based
+- [x] 1.4.11 Migration 011: tabela `notifications` (FK users ON DELETE CASCADE, type CHECK enum, payload JSONB) + índice parcial não-lidas
+- [x] 1.4.12 Migration 012: tabela `disputes` (FK contracts UNIQUE + users ON DELETE RESTRICT, category CHECK enum, status CHECK, resolution CHECK, refund_percent CHECK 1-99) + índice de deadline
+- [x] 1.4.13 Migration 013: tabela `commission_rates` (FK categories ON DELETE CASCADE nullable, percent NUMERIC(5,2) CHECK, effective_from/until com validação) + seed taxa padrão 5%
+- [x] 1.4.14 Migration 014: tabela `consent_logs` (FK users ON DELETE RESTRICT, consent_type CHECK, ip_address INET, version)
+- [x] 1.4.15 Migration 015: tabela `push_subscriptions` (FK users ON DELETE CASCADE, endpoint UNIQUE, keys p256dh/auth)
+- [x] 1.4.16 Migration 016: tabela `favorites` (FK users + professionals ON DELETE CASCADE, UNIQUE client+professional)
+- [x] 1.5 Seed inicial de categorias: executar script que cria 16 categorias conforme `specs/categories-seed/spec.md` (nome, slug, cor hex, sort_order)
+- [x] 1.6 Configurar variáveis de ambiente (`.env.example` para cada app)
 - [ ] 1.7 Pipeline CI básica: lint + type-check + testes (GitHub Actions)
 - [ ] 1.8 Configurar OpenTelemetry em todos os serviços + Grafana dashboard básico
 - [ ] 1.9 Gerar schema OpenAPI 3.1 automaticamente via FastAPI (`/docs` e `/openapi.json`) e exportar artefato versionado no CI

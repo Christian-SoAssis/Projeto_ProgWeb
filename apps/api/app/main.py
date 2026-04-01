@@ -6,8 +6,6 @@ import os
 
 from app.core.config import settings
 from app.api.v1 import router as v1_router
-from app.routers.auth import router as auth_router
-from app.routers.professionals import router as professionals_router
 from app.middleware.log_sanitizer import LogSanitizerMiddleware
 
 
@@ -45,8 +43,7 @@ os.makedirs(uploads_dir, exist_ok=True)
 _app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
 
 # Routers
-_app.include_router(v1_router, prefix="/api/v1", tags=["API v1"])
-_app.include_router(professionals_router, prefix="/api/v1")
+_app.include_router(v1_router, prefix="/api/v1")
 
 
 @_app.get("/health", tags=["Health"])
@@ -59,6 +56,7 @@ async def health():
     }
 
 
-# Envolver com middleware ASGI puro (após registrar todas as rotas)
-# Usar wrapping direto em vez de add_middleware() para compatibilidade com ASGI puro
-app = LogSanitizerMiddleware(_app)
+# Registrar middleware
+_app.add_middleware(LogSanitizerMiddleware)
+
+app = _app

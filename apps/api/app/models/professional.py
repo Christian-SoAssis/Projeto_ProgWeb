@@ -1,8 +1,8 @@
 """Model SQLAlchemy para a tabela professionals."""
 import uuid as _uuid
 
-from sqlalchemy import Boolean, Column, Float, ForeignKey, Integer, String, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Boolean, Column, Float, ForeignKey, Integer, String, Text, Index
+from sqlalchemy.dialects.postgresql import UUID, TSVECTOR
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
@@ -34,6 +34,9 @@ class Professional(Base):
     # Caminho do documento enviado (CPF/CNPJ)
     document_path = Column(String(500), nullable=True)
     document_type = Column(String(10), nullable=True)  # 'cpf' | 'cnpj'
+
+    # Indice FTS (tsvector)
+    search_vector = Column(TSVECTOR, nullable=True)
 
     # Relacionamentos
     user = relationship("User", back_populates="professional")
