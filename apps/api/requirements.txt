@@ -25,6 +25,7 @@ hiredis==2.3.2
 # Testes
 pytest==7.4.4
 pytest-asyncio==0.23.6
+pytest-cov==4.1.0
 httpx==0.26.0
 
 # Utilitários
