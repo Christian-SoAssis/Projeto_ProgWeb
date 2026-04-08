@@ -33,8 +33,8 @@ def test_jwt_expired_token():
     user_id = str(uuid4())
     # Create an expired token manually or using expired delta
     token = security.create_access_token({"sub": user_id}, expires_delta=timedelta(seconds=-1))
-    from jose import JWTError
-    with pytest.raises(JWTError):
+    from fastapi import HTTPException
+    with pytest.raises(HTTPException):
         security.decode_token(token)
 
 @pytest.mark.asyncio

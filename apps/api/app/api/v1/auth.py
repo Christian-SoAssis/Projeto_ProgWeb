@@ -72,7 +72,9 @@ async def login(
             detail="Credenciais inválidas"
         )
     
-    # Atualizar last_login_at se desejar (opcional)
+    # Atualizar last_login_at
+    user.last_login_at = datetime.now(timezone.utc)
+    await db.commit()
     
     return TokenResponse(
         access_token=create_access_token({"sub": str(user.id), "role": user.role.value}),

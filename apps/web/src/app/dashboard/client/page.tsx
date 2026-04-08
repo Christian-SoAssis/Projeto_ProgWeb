@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Search, Plus, MapPin, Clock, ArrowRight } from "lucide-react"
+import { useAuth } from "@/context/auth-context"
 
 export default function ClientDashboard() {
+  const { user } = useAuth()
   const activeRequests = [
     { id: 1, title: "Reforma Banheiro", status: "Orçamentos (3)", date: "Há 2 dias" },
     { id: 2, title: "Pintura de Fachada", status: "Em análise", date: "Há 5 horas" },
@@ -14,13 +16,13 @@ export default function ClientDashboard() {
 
   return (
     <main className="min-h-screen bg-background pb-20">
-      <DashboardHeader userName="Carlos Silva" roleLabel="Cliente" />
+      <DashboardHeader userName={user?.name || "Cliente"} roleLabel="Cliente" />
 
       <div className="px-6 space-y-8 max-w-2xl mx-auto">
         {/* Welcome Section */}
         <section className="mt-4">
           <h1 className="text-2xl font-black tracking-tight text-foreground/90">
-            Olá, <span className="text-primary italic">Carlos!</span>
+            Olá, <span className="text-primary italic">{user?.name?.split(" ")[0] || "Usuário"}!</span>
           </h1>
           <p className="text-sm font-medium text-muted-foreground mt-1">
             Do que você precisa hoje?

@@ -21,14 +21,29 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
-import { ChevronLeft, Github } from "lucide-react"
+import { ChevronLeft, Github, Loader2 } from "lucide-react"
+import { useAuth } from "@/context/auth-context"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 
 const loginSchema = z.object({
   email: z.string().email({ message: "E-mail inválido." }),
-  password: z.string().min(6, { message: "Senha deve ter no mínimo 6 caracteres." }),
+  password: z.string().min(1, { message: "Senha é obrigatória." }),
 })
 
 export default function LoginPage() {
+  const { login } = useAuth()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    if (searchParams.get("registered")) {
+      toast.info("Conta criada!", {
+        description: "Agora você pode entrar com suas credenciais.",
+      })
+    }
+  }, [searchParams])
+
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -37,11 +52,18 @@ export default function LoginPage() {
     },
   })
 
-  function onSubmit(values: z.infer<typeof loginSchema>) {
-    toast.info("Tentativa de Login", {
-      description: `E-mail: ${values.email}`,
-    })
-    console.log(values)
+  async function onSubmit(values: z.infer<typeof loginSchema>) {
+    setIsSubmitting(true)
+    try {
+      await login(values)
+      toast.success("Login realizado!")
+    } catch (error: any) {
+      toast.error("Erro ao entrar", {
+        description: error.message || "E-mail ou senha incorretos.",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -101,8 +123,13 @@ export default function LoginPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" variant="neo-elevated" className="w-full h-14 rounded-2xl text-primary font-bold text-lg mt-4 shadow-none hover:translate-y-[-2px] transition-all">
-                Entrar
+              <Button 
+                type="submit" 
+                variant="neo-elevated" 
+                className="w-full h-14 rounded-2xl text-primary font-bold text-lg mt-4 shadow-none hover:translate-y-[-2px] transition-all"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? <Loader2 className="animate-spin" /> : "Entrar"}
               </Button>
             </form>
           </Form>

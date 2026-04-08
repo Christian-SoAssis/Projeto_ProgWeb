@@ -74,11 +74,16 @@ async def app(db_session):
 
 
 @pytest_asyncio.fixture(scope="function")
-async def client(app):
+async def async_client(app):
     """Cliente HTTP que usa a instância do app com overrides."""
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
+
+@pytest_asyncio.fixture(scope="function")
+async def client(async_client):
+    """Alias para async_client para compatibilidade."""
+    yield async_client
 
 
 @pytest_asyncio.fixture(autouse=True)

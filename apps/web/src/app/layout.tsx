@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/context/auth-context";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -32,8 +33,10 @@ export default function RootLayout({
         className={`${dmSans.variable} ${dmMono.variable} antialiased bg-background text-foreground`}
       >
         <TooltipProvider>
-          {children}
-          <Toaster />
+          <AuthProvider>
+            {children}
+            <Toaster />
+          </AuthProvider>
         </TooltipProvider>
       </body>
     </html>

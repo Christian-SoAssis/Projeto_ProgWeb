@@ -192,19 +192,20 @@ async def test_register_professional_success(async_client: AsyncClient, db_sessi
 
     uid = uuid4().hex[:8]
     import json
-    files = {"document_file": ("doc.pdf", b"dummy content", "application/pdf")}
+    files = {"document": ("doc.pdf", b"dummy content", "application/pdf")}
     payload_data = {
         "name": "Prof", "email": f"prof_{uid}@log.com", "password": "password123",
         "consent_terms": True, "consent_privacy": True,
-        "bio": "bio", "latitude": -23.5, "longitude": -46.6,
-        "service_radius_km": 10, "category_ids": [cat_id], "document_type": "cpf"
+        "bio": "Bio do profissional com mais de dez caracteres", "latitude": -23.5, "longitude": -46.6,
+        "service_radius_km": 10, "category_ids_json": json.dumps([cat_id]), "document_type": "cpf",
+        "hourly_rate_cents": 5000
     }
     resp = await async_client.post(
-        "/api/v1/professionals",
-        data={"payload": json.dumps(payload_data)},
+        "/api/v1/professionals/",
+        data=payload_data,
         files=files
     )
-    assert resp.status_code == 201
+    assert resp.status_code == 201, f"STATUS {resp.status_code} | BODY: {resp.text} | SENT: {payload_data}"
     assert resp.json()["role"] == "professional"
     assert resp.json()["is_verified"] is False
 

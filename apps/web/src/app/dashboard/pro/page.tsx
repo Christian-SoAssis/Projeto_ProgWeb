@@ -4,9 +4,11 @@ import { DashboardHeader } from "@/components/dashboard/DashboardHeader"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { MapPin, Star, DollarSign, Briefcase, Zap, AlertCircle } from "lucide-react"
+import { useAuth } from "@/context/auth-context"
 import { useEffect, useState, useRef } from "react"
 
 export default function ProfessionalDashboard() {
+  const { user } = useAuth()
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [locationError, setLocationError] = useState<string | null>(null)
   const [retryCount, setRetryCount] = useState(0)
@@ -62,7 +64,7 @@ export default function ProfessionalDashboard() {
 
   return (
     <main className="min-h-screen bg-background pb-20">
-      <DashboardHeader userName="Marcos Souza" roleLabel="Profissional" />
+      <DashboardHeader userName={user?.name || "Profissional"} roleLabel="Profissional" />
 
       <div className="px-6 space-y-8 max-w-2xl mx-auto">
         {/* Stats Grid */}

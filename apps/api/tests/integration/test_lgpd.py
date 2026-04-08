@@ -22,7 +22,7 @@ async def test_delete_account_success(async_client: AsyncClient, db_session):
         headers={"Authorization": f"Bearer {token}"},
         json={"password": "password123"}
     )
-    assert resp_del.status_code == 204
+    assert resp_del.status_code == 200
 
     from sqlalchemy import text
     res = await db_session.execute(

@@ -3,6 +3,7 @@
 import { NotificationBell } from "./NotificationBell"
 import { User, LogOut, ChevronDown } from "lucide-react"
 import { useState } from "react"
+import { useAuth } from "@/context/auth-context"
 
 interface DashboardHeaderProps {
   userName: string
@@ -11,6 +12,7 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ userName, roleLabel }: DashboardHeaderProps) {
   const [profileOpen, setProfileOpen] = useState(false)
+  const { logout } = useAuth()
 
   return (
     <header className="w-full flex justify-between items-center px-6 py-4 mb-2">
@@ -50,7 +52,10 @@ export function DashboardHeader({ userName, roleLabel }: DashboardHeaderProps) {
                 <User className="w-4 h-4" /> Meu Perfil
               </button>
               <div className="h-px bg-muted/20 my-1 mx-2" />
-              <button className="w-full px-4 py-2 text-left text-sm font-bold text-destructive hover:bg-destructive/5 transition-colors flex items-center gap-2">
+              <button 
+                onClick={logout}
+                className="w-full px-4 py-2 text-left text-sm font-bold text-destructive hover:bg-destructive/5 transition-colors flex items-center gap-2"
+              >
                 <LogOut className="w-4 h-4" /> Sair
               </button>
             </div>
