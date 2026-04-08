@@ -14,10 +14,10 @@
 **Caminho:** `openspec/changes/reduce-containers/`
 **O que faz:** Consolida a topologia de containers — remove serviços redundantes (Typesense, MinIO, OTEL Collector) e merge do matching no backend principal.
 
-- [ ] **Tarefa 1** — Refatoração Backend: mover `apps/matching` → `apps/api/app/matching`, criar `engine.py`, atualizar `requirements.txt`
-- [ ] **Tarefa 2** — Consolidação PostgreSQL: migração `tsvector`, trigger de atualização, índices `pg_trgm`
-- [ ] **Tarefa 3** — Docker & Cleanup: atualizar `docker-compose.yml` (4 containers: api, web, postgres, redis), volumes bind mount
-- [ ] **Tarefa 4** — Verificação: validar matching, busca PostGIS+FTS, upload filesystem, `docker compose up`
+- [x] **Tarefa 1** — Refatoração Backend: mover `apps/matching` → `apps/api/app/matching`, criar `engine.py`, atualizar `requirements.txt`
+- [x] **Tarefa 2** — Consolidação PostgreSQL: migração `tsvector`, trigger de atualização, índices `pg_trgm`
+- [x] **Tarefa 3** — Docker & Cleanup: atualizar `docker-compose.yml` (4 containers: api, web, postgres, redis), volumes bind mount
+- [x] **Tarefa 4** — Verificação: validar matching, busca PostGIS+FTS, upload filesystem, `docker compose up`
 
 **✅ Critério de conclusão:** `docker compose up` sobe com 4 containers e todos os healthchecks passam.
 
@@ -27,17 +27,17 @@
 **Caminho:** `openspec/changes/service-marketplace-platform/`
 **O que faz:** Setup completo do monorepo, banco de dados e migrações iniciais.
 
-- [ ] **1.1** Configurar monorepo `apps/web` (Next.js 14) + `apps/api` (FastAPI)
-- [ ] **1.1a** Setup shadcn/ui: `npx shadcn@latest init`, instalar 29 componentes, configurar theme tokens
-- [ ] **1.2** Docker Compose: PostgreSQL 16 + PostGIS + Redis (4 containers)
-- [ ] **1.3** Extensões PostgreSQL: PostGIS, pgvector, uuid-ossp
-- [ ] **1.4** Alembic: init, `env.py` async com SQLAlchemy 2.0
-  - [ ] **1.4.1–1.4.16** Migrations 001–016 (users, professionals, categories, professional_categories, requests, request_images, bids, contracts, reviews, messages, notifications, disputes, commission_rates, consent_logs, push_subscriptions, favorites)
+- [x] **1.1** Configurar monorepo `apps/web` (Next.js 14) + `apps/api` (FastAPI)
+- [x] **1.1a** Setup shadcn/ui: `npx shadcn@latest init`, instalar 29 componentes, configurar theme tokens
+- [x] **1.2** Docker Compose: PostgreSQL 16 + PostGIS + Redis (4 containers)
+- [x] **1.3** Extensões PostgreSQL: PostGIS, pgvector, uuid-ossp
+- [x] **1.4** Alembic: init, `env.py` async com SQLAlchemy 2.0
+  - [x] **1.4.1–1.4.16** Migrations 001–016 (users, professionals, categories, professional_categories, requests, request_images, bids, contracts, reviews, messages, notifications, disputes, commission_rates, consent_logs, push_subscriptions, favorites)
 - [ ] **1.5** Seed: ~20 categorias com hierarquia
-- [ ] **1.6** Variáveis de ambiente (`.env.example` por app)
+- [x] **1.6** Variáveis de ambiente (`.env.example` por app)
 - [ ] **1.7** CI básica: lint + type-check + testes (GitHub Actions)
 - [ ] **1.8** OpenTelemetry + Grafana dashboard básico
-- [ ] **1.9** Schema OpenAPI 3.1 auto-gerado via FastAPI
+- [x] **1.9** Schema OpenAPI 3.1 auto-gerado via FastAPI
 - [ ] **1.10** Frontend consome apenas endpoints documentados (openapi-typescript + lint de contratos)
 
 **✅ Critério de conclusão:** Todas as 16 migrations aplicadas, seed de categorias OK, CI verde.
@@ -52,7 +52,7 @@
 
 **TDD obrigatório:** escrever testes ANTES da implementação.
 
-- [ ] **2.T1–2.T3** Testes unitários + integração + schemas Pydantic (UserCreate, ProfessionalCreate, LoginRequest, RefreshRequest)
+- [x] **2.T1–2.T3** Testes unitários + integração + schemas Pydantic (UserCreate, ProfessionalCreate, LoginRequest, RefreshRequest)
 - [x] **2.1** JWT: access token 15min + refresh rotation 7d
 - [x] **2.2** `POST /auth/register` com bcrypt
 - [x] **2.3** `POST /auth/login`
@@ -61,8 +61,8 @@
 - [x] **2.6** `POST /professionals` com upload de documentos (Filesystem Local)
 - [x] **2.7** Fluxo de verificação de profissional (`PATCH /admin/professionals/:id`)
 - [x] **2.8** Middleware de autenticação/autorização por role
-- [ ] **2.LT1–2.LT3** Testes LGPD (anonimização, consentimento, exclusão)
-- [ ] **2.9–2.16** LGPD: consent_logs, endpoints de consentimento, DELETE /auth/me, mascaramento de logs, retenção de dados
+- [x] **2.LT1–2.LT3** Testes LGPD (anonimização, consentimento, exclusão)
+- [x] **2.9–2.16** LGPD: consent_logs, endpoints de consentimento, DELETE /auth/me, mascaramento de logs, retenção de dados
 
 ### 2.B — Pedidos & VLM (`service-marketplace-platform` §3)
 
@@ -144,8 +144,8 @@
 ### 3.0 — Design System (`global-visual-identity`)
 **Caminho:** `openspec/changes/global-visual-identity/`
 
-- [ ] **1.1–1.4** Design tokens: DM Sans + DM Mono, cores neomórficas, variáveis CSS, utilitários Tailwind
-- [ ] **2.1–2.4** Componentes base: Button, Input, NeomorphicCard, Badge
+- [x] **1.1–1.4** Design tokens: DM Sans + DM Mono, cores neomórficas, variáveis CSS, utilitários Tailwind
+- [x] **2.1–2.4** Componentes base: Button, Input, NeomorphicCard, Badge
 - [ ] **3.1–3.3** Sistema visual de categorias: mapeamento de cores, helper rgba
 - [ ] **4.1–4.4** Landing Page hero: Header, Hero, Barra de Busca, Category Pills
 - [ ] **5.1–5.3** Landing Page conteúdo: Diferenciais, Grid categorias, Footer
