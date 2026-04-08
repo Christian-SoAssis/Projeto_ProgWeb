@@ -182,30 +182,31 @@ async def test_get_me_expired_token(async_client: AsyncClient):
 
 
 # --- POST /professionals ---
-async def test_register_professional_success(async_client: AsyncClient, db_session):
-    from sqlalchemy import text
-    cat_id = str(uuid4())
-    await db_session.execute(
-        text(f"INSERT INTO categories (id, name, slug) VALUES ('{cat_id}', 'Test', 'test-{cat_id[:8]}') ON CONFLICT DO NOTHING")
-    )
-    await db_session.commit()
+async def test_register_professional_success(app_own_session):
+    """
+    Usa sessão independente (app_own_session) porque o endpoint faz db.commit()
+    — incompatível com o db_session de teste que opera em transação aninhada.
+    """
+    from httpx import AsyncClient, ASGITransport
+    import json
 
     uid = uuid4().hex[:8]
-    import json
     files = {"document": ("doc.pdf", b"dummy content", "application/pdf")}
     payload_data = {
-        "name": "Prof", "email": f"prof_{uid}@log.com", "password": "password123",
-        "consent_terms": True, "consent_privacy": True,
+        "name": "Prof Teste", "email": f"prof_{uid}@log.com", "password": "password123",
+        "consent_terms": "true", "consent_privacy": "true",
         "bio": "Bio do profissional com mais de dez caracteres", "latitude": -23.5, "longitude": -46.6,
-        "service_radius_km": 10, "category_ids_json": json.dumps([cat_id]), "document_type": "cpf",
+        "service_radius_km": 10, "category_ids_json": json.dumps([str(uuid4())]), "document_type": "cpf",
         "hourly_rate_cents": 5000
     }
-    resp = await async_client.post(
-        "/api/v1/professionals/",
-        data=payload_data,
-        files=files
-    )
-    assert resp.status_code == 201, f"STATUS {resp.status_code} | BODY: {resp.text} | SENT: {payload_data}"
+    transport = ASGITransport(app=app_own_session)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        resp = await ac.post(
+            "/api/v1/professionals/",
+            data=payload_data,
+            files=files
+        )
+    assert resp.status_code == 201, f"STATUS {resp.status_code} | BODY: {resp.text}"
     assert resp.json()["role"] == "professional"
     assert resp.json()["is_verified"] is False
 

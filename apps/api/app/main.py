@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
@@ -7,13 +7,20 @@ import os
 from app.core.config import settings
 from app.api.v1 import router as v1_router
 from app.middleware.log_sanitizer import LogSanitizerMiddleware
+from app.core.redis import create_tokens_redis, create_queue_redis
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Gerencia startup e shutdown da aplicação (padrão moderno FastAPI 0.95+)."""
+    # Criar clientes Redis dentro do event loop ativo
+    app.state.tokens_redis = create_tokens_redis()
+    app.state.queue_redis = create_queue_redis()
     print(f"🚀 ServiçoJá API iniciada em modo {settings.ENVIRONMENT}")
     yield
+    # Fechar conexões Redis ao encerrar
+    await app.state.tokens_redis.aclose()
+    await app.state.queue_redis.aclose()
     print("👋 ServiçoJá API finalizada")
 
 

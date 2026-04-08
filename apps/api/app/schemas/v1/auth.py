@@ -96,6 +96,34 @@ class ProfessionalResponse(ProfessionalBase):
     
     model_config = ConfigDict(from_attributes=True)
 
+
+class ProfessionalRegisterResponse(BaseModel):
+    """Response simplificado para o endpoint de cadastro de profissional.
+    Não inclui category_ids (campo de entrada, não armazenado na tabela).
+    Inclui role vindo do usuário relacionado.
+    """
+    id: UUID
+    user_id: UUID
+    is_verified: bool
+    reputation_score: float
+    rejection_reason: Optional[str] = None
+    # role vem do User via relacionamento
+    role: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+    @classmethod
+    def from_professional(cls, professional, user) -> "ProfessionalRegisterResponse":
+        return cls(
+            id=professional.id,
+            user_id=professional.user_id,
+            is_verified=professional.is_verified,
+            reputation_score=professional.reputation_score,
+            rejection_reason=professional.rejection_reason,
+            role=user.role.value if hasattr(user.role, "value") else str(user.role),
+        )
+
+
 class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str

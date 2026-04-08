@@ -1,13 +1,12 @@
-import os
 from datetime import datetime, timedelta, timezone
-from typing import Dict, Any, Optional
+from typing import Optional
 from uuid import uuid4
 import bcrypt
 from jose import JWTError, jwt
 from fastapi import HTTPException, status
+import redis.asyncio as aioredis
 
 from app.core.config import settings
-from app.core.redis import tokens_redis
 
 # JWT configuration
 SECRET_KEY = settings.JWT_SECRET
@@ -15,9 +14,11 @@ ALGORITHM = settings.ALGORITHM
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES
 REFRESH_TOKEN_EXPIRE_DAYS = settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS
 
+
 def hash_password(plain: str) -> str:
     """Gera hash bcrypt com salt automático."""
     return bcrypt.hashpw(plain.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
 
 def verify_password(plain: str, hashed: str) -> bool:
     """Verifica senha contra hash bcrypt."""
@@ -25,6 +26,7 @@ def verify_password(plain: str, hashed: str) -> bool:
         return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
     except Exception:
         return False
+
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     """Cria um Access Token JWT com claims numéricas (exp, iat)."""
@@ -43,6 +45,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     })
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
+
 def create_refresh_token(data: dict) -> str:
     """Cria um Refresh Token JWT com claims numéricas (exp, iat)."""
     to_encode = data.copy()
@@ -57,6 +60,7 @@ def create_refresh_token(data: dict) -> str:
     })
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
+
 def decode_token(token: str) -> dict:
     """Decodifica e valida um token JWT."""
     try:
@@ -69,14 +73,17 @@ def decode_token(token: str) -> dict:
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-async def is_refresh_token_revoked(jti: str) -> bool:
+
+async def is_refresh_token_revoked(jti: str, redis_client: aioredis.Redis) -> bool:
     """Verifica se o JTI do refresh token está no Redis (revogado ou já usado)."""
-    return await tokens_redis.exists(f"rotated:{jti}")
+    return await redis_client.exists(f"rotated:{jti}")
 
-async def mark_refresh_token_used(jti: str, expires_in_seconds: int):
+
+async def mark_refresh_token_used(jti: str, expires_in_seconds: int, redis_client: aioredis.Redis):
     """Marca um refresh token como usado no Redis para evitar replay attack."""
-    await tokens_redis.setex(f"rotated:{jti}", expires_in_seconds, "1")
+    await redis_client.setex(f"rotated:{jti}", expires_in_seconds, "1")
 
-async def revoke_user_tokens(user_id: str):
+
+async def revoke_user_tokens(user_id: str, redis_client: aioredis.Redis):
     """Revoga todos os tokens de um usuário (em caso de suspeita de breach)."""
-    await tokens_redis.setex(f"breach:{user_id}", 3600 * 24, "1")
+    await redis_client.setex(f"breach:{user_id}", 3600 * 24, "1")

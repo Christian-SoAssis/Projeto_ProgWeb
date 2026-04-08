@@ -1,18 +1,25 @@
 import json
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import ValidationError
 
 from app.core.database import get_db
 from app.core.security import create_access_token, create_refresh_token
 from app.models.user import UserRole
-from app.schemas.v1.auth import ProfessionalCreate, UserCreate, ProfessionalResponse, TokenResponse
+from app.schemas.v1.auth import (
+    ProfessionalCreate,
+    UserCreate,
+    ProfessionalRegisterResponse,
+    TokenResponse,
+)
 from app.services import auth_service
 
 router = APIRouter(prefix="/professionals", tags=["Professionals"])
 
-@router.post("/", response_model=ProfessionalResponse, status_code=status.HTTP_201_CREATED)
+
+@router.post("/", response_model=ProfessionalRegisterResponse, status_code=status.HTTP_201_CREATED)
 async def register_professional(
+    request: Request,
     # Multipart fields
     name: str = Form(...),
     email: str = Form(...),
@@ -37,6 +44,10 @@ async def register_professional(
 ):
     """Cadastro completo de profissional (Usuário + Profissional + Documento)."""
     
+    # Bug 2 fix: guard contra request.client None (testes multipart via httpx)
+    ip = request.client.host if request.client else "unknown"
+    ua = request.headers.get("user-agent", "unknown")
+
     # 1. Validar schemas Pydantic manualmente (desde que vem de Form)
     try:
         category_ids = json.loads(category_ids_json)
@@ -57,10 +68,13 @@ async def register_professional(
         
     # 2. Operação Atômica via Services
     try:
-        # a) Criar usuário
+        # a) Criar usuário com IP e UA corretos
         user = await auth_service.create_user_with_consent(
-            db=db, user_in=user_in, role=UserRole.PROFESSIONAL,
-            # Placeholder para IP/UA se necessário
+            db=db,
+            user_in=user_in,
+            role=UserRole.PROFESSIONAL,
+            ip_address=ip,
+            user_agent=ua,
         )
         
         # b) Criar perfil profissional e salvar documento
@@ -70,14 +84,19 @@ async def register_professional(
         
         await db.commit()
         await db.refresh(professional)
-        return professional
+
+        # Montar resposta manualmente para incluir role do user
+        # e evitar serialização de campos que não existem na tabela (category_ids)
+        return ProfessionalRegisterResponse.from_professional(professional, user)
         
     except HTTPException:
-        # Relançar exceções HTTP geradas pelos services
         raise
     except Exception as e:
+        import traceback
+        print(f"\n🔴 ERRO INTERNO PROFISSIONAL: {type(e).__name__}: {e}")
+        print(traceback.format_exc())
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Erro interno no cadastro: {str(e)}"
+            detail=f"Erro interno no cadastro: {type(e).__name__}: {e}"
         )

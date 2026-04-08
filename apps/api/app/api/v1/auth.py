@@ -1,10 +1,11 @@
-from typing import List, Annotated
+from typing import List
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
+import redis.asyncio as aioredis
 
 from app.core.database import get_db
-from app.core.dependencies import get_current_user
+from app.core.dependencies import get_current_user, get_tokens_redis
 from app.core.security import (
     create_access_token,
     create_refresh_token,
@@ -28,6 +29,7 @@ from app.services import auth_service, lgpd_service
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
+
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 async def register(
     user_in: UserCreate,
@@ -35,8 +37,8 @@ async def register(
     db: AsyncSession = Depends(get_db)
 ):
     """Registra um novo cliente e retorna tokens."""
-    ip = request.client.host if request.client else None
-    ua = request.headers.get("user-agent")
+    ip = request.client.host if request.client else "unknown"
+    ua = request.headers.get("user-agent", "unknown")
     
     user = await auth_service.create_user_with_consent(
         db=db,
@@ -55,13 +57,13 @@ async def register(
         refresh_token=refresh_token
     )
 
+
 @router.post("/login", response_model=TokenResponse)
 async def login(
     login_in: LoginRequest,
     db: AsyncSession = Depends(get_db)
 ):
     """Autentica usuário e retorna tokens."""
-    # Buscar usuário por email
     from sqlalchemy import select
     result = await db.execute(select(User).where(User.email == login_in.email))
     user = result.scalar_one_or_none()
@@ -81,8 +83,12 @@ async def login(
         refresh_token=create_refresh_token({"sub": str(user.id)})
     )
 
+
 @router.post("/refresh", response_model=TokenResponse)
-async def refresh(refresh_in: RefreshRequest):
+async def refresh(
+    refresh_in: RefreshRequest,
+    tokens_redis: aioredis.Redis = Depends(get_tokens_redis)
+):
     """Rotaciona o par de tokens usando refresh token rotation."""
     payload = decode_token(refresh_in.refresh_token)
     
@@ -92,32 +98,26 @@ async def refresh(refresh_in: RefreshRequest):
     jti = payload.get("jti")
     user_id = payload.get("sub")
     
-    if await is_refresh_token_revoked(jti):
-        # Replay detectado! Revogar tudo para o usuário se possível
-        # security.revoke_user_tokens(user_id)
+    if await is_refresh_token_revoked(jti, tokens_redis):
         raise HTTPException(status_code=401, detail="Token já utilizado")
         
     # Marcar como usado
-    # exp é timestamp UTC
     exp = payload.get("exp")
     now_ts = int(datetime.now(timezone.utc).timestamp())
     ttl = max(exp - now_ts, 0)
-    await mark_refresh_token_used(jti, ttl)
+    await mark_refresh_token_used(jti, ttl, tokens_redis)
     
-    # Emitir novos
-    # Nota: No fluxo real, deveríamos buscar a role do usuário no banco ou manter no payload (risco de stale data)
-    # Por segurança, o payload do refresh geralmente só tem o sub.
-    # Aqui vamos assumir que o payload tem a role ou faremos um select rápido.
-    # Para brevidade, re-usamos o payload ou simplificamos.
     return TokenResponse(
         access_token=create_access_token({"sub": user_id, "role": payload.get("role", "client")}),
         refresh_token=create_refresh_token({"sub": user_id, "role": payload.get("role", "client")})
     )
 
+
 @router.get("/me", response_model=UserResponse)
 async def get_me(user: User = Depends(get_current_user)):
     """Retorna dados do usuário autenticado."""
     return user
+
 
 @router.patch("/me", response_model=UserResponse)
 async def update_me(
@@ -136,6 +136,7 @@ async def update_me(
     await db.commit()
     await db.refresh(user)
     return user
+
 
 @router.delete("/me", status_code=status.HTTP_200_OK)
 async def delete_me(
@@ -162,6 +163,7 @@ async def delete_me(
     
     await db.commit()
     return {"message": "Conta excluída com sucesso"}
+
 
 @router.get("/me/consents", response_model=List[ConsentResponse])
 async def get_my_consents(
