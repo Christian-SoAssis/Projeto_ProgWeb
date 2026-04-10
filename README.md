@@ -72,11 +72,10 @@ Projeto_ProgWeb/
 │               ├── service-request/
 │               ├── search-discovery/
 │               └── ...
-├── apps/                              # (a criar)
+├── apps/                              # Aplicações e módulos
 │   ├── web/                           # Next.js 14 (frontend)
-│   ├── api/                           # Fastify BFF
-│   └── matching/                      # FastAPI microservice (Python)
-└── docker-compose.yml                 # (a criar)
+│   └── api/                           # FastAPI Backend + Matching Module
+└── docker-compose.yml                 # Orquestração local
 ```
 
 ---
@@ -88,12 +87,12 @@ Projeto_ProgWeb/
 | 1 | **Fundação e Infra** | Monorepo, Docker Compose, migrations, CI, OpenAPI schema |
 | 2 | **Auth e Cadastro** | JWT, OAuth2 Google, verificação de profissional, LGPD |
 | 3 | **Pedidos + VLM** | Criação de pedido, upload de imagens, análise Gemini Vision |
-| 4 | **Motor de Matching** | Matching v0 (regras) → v1 (LightGBM LTR), microservice FastAPI |
+| 4 | **Motor de Matching** | Matching v0 (regras) → v1 (LightGBM LTR), módulo in-process na api |
 | 5 | **Bids e Pagamento** | Bid, contrato, split-payment MercadoPago (5% comissão), disputa |
 | 6 | **Chat In-App** | WebSocket (Socket.io), anti-desintermediação NLP |
 | 7 | **Reviews e Reputação** | NLP granular (BERTimbau), detecção de reviews inautênticas |
 | 8 | **Painéis e PWA** | Dashboards cliente/profissional/admin, Service Worker, push |
-| 9 | **Busca e Descoberta** | Typesense geo + full-text, mapa interativo, pgvector |
+| 9 | **Busca e Descoberta** | PostgreSQL FTS + PostGIS + pgvector, mapa interativo |
 | 10 | **Observabilidade** | OpenTelemetry, Grafana, testes de carga, segurança OWASP |
 
 > Cada módulo segue **TDD**: sub-tarefas de testes (unitários + integração + schema Pydantic) são escritas **antes** do código de implementação.
@@ -133,19 +132,18 @@ cd Projeto_ProgWeb
 cp .env.example .env
 
 # 3. Subir a infraestrutura
-docker-compose up -d
+docker compose up -d
 
-# 4. Rodar migrations
-docker-compose exec api alembic upgrade head
+# 4. Rodar migrations (se necessário)
+docker compose exec api alembic upgrade head
 
 # 5. Seed inicial
-docker-compose exec api python scripts/seed_categories.py
+docker compose exec api python scripts/seed_categories.py
 
 # 6. Acessar
 # Frontend: http://localhost:3000
 # API Docs: http://localhost:8000/docs
-# Typesense: http://localhost:8108
-# MinIO Console: http://localhost:9001
+# PgAdmin: http://localhost:5050
 ```
 
 ---

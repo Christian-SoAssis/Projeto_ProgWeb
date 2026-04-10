@@ -16,11 +16,14 @@ graph TB
         API["api<br/>FastAPI<br/>:8000<br/>(+ matching module)"]
         DB["db<br/>PostgreSQL 16<br/>:5432"]
         REDIS["redis<br/>Redis 7<br/>:6379"]
+        PGADMIN["pgadmin<br/>pgAdmin 4<br/>:5050"]
     end
 
     WEB -->|HTTP| API
     API -->|TCP| DB
     API -->|TCP| REDIS
+    API -->|TCP| PGADMIN
+    PGADMIN -->|TCP| DB
 ```
 
 ### Redes
@@ -28,7 +31,7 @@ graph TB
 | Rede | Serviços | Propósito |
 |------|----------|-----------|
 | `frontend` | web, api | Frontend acessa apenas a API |
-| `data` | api, db, redis | Acesso a dados e infra |
+| `data` | api, db, redis, pgadmin | Acesso a dados e infra |
 
 > [!IMPORTANT]
 > **`web` NÃO tem acesso direto ao banco ou Redis.** Todo acesso a dados passa pela `api`. O matching engine é executado in-process na `api`.
@@ -41,7 +44,9 @@ graph TB
 
 ```yaml
 db:
-  image: pgvector/pgvector:pg16
+  build:
+    context: .
+    dockerfile: apps/db/Dockerfile
   container_name: servicoja-db
   restart: unless-stopped
   ports:
@@ -64,6 +69,9 @@ db:
     start_period: 10s
 ```
 
+> [!NOTE]
+> O Dockerfile customizado parte de `postgis/postgis:16-3.4` e instala `postgresql-16-pgvector` no topo, resolvendo a incompatibilidade nativa entre as duas extensões em imagens pré-moldadas.
+
 **`scripts/init-extensions.sql`:**
 ```sql
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -73,7 +81,7 @@ CREATE EXTENSION IF NOT EXISTS "vector";
 
 | Item | Valor |
 |------|-------|
-| **Imagem** | `pgvector/pgvector:pg16` (inclui pgvector; PostGIS instalado via init script) |
+| **Build** | `apps/db/Dockerfile` (PostGIS 3.4 + pgvector 0.7) |
 | **Porta** | `5432` |
 | **Volume** | `pgdata` (named volume, persistente) |
 | **Healthcheck** | `pg_isready` |
@@ -168,7 +176,35 @@ api:
 
 ---
 
-### 4. `web` — Next.js 14 Frontend
+### 4. `pgadmin` — Administração PostgreSQL
+
+```yaml
+pgadmin:
+  image: dpage/pgadmin4:latest
+  container_name: servicoja-pgadmin
+  restart: unless-stopped
+  ports:
+    - "5050:80"
+  environment:
+    PGADMIN_DEFAULT_EMAIL: admin@servicoja.local
+    PGADMIN_DEFAULT_PASSWORD: admin
+  depends_on:
+    db:
+      condition: service_healthy
+  networks:
+    - data
+```
+
+| Item | Valor |
+|------|-------|
+| **Imagem** | `dpage/pgadmin4:latest` |
+| **Porta** | `5050` |
+| **Redes** | `data` |
+| **depends_on** | db ✅ |
+
+---
+
+### 5. `web` — Next.js 14 Frontend
 
 ```yaml
 web:
@@ -260,13 +296,10 @@ networks:
 
 ```mermaid
 graph LR
-    DB["1. db"] --> API["5. api"]
+    DB["1. db"] --> API["3. api"]
     REDIS["2. redis"] --> API
-    MINIO["3. minio"] --> API
-    TYPESENSE["4. typesense"] --> API
-    DB --> MATCHING["6. matching"]
-    REDIS --> MATCHING
-    API --> WEB["7. web"]
+    DB --> PGADMIN["4. pgadmin"]
+    API --> WEB["5. web"]
 ```
 
 | Ordem | Serviço | Espera por |
@@ -274,7 +307,8 @@ graph LR
 | 1 | `db` | — |
 | 2 | `redis` | — |
 | 3 | `api` | db ✅, redis ✅ |
-| 4 | `web` | api ✅ |
+| 4 | `pgadmin` | db ✅ |
+| 5 | `web` | api ✅ |
 
 > Todos os `depends_on` usam `condition: service_healthy` — o serviço só inicia quando a dependência passa o healthcheck.
 
@@ -287,7 +321,7 @@ Os workers de background (pipeline VLM, indexação Typesense, NLP de reviews) r
 | Worker | Trigger | Destino |
 |--------|---------|----------|
 | VLM (Gemini Vision) | Upload de imagem → fila Redis (DB 0) | `requests.ai_*` no PostgreSQL |
-| Indexação FTS | Profissional aprovado/atualizado | `professionals.search_vector` |
+| Indexação FTS | Profissional aprovado/atualizado | `professionals.search_vector` (PostgreSQL) |
 | NLP de reviews | Review criada → fila Redis (DB 0) | `reviews.score_*` no PostgreSQL |
 | Matching Engine | Request via API | In-process execution |
 
@@ -299,60 +333,7 @@ Os workers de background (pipeline VLM, indexação Typesense, NLP de reviews) r
 
 ## `.env.example`
 
-```env
-# ============================================================
-# ServiçoJá — Variáveis de Ambiente (Desenvolvimento Local)
-# ============================================================
-# Copiar para .env antes de rodar: cp .env.example .env
-
-# ---- PostgreSQL ----
-DB_NAME=servicoja
-DB_USER=servicoja
-DB_PASSWORD=servicoja_dev_2026
-DB_PORT=5432
-
-# ---- Redis ----
-REDIS_PASSWORD=redis_dev_2026
-REDIS_PORT=6379
-
-# ---- Storage (Filesystem Dev) ----
-UPLOADS_DIR=./uploads
-MODELS_DIR=./models
-
-# ---- API (FastAPI) ----
-API_PORT=8000
-JWT_SECRET=jwt_super_secret_dev_key_change_in_production_2026
-JWT_ACCESS_TOKEN_EXPIRE_MINUTES=15
-JWT_REFRESH_TOKEN_EXPIRE_DAYS=7
-
-# ---- Frontend (Next.js) ----
-WEB_PORT=3000
-
-# ---- MercadoPago (Sandbox) ----
-MERCADOPAGO_ACCESS_TOKEN=TEST-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-MERCADOPAGO_PUBLIC_KEY=TEST-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-MERCADOPAGO_WEBHOOK_SECRET=webhook_secret_dev
-
-# ---- Google Gemini Vision API ----
-GEMINI_API_KEY=AIzaSy_your_gemini_api_key_here
-
-# ---- Email (Resend) ----
-RESEND_API_KEY=re_xxxxxxxxxxxx
-RESEND_FROM_EMAIL=noreply@servicoja.local
-
-# ---- Web Push (VAPID) ----
-# Gerar via: npx web-push generate-vapid-keys
-VAPID_PUBLIC_KEY=BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkOs-
-VAPID_PRIVATE_KEY=UUxI4O8-FbRouAevSmBQ6o18hgE4nSG97jN999qUYo4=
-VAPID_MAILTO=mailto:dev@servicoja.local
-
-# ---- Monitoramento ----
-OTEL_SDK_DISABLED=true
-
-# ---- Geral ----
-ENVIRONMENT=development
-LOG_LEVEL=debug
-```
+> Consulte o arquivo `.env.example` na raiz do projeto. Este documento não duplica variáveis para evitar drift.
 
 ---
 

@@ -33,14 +33,14 @@
 - [x] **1.3** Extensões PostgreSQL: PostGIS, pgvector, uuid-ossp
 - [x] **1.4** Alembic: init, `env.py` async com SQLAlchemy 2.0
   - [x] **1.4.1–1.4.16** Migrations 001–016 (users, professionals, categories, professional_categories, requests, request_images, bids, contracts, reviews, messages, notifications, disputes, commission_rates, consent_logs, push_subscriptions, favorites)
-- [ ] **1.5** Seed: ~20 categorias com hierarquia
+- [x] **1.5** Seed: ~20 categorias com hierarquia
 - [x] **1.6** Variáveis de ambiente (`.env.example` por app)
 - [ ] **1.7** CI básica: lint + type-check + testes (GitHub Actions)
 - [ ] **1.8** OpenTelemetry + Grafana dashboard básico
 - [x] **1.9** Schema OpenAPI 3.1 auto-gerado via FastAPI
 - [ ] **1.10** Frontend consome apenas endpoints documentados (openapi-typescript + lint de contratos)
 
-**✅ Critério de conclusão:** Todas as 16 migrations aplicadas, seed de categorias OK, CI verde.
+**✅ Critério de conclusão:** Todas as 16 migrations aplicadas, seed de 16 categorias executado, `docker compose up` sobe com 5 containers (db, redis, api, pgadmin, web) com healthchecks passando.
 
 ---
 

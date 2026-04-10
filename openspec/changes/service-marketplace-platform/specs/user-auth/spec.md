@@ -121,7 +121,7 @@ O sistema **SHALL** permitir registro de profissionais com dados adicionais (bio
 
 - **GIVEN** que os dados do profissional são válidos e o documento (CPF/CNPJ) foi enviado
 - **WHEN** o usuário envia `POST /professionals` com dados e arquivo de documento
-- **THEN** o sistema **MUST** criar usuário com `role='professional'`, `is_verified=false`, armazenar documento no S3/MinIO, retornar `201 Created`
+- **THEN** o sistema **MUST** criar usuário com `role='professional'`, `is_verified=false`, armazenar documento no filesystem local via abstração `IStorage`, retornar `201 Created`
 
 ### Scenario 2 — Campo obrigatório ausente
 
@@ -129,9 +129,9 @@ O sistema **SHALL** permitir registro de profissionais com dados adicionais (bio
 - **WHEN** a requisição chega ao FastAPI
 - **THEN** o sistema **MUST** retornar `422 Unprocessable Entity` com detalhe do(s) campo(s) inválido(s)
 
-### Scenario 3 — Falha no upload para S3/MinIO
+### Scenario 3 — Falha no upload
 
-- **GIVEN** que o MinIO está indisponível ao tentar salvar o documento
+- **GIVEN** que o diretório de uploads está indisponível (sem permissão de escrita ou disco cheio) ao tentar salvar o documento
 - **WHEN** o cadastro de profissional é processado
 - **THEN** o sistema **MUST** retornar `503 Service Unavailable`; **MUST NOT** criar o registro de usuário parcial no banco (operação **MUST** ser atômica: ou tudo persiste ou nada)
 
@@ -151,7 +151,7 @@ O sistema **SHALL** manter fluxo obrigatório de verificação manual de profiss
 
 - **GIVEN** que o profissional está com `is_verified=false`
 - **WHEN** admin autenticado envia `PATCH /admin/professionals/:id` com `{ status: 'verified' }`
-- **THEN** o sistema **MUST** atualizar `is_verified=true`, enfileirar indexação no Typesense, enviar notificação ao profissional, retornar `200 OK`
+- **THEN** o sistema **MUST** atualizar `is_verified=true`, atualizar `search_vector` (FTS) do profissional no PostgreSQL, enviar notificação ao profissional, retornar `200 OK`
 
 ### Scenario 2 — Admin rejeita profissional
 
