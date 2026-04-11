@@ -1,4 +1,3 @@
-
 services:
   db:
     build:
@@ -18,7 +17,7 @@ services:
     networks:
       - data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-servicoja} -d ${DB_NAME:-servicoja}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER:-servicoja} -d ${DB_NAME:-servicoja}" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -36,7 +35,7 @@ services:
     networks:
       - data
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis_dev_2026}", "ping"]
+      test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis_dev_2026}", "ping" ]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -70,7 +69,7 @@ services:
       - frontend
       - data
     healthcheck:
-      test: ["CMD", "curl", "-sf", "http://localhost:8000/health"]
+      test: [ "CMD", "curl", "-sf", "http://localhost:8000/health" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -102,7 +101,7 @@ services:
     ports:
       - "${WEB_PORT:-3000}:3000"
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:${API_PORT:-8000}
+      NEXT_PUBLIC_API_URL: http://localhost:${API_PORT:-8000}/api/v1
       NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${VAPID_PUBLIC_KEY:-}
       NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY: ${MERCADOPAGO_PUBLIC_KEY:-}
       API_INTERNAL_URL: http://api:8000
@@ -117,7 +116,7 @@ services:
     networks:
       - frontend
     healthcheck:
-      test: ["CMD", "curl", "-sf", "http://localhost:3000"]
+      test: [ "CMD", "curl", "-sf", "http://localhost:3000" ]
       interval: 10s
       timeout: 5s
       retries: 5
