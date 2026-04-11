@@ -22,6 +22,13 @@ class Category(Base):
     sort_order = Column(Integer, default=0, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
 
-    # Relacionamento self-referencial (árvore de categorias)
+    # Relacionamentos
     parent = relationship("Category", remote_side=[id], back_populates="children")
     children = relationship("Category", back_populates="parent")
+    requests = relationship("Request", back_populates="category", lazy="noload")
+    professionals = relationship(
+        "Professional",
+        secondary="professional_categories",
+        back_populates="categories",
+        lazy="noload",
+    )

@@ -45,10 +45,16 @@ class User(Base):
         nullable=False,
     )
 
-    # Relacionamento 1-to-1 com professionals (lazy="noload" para não carregar por padrão)
+    # Relacionamentos
     professional = relationship(
         "Professional",
         back_populates="user",
         uselist=False,
         lazy="noload",
+    )
+    requests = relationship(
+        "Request",
+        back_populates="client",
+        lazy="noload",
+        cascade="all, delete-orphan",
     )

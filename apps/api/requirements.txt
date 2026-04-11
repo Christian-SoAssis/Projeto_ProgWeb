@@ -21,6 +21,7 @@ bcrypt==4.2.0
 # Cache e filas
 redis==5.0.1
 hiredis==2.3.2
+arq==0.25.0
 
 # Testes
 pytest==7.4.4
@@ -34,3 +35,7 @@ python-dotenv==1.0.0
 # Geo / Vector extensions
 geoalchemy2==0.14.3
 pgvector==0.2.4
+
+# AI e Arquivos
+google-genai==0.3.0
+aiofiles==23.2.1

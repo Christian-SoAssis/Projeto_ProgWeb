@@ -28,6 +28,10 @@ class Settings(BaseSettings):
     UPLOADS_DIR: str = "./uploads"
     MODELS_DIR: str = "./models"
 
+    # AI
+    GOOGLE_API_KEY: str = "[ENCRYPTION_KEY]"
+    GEMINI_MODEL: str = "gemini-1.5-flash"
+
     model_config = {"env_file": ".env", "case_sensitive": True}
 
 
