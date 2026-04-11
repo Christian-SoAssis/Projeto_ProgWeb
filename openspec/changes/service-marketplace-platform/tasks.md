@@ -41,41 +41,41 @@
 ## 2. Auth e Cadastro
 
 ### 2.T Testes (TDD — escrever antes da implementação)
-- [ ] 2.T1 Testes unitários: regras de hash bcrypt, geração/validação de JWT, rotação de refresh token, lógica de roles
-- [ ] 2.T2 Testes de integração (pytest + httpx): POST /auth/register, POST /auth/login, POST /auth/refresh, POST /professionals, PATCH /admin/professionals/:id — com banco real
-- [ ] 2.T3 Testes de schema Pydantic (ref: `pydantic-schemas/spec.md` §1, §2, §16):
-  - [ ] 2.T3a `UserCreate`: name <2 chars, email inválido, phone sem +55, password <8 chars, consent_terms=false, consent_privacy ausente
-  - [ ] 2.T3b `ProfessionalCreate`: latitude >90, longitude >180, service_radius_km=0, hourly_rate_cents negativo, category_ids vazio/>10, document_type inválido, bio >1000 chars
-  - [ ] 2.T3c `UserUpdate`: name >100 chars, phone com letras
-  - [ ] 2.T3d `ProfessionalUpdate`: service_radius_km >200, hourly_rate_cents=0
-  - [ ] 2.T3e `LoginRequest`: email inválido, password vazio
-  - [ ] 2.T3f `RefreshRequest`: refresh_token vazio
+- [x] 2.T1 Testes unitários: regras de hash bcrypt, geração/validação de JWT, rotação de refresh token, lógica de roles
+- [x] 2.T2 Testes de integração (pytest + httpx): POST /auth/register, POST /auth/login, POST /auth/refresh, POST /professionals, PATCH /admin/professionals/:id — com banco real
+- [x] 2.T3 Testes de schema Pydantic (ref: `pydantic-schemas/spec.md` §1, §2, §16):
+  - [x] 2.T3a `UserCreate`: name <2 chars, email inválido, phone sem +55, password <8 chars, consent_terms=false, consent_privacy ausente
+  - [x] 2.T3b `ProfessionalCreate`: latitude >90, longitude >180, service_radius_km=0, hourly_rate_cents negativo, category_ids vazio/>10, document_type inválido, bio >1000 chars
+  - [x] 2.T3c `UserUpdate`: name >100 chars, phone com letras
+  - [x] 2.T3d `ProfessionalUpdate`: service_radius_km >200, hourly_rate_cents=0
+  - [x] 2.T3e `LoginRequest`: email inválido, password vazio
+  - [x] 2.T3f `RefreshRequest`: refresh_token vazio
 
 ### 2.I Implementação
-- [ ] 2.1 Implementar JWT (access token 15min + refresh token rotation 7d)
-- [ ] 2.2 Endpoint POST /auth/register (cliente) com hash bcrypt
-- [ ] 2.3 Endpoint POST /auth/login com validação de credenciais
-- [ ] 2.4 Endpoint POST /auth/refresh com rotação de refresh token
+- [x] 2.1 Implementar JWT (access token 15min + refresh token rotation 7d)
+- [x] 2.2 Endpoint POST /auth/register (cliente) com hash bcrypt
+- [x] 2.3 Endpoint POST /auth/login com validação de credenciais
+- [x] 2.4 Endpoint POST /auth/refresh com rotação de refresh token
 - [ ] 2.5 OAuth2 Google: configurar callback e criação/vinculação de conta
-- [ ] 2.6 Endpoint POST /professionals para cadastro com upload de documentos para Filesystem Local (StaticFiles)
-- [ ] 2.7 Fluxo de verificação de profissional: admin aprova via PATCH /admin/professionals/:id
-- [ ] 2.8 Middleware de autenticação e autorização por role (client, professional, admin)
+- [x] 2.6 Endpoint POST /professionals para cadastro com upload de documentos para Filesystem Local (StaticFiles)
+- [x] 2.7 Fluxo de verificação de profissional: admin aprova via PATCH /admin/professionals/:id
+- [x] 2.8 Middleware de autenticação e autorização por role (client, professional, admin)
 
 ### 2.L LGPD — Testes (TDD — escrever antes da implementação)
-- [ ] 2.LT1 Testes unitários: lógica de anonimização de PII (name, email, phone, cpf → valores anônimos), validação de contratos ativos bloqueando exclusão, mascaramento de CPF/CNPJ (regex), sanitização de logs
-- [ ] 2.LT2 Testes de integração (pytest + httpx): DELETE /auth/me (sucesso, senha errada, contratos ativos), GET /auth/me/consents, validação de consent_logs após registro — com banco real
-- [ ] 2.LT3 Testes de schema Pydantic (ref: `pydantic-schemas/spec.md` §13, §16):
-  - [ ] 2.LT3a `DeleteAccountRequest`: password vazio, campo ausente
-  - [ ] 2.LT3b `ConsentPayload`: consent_terms=false, consent_privacy=false, campos ausentes
-  - [ ] 2.LT3c `ConsentResponse`: validar from_attributes, campos computed
+- [x] 2.LT1 Testes unitários: lógica de anonimização de PII (name, email, phone, cpf → valores anônimos), validação de contratos ativos bloqueando exclusão, mascaramento de CPF/CNPJ (regex), sanitização de logs
+- [x] 2.LT2 Testes de integração (pytest + httpx): DELETE /auth/me (sucesso, senha errada, contratos ativos), GET /auth/me/consents, validação de consent_logs após registro — com banco real
+- [x] 2.LT3 Testes de schema Pydantic (ref: `pydantic-schemas/spec.md` §13, §16):
+  - [x] 2.LT3a `DeleteAccountRequest`: password vazio, campo ausente
+  - [x] 2.LT3b `ConsentPayload`: consent_terms=false, consent_privacy=false, campos ausentes
+  - [x] 2.LT3c `ConsentResponse`: validar from_attributes, campos computed
 
 ### 2.L LGPD — Implementação
-- [ ] 2.9 Criar tabela `consent_logs` (user_id, consent_type, accepted_at, ip_address, user_agent, version) e migration
-- [ ] 2.10 Adicionar campos `consent_terms` e `consent_privacy` obrigatórios nos schemas de registro (RegisterRequest, ProfessionalCreateRequest); rejeitar cadastro se não aceitos
-- [ ] 2.11 Endpoint GET /auth/me/consents — listar consentimentos do usuário autenticado
-- [ ] 2.12 Endpoint DELETE /auth/me — exclusão de conta com confirmação de senha, anonimização de PII, remoção de documentos locais, revogação de tokens, cancelamento de bids pendentes (profissional), atualização de FTS (profissional)
-- [ ] 2.13 Bloquear exclusão se houver contratos com `status='in_progress'` (retornar `409 Conflict`)
-- [ ] 2.14 Middleware de mascaramento de logs: CPF (`***.***.***-XX`), CNPJ (`**.***.****/****-XX`), `Authorization: Bearer [REDACTED]`, file paths do S3 omitidos
+- [x] 2.9 Criar tabela `consent_logs` (user_id, consent_type, accepted_at, ip_address, user_agent, version) e migration
+- [x] 2.10 Adicionar campos `consent_terms` e `consent_privacy` obrigatórios nos schemas de registro (RegisterRequest, ProfessionalCreateRequest); rejeitar cadastro se não aceitos
+- [x] 2.11 Endpoint GET /auth/me/consents — listar consentimentos do usuário autenticado
+- [x] 2.12 Endpoint DELETE /auth/me — exclusão de conta com confirmação de senha, anonimização de PII, remoção de documentos locais, revogação de tokens, cancelamento de bids pendentes (profissional), atualização de FTS (profissional)
+- [x] 2.13 Bloquear exclusão se houver contratos com `status='in_progress'` (retornar `409 Conflict`)
+- [x] 2.14 Middleware de mascaramento de logs: CPF (`***.***.***-XX`), CNPJ (`**.***.****/****-XX`), `Authorization: Bearer [REDACTED]`, file paths do S3 omitidos
 - [ ] 2.15 SpanProcessor customizado no OpenTelemetry para sanitizar PII nos atributos de spans antes de exportar
 - [ ] 2.16 Job de retenção de dados (cron diário): anonimizar contas inativas > 12 meses, remover mensagens de chat > 24 meses, limpar logs com PII > 90 dias; enviar e-mail de aviso 30 dias antes da anonimização
 
