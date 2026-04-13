@@ -8,6 +8,9 @@ from sqlalchemy.orm import relationship
 from app.core.database import Base
 
 
+from app.models.associations import professional_categories
+
+
 class Professional(Base):
     __tablename__ = "professionals"
 
@@ -39,4 +42,11 @@ class Professional(Base):
     search_vector = Column(TSVECTOR, nullable=True)
 
     # Relacionamentos
-    user = relationship("User", back_populates="professional")
+    user = relationship("User", back_populates="professional", lazy="noload")
+    categories = relationship(
+        "Category",
+        secondary=professional_categories,
+        back_populates="professionals",
+        lazy="noload",
+    )
+

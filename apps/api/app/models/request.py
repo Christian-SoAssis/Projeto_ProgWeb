@@ -4,7 +4,9 @@ import uuid
 from sqlalchemy import Column, ForeignKey, Text, Integer, DateTime, CheckConstraint, Boolean
 from sqlalchemy.orm import Relationship
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
+from sqlalchemy.ext.hybrid import hybrid_property
 from geoalchemy2 import Geometry
+from geoalchemy2.shape import to_shape
 from app.core.database import Base
 
 
@@ -29,11 +31,25 @@ class Request(Base):
     created_at = Column(DateTime(timezone=True), nullable=False, server_default="now()")
     updated_at = Column(DateTime(timezone=True), nullable=False, server_default="now()", onupdate=datetime.now)
 
+    @hybrid_property
+    def latitude(self) -> float:
+        if self.location is not None:
+            point = to_shape(self.location)
+            return point.y
+        return None
+
+    @hybrid_property
+    def longitude(self) -> float:
+        if self.location is not None:
+            point = to_shape(self.location)
+            return point.x
+        return None
+
     # Relationships
-    client = Relationship("User", back_populates="requests")
-    category = Relationship("Category", back_populates="requests")
-    images = Relationship("RequestImage", back_populates="request", cascade="all, delete-orphan")
-    bids = Relationship("Bid", back_populates="request", cascade="all, delete-orphan")
+    client = Relationship("User", back_populates="requests", lazy="noload")
+    category = Relationship("Category", back_populates="requests", lazy="noload")
+    images = Relationship("RequestImage", back_populates="request", cascade="all, delete-orphan", lazy="noload")
+    bids = Relationship("Bid", back_populates="request", cascade="all, delete-orphan", lazy="noload")
 
     __table_args__ = (
         CheckConstraint("length(title) >= 5", name="chk_req_title_len"),

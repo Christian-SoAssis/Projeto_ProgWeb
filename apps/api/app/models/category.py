@@ -7,6 +7,9 @@ from sqlalchemy.orm import relationship
 from app.core.database import Base
 
 
+from app.models.associations import professional_categories
+
+
 class Category(Base):
     __tablename__ = "categories"
 
@@ -28,7 +31,8 @@ class Category(Base):
     requests = relationship("Request", back_populates="category", lazy="noload")
     professionals = relationship(
         "Professional",
-        secondary="professional_categories",
+        secondary=professional_categories,
         back_populates="categories",
         lazy="noload",
     )
+

@@ -1,6 +1,6 @@
 from typing import List, Optional
 import uuid
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, status
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.dependencies import get_current_user
@@ -52,9 +52,9 @@ async def create_request(
 
 @router.get("", response_model=List[RequestResponse])
 async def list_requests(
-    client_only: bool = False,
-    limit: int = 20,
-    offset: int = 0,
+    client_only: bool = Query(False),
+    limit: int = Query(20, ge=1, le=100),
+    offset: int = Query(0, ge=0),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):

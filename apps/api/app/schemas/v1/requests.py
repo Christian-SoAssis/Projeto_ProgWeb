@@ -53,14 +53,4 @@ class RequestResponse(RequestBase):
 
     model_config = ConfigDict(from_attributes=True)
     
-    # Camada de compatibilidade para extração de lat/lng da geometria (Geometry)
-    @field_validator("latitude", mode="before")
-    @classmethod
-    def extract_lat(cls, v):
-        if hasattr(v, "x"): # Se for um objeto Geometry (WKBElement)
-             # Na verdade, point.y é latitude
-             pass
-        return v
-    # Facilitarei isso no serviço usando o retorno do PostGIS Formatado se possível
-    # Mas para o Pydantic ser fiel aos campos lat/lng do base:
-    pass
+

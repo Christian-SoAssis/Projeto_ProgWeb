@@ -9,7 +9,12 @@ class Contract(Base):
     __tablename__ = "contracts"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    request_id = Column(UUID(as_uuid=True), nullable=False)
+    request_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("requests.id", ondelete="RESTRICT"),
+        nullable=False,
+        unique=True
+    )
     professional_id = Column(UUID(as_uuid=True), ForeignKey("professionals.id", ondelete="RESTRICT"), nullable=False)
     client_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="RESTRICT"), nullable=False)
     

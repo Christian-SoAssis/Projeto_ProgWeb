@@ -3,6 +3,7 @@ import uuid
 from typing import List, Optional
 from fastapi import UploadFile
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.request import Request, RequestImage
 from app.schemas.v1.requests import RequestCreate
@@ -63,7 +64,7 @@ class RequestService:
                 db.add(new_image)
 
         await db.commit()
-        await db.refresh(new_request)
+        await db.refresh(new_request, attribute_names=["images"])
         
         # 3. Disparar Job de Análise IA (ARQ)
         try:
@@ -76,7 +77,7 @@ class RequestService:
         return new_request
 
     async def get_request(self, db: AsyncSession, request_id: uuid.UUID) -> Optional[Request]:
-        query = select(Request).where(Request.id == request_id)
+        query = select(Request).options(selectinload(Request.images)).where(Request.id == request_id)
         result = await db.execute(query)
         return result.scalar_one_or_none()
 
@@ -87,7 +88,7 @@ class RequestService:
         limit: int = 20, 
         offset: int = 0
     ) -> List[Request]:
-        query = select(Request)
+        query = select(Request).options(selectinload(Request.images))
         if client_id:
             query = query.where(Request.client_id == client_id)
         
