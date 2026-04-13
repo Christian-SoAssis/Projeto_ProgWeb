@@ -122,7 +122,12 @@ async def test_create_user_with_consent_success(db_session: AsyncSession):
         consent_privacy=True
     )
     
-    user = await create_user_with_consent(db_session, user_in)
+    user = await create_user_with_consent(
+        db_session,
+        user_in,
+        ip_address="127.0.0.1",
+        user_agent="pytest"
+    )
     await db_session.flush()
     
     assert user.email == email
