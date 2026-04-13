@@ -7,7 +7,8 @@ from httpx import AsyncClient
 from sqlalchemy import select
 from app.models.request import Request, RequestImage
 from app.models.category import Category
-from app.models.user import User
+from app.models.user import User, UserRole
+from geoalchemy2 import WKTElement
 
 @pytest_asyncio.fixture(scope="function")
 async def auth_client(client, db_session):
@@ -18,7 +19,7 @@ async def auth_client(client, db_session):
         email=f"client_{uuid.uuid4().hex[:6]}@example.com",
         name="Test Client",
         password_hash="fakehash-$2b$12$6/9q...", # Mock hash
-        role="client",
+        role=UserRole.CLIENT,
         is_active=True
     )
     db_session.add(user)
@@ -126,7 +127,7 @@ async def test_list_requests_ownership(auth_client, sample_category, db_session)
         category_id=sample_category.id,
         title="Meu Pedido",
         urgency="flexible",
-        location="POINT(0 0)",
+        location=WKTElement("POINT(0 0)", srid=4326),
         status="open"
     )
     db_session.add(req)
@@ -141,7 +142,7 @@ async def test_list_requests_ownership(auth_client, sample_category, db_session)
         category_id=sample_category.id,
         title="Outro Pedido",
         urgency="flexible",
-        location="POINT(0 0)",
+        location=WKTElement("POINT(0 0)", srid=4326),
         status="open"
     )
     db_session.add(req_other)
@@ -165,7 +166,7 @@ async def test_pagination(auth_client, sample_category, db_session):
             category_id=sample_category.id, 
             title=f"Pedido {i}", 
             urgency="flexible", 
-            location="POINT(0 0)",
+            location=WKTElement("POINT(0 0)", srid=4326),
             status="open"
         )
         db_session.add(req)

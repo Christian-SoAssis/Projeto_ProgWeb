@@ -35,6 +35,7 @@ python-dotenv==1.0.0
 # Geo / Vector extensions
 geoalchemy2==0.14.3
 pgvector==0.2.4
+shapely==2.1.2
 
 # AI e Arquivos
 google-genai==0.3.0

@@ -8,6 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.request import Request, RequestImage
 from app.schemas.v1.requests import RequestCreate
 from app.core.config import settings
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from arq import create_pool
 from arq.connections import RedisSettings
 import aiofiles
@@ -64,7 +66,13 @@ class RequestService:
                 db.add(new_image)
 
         await db.commit()
-        await db.refresh(new_request, attribute_names=["images"])
+        result = await db.execute(
+            select(Request)
+            .options(selectinload(Request.images))
+            .where(Request.id == new_request.id)
+            .execution_options(populate_existing=True)
+        )
+        new_request = result.scalar_one()
         
         # 3. Disparar Job de Análise IA (ARQ)
         try:
