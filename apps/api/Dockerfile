@@ -21,6 +21,9 @@ COPY . .
 
 RUN mkdir -p /app/uploads /app/models
 
+COPY scripts/start.sh /app/scripts/start.sh
+RUN chmod +x /app/scripts/start.sh
+
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["/app/scripts/start.sh"]
