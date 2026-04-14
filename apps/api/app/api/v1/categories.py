@@ -1,22 +1,24 @@
 from typing import List
 from fastapi import APIRouter, Depends
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+
 from app.core.database import get_db
 from app.models.category import Category
-from app.schemas.v1.categories import CategoryResponse
 
 router = APIRouter(prefix="/categories", tags=["Categories"])
 
-@router.get("", response_model=List[CategoryResponse])
+
+@router.get("", response_model=List[dict])
 async def list_categories(db: AsyncSession = Depends(get_db)):
-    """
-    Retorna a lista de todas as categorias ativas, ordenadas por ordem de exibição.
-    """
-    stmt = (
+    """Lista todas as categorias ativas. Endpoint público."""
+    result = await db.execute(
         select(Category)
         .where(Category.is_active == True)
-        .order_by(Category.sort_order.asc())
+        .order_by(Category.sort_order, Category.name)
     )
-    result = await db.execute(stmt)
-    return result.scalars().all()
+    categories = result.scalars().all()
+    return [
+        {"id": str(cat.id), "name": cat.name, "slug": cat.slug, "color": cat.color}
+        for cat in categories
+    ]

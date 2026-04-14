@@ -32,6 +32,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async function loadUser() {
       const token = localStorage.getItem("access_token")
       if (token) {
+        // Sincronizar cookie do lado do cliente para o middleware
+        document.cookie = `access_token=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Strict`
+        
         try {
           const userData = await apiFetch("/auth/me")
           setUser(userData)

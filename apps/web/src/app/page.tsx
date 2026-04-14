@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import Link from "next/link";
 
 export default function HomePage() {
   return (
@@ -18,10 +19,10 @@ export default function HomePage() {
           </div>
           <div className="flex gap-3">
             <Button variant="ghost" size="sm" asChild className="text-xs font-semibold">
-              <a href="/login">Entrar</a>
+              <Link href="/login">Entrar</Link>
             </Button>
             <Button variant="neo-elevated" size="sm" asChild className="text-xs font-bold text-primary">
-              <a href="/register">Cadastrar</a>
+              <Link href="/register">Cadastrar</Link>
             </Button>
           </div>
         </div>
@@ -75,8 +76,10 @@ export default function HomePage() {
       </section>
 
       <footer className="w-full flex justify-center gap-4 pt-4">
-        <Button className="neo-elevated rounded-2xl h-14 w-full bg-background hover:bg-background text-primary font-bold shadow-none border-none">
-          Criar Novo Pedido
+        <Button asChild className="neo-elevated rounded-2xl h-14 w-full bg-background hover:bg-background text-primary font-bold shadow-none border-none">
+          <Link href="/requests/new">
+            Criar Novo Pedido
+          </Link>
         </Button>
       </footer>
     </main>

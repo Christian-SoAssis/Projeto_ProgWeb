@@ -50,6 +50,9 @@ export default function NewRequestPage() {
     },
   })
 
+  const watchedLatitude = form.watch("latitude")
+  const watchedLongitude = form.watch("longitude")
+
   // Redirecionar se não autenticado
   useEffect(() => {
     if (!loading && !isAuthenticated) router.push("/login")
@@ -251,7 +254,7 @@ export default function NewRequestPage() {
             <FormLabel className="ml-1 text-xs font-bold uppercase tracking-wider opacity-70">
               Localização
             </FormLabel>
-            <div className={`mt-2 neo-inset rounded-2xl p-4 flex items-center gap-3 ${isLocating ? "text-primary" : form.getValues("latitude") ? "text-green-600" : "text-destructive"}`}>
+            <div className={`mt-2 neo-inset rounded-2xl p-4 flex items-center gap-3 ${isLocating ? "text-primary" : watchedLatitude ? "text-green-600" : "text-destructive"}`}>
               {isLocating ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
@@ -260,8 +263,8 @@ export default function NewRequestPage() {
               <span className="text-sm font-semibold">
                 {isLocating
                   ? "Obtendo localização..."
-                  : form.getValues("latitude")
-                  ? `${form.getValues("latitude")?.toFixed(4)}, ${form.getValues("longitude")?.toFixed(4)}`
+                  : watchedLatitude
+                  ? `${watchedLatitude.toFixed(4)}, ${watchedLongitude?.toFixed(4)}`
                   : "Localização não obtida"}
               </span>
             </div>
@@ -295,7 +298,7 @@ export default function NewRequestPage() {
             type="submit"
             variant="neo-elevated"
             className="w-full h-14 rounded-2xl text-primary font-bold text-lg mt-4"
-            disabled={isSubmitting || isLocating || !form.getValues("latitude")}
+            disabled={isSubmitting || isLocating || !watchedLatitude}
           >
             {isSubmitting ? <Loader2 className="animate-spin" /> : "Buscar Profissionais"}
           </Button>
