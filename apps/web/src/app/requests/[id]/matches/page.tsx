@@ -117,7 +117,7 @@ export default function MatchesPage() {
                 <Button
                   variant="neo-elevated"
                   className="flex-1 h-10 rounded-xl text-xs font-bold text-primary"
-                  onClick={() => toast.info("Em breve: envio de orçamento pelo profissional")}
+                  onClick={() => router.push(`/professionals/${prof.id}`)}
                 >
                   Ver Perfil
                 </Button>

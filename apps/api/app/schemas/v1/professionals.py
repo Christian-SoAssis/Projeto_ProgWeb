@@ -32,3 +32,25 @@ class ProfessionalApproval(BaseModel):
     """Payload do admin para aprovar/rejeitar profissional."""
     is_verified: bool
     rejection_reason: Optional[str] = Field(None, max_length=500)
+
+
+class CategoryBasic(BaseModel):
+    """Schema básico de categoria para exibição em perfis."""
+    id: UUID
+    name: str
+    color: Optional[str] = None
+
+    model_config = {"from_attributes": True}
+
+
+class ProfessionalPublicProfile(BaseModel):
+    """Perfil público do profissional para clientes."""
+    id: UUID
+    name: str
+    bio: str
+    reputation_score: float
+    is_verified: bool
+    hourly_rate_cents: Optional[int]
+    categories: list[CategoryBasic]
+
+    model_config = {"from_attributes": True}

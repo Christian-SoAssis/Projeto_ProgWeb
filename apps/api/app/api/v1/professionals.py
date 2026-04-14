@@ -1,17 +1,22 @@
 import json
+from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form, Request
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 from pydantic import ValidationError
 
 from app.core.database import get_db
 from app.core.security import create_access_token, create_refresh_token
 from app.models.user import UserRole
+from app.models.professional import Professional
 from app.schemas.v1.auth import (
     ProfessionalCreate,
     UserCreate,
     ProfessionalRegisterResponse,
     TokenResponse,
 )
+from app.schemas.v1.professionals import ProfessionalPublicProfile
 from app.services import auth_service
 
 router = APIRouter(prefix="/professionals", tags=["Professionals"])
@@ -100,3 +105,42 @@ async def register_professional(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Erro interno no cadastro: {type(e).__name__}: {e}"
         )
+
+
+@router.get("/{professional_id}", response_model=ProfessionalPublicProfile)
+async def get_professional_profile(
+    professional_id: UUID,
+    db: AsyncSession = Depends(get_db)
+):
+    """Retorna o perfil público de um profissional por ID."""
+    query = (
+        select(Professional)
+        .options(
+            joinedload(Professional.user),
+            joinedload(Professional.categories)
+        )
+        .where(Professional.id == professional_id)
+    )
+    
+    result = await db.execute(query)
+    professional = result.scalar_one_or_none()
+    
+    if not professional:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Profissional não encontrado"
+        )
+    
+    # Formatar resposta para bater com o schema ProfessionalPublicProfile
+    return {
+        "id": professional.id,
+        "name": professional.user.name,
+        "bio": professional.bio,
+        "reputation_score": professional.reputation_score,
+        "is_verified": professional.is_verified,
+        "hourly_rate_cents": professional.hourly_rate_cents,
+        "categories": [
+            {"id": cat.id, "name": cat.name, "color": cat.color}
+            for cat in professional.categories
+        ]
+    }
