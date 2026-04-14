@@ -45,6 +45,7 @@ async def test_bid_on_non_open_request():
 @pytest.mark.asyncio
 async def test_accept_bid_creates_contract_logic():
     db = AsyncMock()
+    db.add = MagicMock()
     client_id = uuid.uuid4()
     req = Request(id=uuid.uuid4(), client_id=client_id, status="open")
     bid = Bid(id=uuid.uuid4(), request_id=req.id, price_cents=15000, status="pending")
