@@ -80,6 +80,12 @@
 - [x] **6.4** Reputation: Recálculo de core ponderado do profissional
 - [x] **6.5** Detecção de Fraude: Heurísticas de reviews inautênticas
 
+### 2.G — Painéis & Busca (TDD)
+- [x] **7.1** Busca profissional: Geo-radius + FTS integration
+- [x] **7.2** Perfil Profissional: Dashboards de métricas e conversão
+- [x] **7.3** Favoritos: Sistema de bookmarking para clientes
+- [x] **7.4** Notificações: Fluxo de leitura e listagem de alertas
+
 ---
 
 ## 🎨 FASE 3 — FRONTEND & UX
