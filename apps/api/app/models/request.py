@@ -7,6 +7,7 @@ from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
 from geoalchemy2 import Geometry
 from geoalchemy2.shape import to_shape
+from shapely.geometry import Point
 from app.core.database import Base
 
 
@@ -33,17 +34,33 @@ class Request(Base):
 
     @hybrid_property
     def latitude(self) -> float:
-        if self.location is not None:
+        if isinstance(self, Request) and self.location is not None:
             point = to_shape(self.location)
             return point.y
         return None
 
+    @latitude.setter
+    def latitude(self, value: float):
+        if self.location is None:
+            self.location = f"POINT({self.longitude or 0.0} {value})"
+        else:
+            p = to_shape(self.location)
+            self.location = f"POINT({p.x} {value})"
+
     @hybrid_property
     def longitude(self) -> float:
-        if self.location is not None:
+        if isinstance(self, Request) and self.location is not None:
             point = to_shape(self.location)
             return point.x
         return None
+
+    @longitude.setter
+    def longitude(self, value: float):
+        if self.location is None:
+            self.location = f"POINT({value} {self.latitude or 0.0})"
+        else:
+            p = to_shape(self.location)
+            self.location = f"POINT({value} {p.y})"
 
     # Relationships
     client = Relationship("User", back_populates="requests", lazy="noload")

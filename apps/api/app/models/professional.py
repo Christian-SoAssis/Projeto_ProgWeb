@@ -6,7 +6,10 @@ from sqlalchemy.dialects.postgresql import UUID, TSVECTOR
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
-
+from geoalchemy2 import Geometry
+from geoalchemy2.shape import to_shape
+from shapely.geometry import Point
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from app.models.associations import professional_categories
 
@@ -23,10 +26,38 @@ class Professional(Base):
     )
     bio = Column(Text, nullable=False)
 
-    # Localização (lat/lng armazenados direto por simplicidade no Módulo 2;
-    # PostGIS geometry é adicionado nas migrations futuras do Módulo 1.4.2)
-    latitude = Column(Float, nullable=True)
-    longitude = Column(Float, nullable=True)
+    # Localização via PostGIS
+    location = Column(Geometry(geometry_type="POINT", srid=4326), nullable=True)
+
+    @hybrid_property
+    def latitude(self) -> float:
+        if isinstance(self, Professional) and self.location is not None:
+            point = to_shape(self.location)
+            return point.y
+        return None
+
+    @latitude.setter
+    def latitude(self, value: float):
+        if self.location is None:
+            self.location = f"POINT({self.longitude or 0.0} {value})"
+        else:
+            p = to_shape(self.location)
+            self.location = f"POINT({p.x} {value})"
+
+    @hybrid_property
+    def longitude(self) -> float:
+        if isinstance(self, Professional) and self.location is not None:
+            point = to_shape(self.location)
+            return point.x
+        return None
+
+    @longitude.setter
+    def longitude(self, value: float):
+        if self.location is None:
+            self.location = f"POINT({value} {self.latitude or 0.0})"
+        else:
+            p = to_shape(self.location)
+            self.location = f"POINT({value} {p.y})"
 
     service_radius_km = Column(Float, nullable=False, default=20.0)
     hourly_rate_cents = Column(Integer, nullable=True)
