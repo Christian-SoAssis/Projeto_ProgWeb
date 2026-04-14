@@ -16,7 +16,6 @@ function formatCurrency(cents: number): string {
 export default function ProfessionalDashboard() {
   const { user } = useAuth()
   const [metrics, setMetrics] = useState<any>(null)
-  const [bids, setBids] = useState<any[]>([])
   const [loadingData, setLoadingData] = useState(true)
 
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
@@ -37,7 +36,6 @@ export default function ProfessionalDashboard() {
           apiFetch("/professionals/me/metrics"),
         ])
         setMetrics(met)
-        setBids([])
       } catch (err) {
         setMetrics({ reputation_score: 0, total_earnings_cents: 0, completed_jobs: 0, pending_bids: 0 })
       } finally {
@@ -48,8 +46,8 @@ export default function ProfessionalDashboard() {
   }, [])
 
   const requestLocation = () => {
-    if (!navigator.geolocation) {
-      setLocationError("Geolocalização não suportada pelo navegador.")
+    if (typeof window === "undefined" || !navigator.geolocation) {
+      setLocationError("Geolocalização não suportada.")
       return
     }
 
@@ -128,8 +126,6 @@ export default function ProfessionalDashboard() {
           </div>
 
           <div className="space-y-4">
-            {/* TODO: conectar a GET /search/professionals quando tiver busca por localização */}
-            {/* Os leads reais virão de GET /requests (pedidos abertos na área do profissional) */}
             {leads.map((lead) => (
               <Card key={lead.id} variant="neo-elevated" className="border-none rounded-[2rem] p-4 hover:translate-y-[-2px] transition-transform cursor-pointer group">
                 <div className="flex justify-between items-start mb-3">
@@ -172,7 +168,5 @@ export default function ProfessionalDashboard() {
         </section>
       </div>
     </main>
-  )
-}
   )
 }
