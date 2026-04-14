@@ -5,5 +5,6 @@ from app.models.lgpd import ConsentLog
 from app.models.bid import Bid
 from app.models.contract import Contract
 from app.models.request import Request, RequestImage
+from app.models.review import Review
 
-__all__ = ["User", "Category", "Professional", "ConsentLog", "Bid", "Contract", "Request", "RequestImage"]
+__all__ = ["User", "Category", "Professional", "ConsentLog", "Bid", "Contract", "Request", "RequestImage", "Review"]
