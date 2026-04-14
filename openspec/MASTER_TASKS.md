@@ -52,26 +52,33 @@
 
 ### 2.B — Pedidos e Análise de IA (VLM)
 *Change: `openspec/changes/service-marketplace-platform/` §3*
-- [ ] **3.1** Testes: geolocalização, urgência, VLM parsing
-- [ ] **3.2** Endpoint `POST /requests` com suporte a geolocalização
-- [ ] **3.3** Upload de múltiplas imagens (Filesystem Local, limite 10MB)
-- [ ] **3.4** GET Endpoints: Listagem paginada e detalhes do pedido
-- [ ] **3.5** Integração Gemini Vision (Worker ARQ/Redis)
-- [ ] **3.6** Parsing IA: `ai_complexity`, `ai_urgency`, `ai_specialties`
+- [x] **3.1** Testes: geolocalização, urgência, VLM parsing
+- [x] **3.2** Endpoint `POST /requests` com suporte a geolocalização
+- [x] **3.3** Upload de múltiplas imagens (Filesystem Local, limite 10MB)
+- [x] **3.4** GET Endpoints: Listagem paginada e detalhes do pedido
+- [x] **3.5** Integração Gemini Vision (Worker ARQ/Redis)
+- [x] **3.6** Parsing IA: `ai_complexity`, `ai_urgency`, `ai_specialties`
 
 ### 2.C — Motor de Matching (IA & Regras)
 *Change: `openspec/changes/service-marketplace-platform/` §4*
-- [ ] **4.1** Endpoint `GET /requests/:id/matches` (Matching v0: geo-radius)
+- [x] **4.1** Endpoint `GET /requests/:id/matches` (Matching v0: geo-radius)
 - [ ] **4.2** Matching v1: LightGBM lambdarank (módulo `app.matching`)
 - [ ] **4.3** Feedback loop: Coleta de dados de impressão e conversão
 
 ### 2.D — Transações e Pagamentos (MercadoPago)
 *Change: `openspec/changes/service-marketplace-platform/` §5*
-- [ ] **5.1** Bids: Envio, listagem por cliente e aceite/rejeição
-- [ ] **5.2** Contratos: Criação automática pós-aceite de bid
+- [x] **5.1** Bids: Envio, listagem por cliente e aceite/rejeição
+- [x] **5.2** Contratos: Criação automática pós-aceite de bid
 - [ ] **5.3** Pagamentos: Split-payment com taxa variável por categoria
 - [ ] **5.4** Webhook: Validação HMAC e repasse D+2
 - [ ] **5.5** Disputas: Abertura, resposta, escalação e estorno financeiro
+
+### 2.F — Reviews & Reputação (IA NLP)
+- [x] **6.1** Modelos: Tabela `reviews` com scores por dimensão
+- [x] **6.2** Endpoint `POST /reviews` (pós-contrato completed)
+- [x] **6.3** NLP Gemini: Extração de scores (pontualidade, qualidade, etc)
+- [x] **6.4** Reputation: Recálculo de core ponderado do profissional
+- [x] **6.5** Detecção de Fraude: Heurísticas de reviews inautênticas
 
 ---
 
