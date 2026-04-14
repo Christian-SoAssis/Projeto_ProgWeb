@@ -1,35 +1,32 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import Column, String, DateTime, ForeignKey, Integer, UniqueConstraint
+from sqlalchemy import Column, String, DateTime, ForeignKey, Integer, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-
 from app.core.database import Base
 
 class Bid(Base):
     __tablename__ = "bids"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    request_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("requests.id", ondelete="CASCADE"),
-        nullable=False,
-    )
-    professional_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("professionals.id", ondelete="CASCADE"),
-        nullable=False,
-    )
+    request_id = Column(UUID(as_uuid=True),
+                        ForeignKey("requests.id", ondelete="CASCADE"),
+                        nullable=False)
+    professional_id = Column(UUID(as_uuid=True),
+                             ForeignKey("professionals.id", ondelete="CASCADE"),
+                             nullable=False)
     price_cents = Column(Integer, nullable=False)
-    status = Column(String(20), nullable=False, default="pending")  # 'pending' | 'accepted' | 'rejected' | 'cancelled'
-    created_at = Column(
-        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False
-    )
+    estimated_hours = Column(Integer, nullable=True)
+    message = Column(Text, nullable=True)
+    status = Column(String(20), nullable=False, default="pending")
+    created_at = Column(DateTime(timezone=True),
+                        default=lambda: datetime.now(timezone.utc),
+                        nullable=False)
 
-    request = relationship("Request", back_populates="bids")
-    professional = relationship("Professional", backref="bids")
-
+    request = relationship("Request", back_populates="bids", lazy="noload")
+    professional = relationship("Professional", lazy="noload")
 
     __table_args__ = (
-        UniqueConstraint("request_id", "professional_id", name="uq_request_professional_bid"),
+        UniqueConstraint("request_id", "professional_id",
+                         name="uq_request_professional_bid"),
     )

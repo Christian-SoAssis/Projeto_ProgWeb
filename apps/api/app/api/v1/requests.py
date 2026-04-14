@@ -12,6 +12,8 @@ from app.schemas.v1.matching import MatchResponse
 from app.services.request_service import request_service
 from app.services.matching_service import get_matches
 from app.core.config import settings
+from app.models.bid import Bid
+from app.schemas.v1.bids import BidResponse as BidResp
 
 router = APIRouter(prefix="/requests", tags=["Requests"])
 
@@ -112,3 +114,29 @@ async def get_request_matches(
     # 3. Executar matching
     matches = await get_matches(db, request)
     return matches
+
+
+@router.get("/{request_id}/bids", response_model=List[BidResp])
+async def list_bids_for_request(
+    request_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Lista bids de um pedido. Apenas o cliente dono do pedido pode ver."""
+    result = await db.execute(
+        select(Request).where(Request.id == request_id)
+    )
+    request = result.scalar_one_or_none()
+
+    if not request:
+        raise HTTPException(status_code=404, detail="Pedido não encontrado")
+
+    if str(request.client_id) != str(current_user.id):
+        raise HTTPException(status_code=403, detail="Acesso negado")
+
+    result = await db.execute(
+        select(Bid)
+        .where(Bid.request_id == request_id)
+        .order_by(Bid.created_at.desc())
+    )
+    return result.scalars().all()
