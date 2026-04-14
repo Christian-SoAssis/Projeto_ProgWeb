@@ -6,12 +6,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { MapPin, Star, DollarSign, Briefcase, Zap, AlertCircle } from "lucide-react"
 import { useAuth } from "@/context/auth-context"
 import { useEffect, useState, useRef } from "react"
+import { apiFetch } from "@/lib/api"
+import { toast } from "sonner"
+
+function formatCurrency(cents: number): string {
+  return (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+}
 
 export default function ProfessionalDashboard() {
   const { user } = useAuth()
+  const [metrics, setMetrics] = useState<any>(null)
+  const [bids, setBids] = useState<any[]>([])
+  const [loadingData, setLoadingData] = useState(true)
+
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [locationError, setLocationError] = useState<string | null>(null)
-  const [retryCount, setRetryCount] = useState(0)
   const [isLocating, setIsLocating] = useState(false)
   const hasAttemptedRef = useRef(false)
 
@@ -20,6 +29,23 @@ export default function ProfessionalDashboard() {
     { id: 2, service: "Ar condicionado parou", client: "João Pedro", distance: "4.1 km", budget: "R$ 400+" },
     { id: 3, service: "Instalação de Chuveiro", client: "Ana Santos", distance: "1.2 km", budget: "R$ 80-120" },
   ]
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const [met] = await Promise.all([
+          apiFetch("/professionals/me/metrics"),
+        ])
+        setMetrics(met)
+        setBids([])
+      } catch (err) {
+        setMetrics({ reputation_score: 0, total_earnings_cents: 0, completed_jobs: 0, pending_bids: 0 })
+      } finally {
+        setLoadingData(false)
+      }
+    }
+    load()
+  }, [])
 
   const requestLocation = () => {
     if (!navigator.geolocation) {
@@ -33,16 +59,10 @@ export default function ProfessionalDashboard() {
         setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude })
         setLocationError(null)
         setIsLocating(false)
-        console.log("Localização obtida com sucesso:", pos.coords.latitude, pos.coords.longitude)
       },
       (err) => {
-        console.error("Erro ao obter localização:", err)
         setIsLocating(false)
-        if (retryCount < 1) { // Will allow one retry (total 2 attempts)
-          setRetryCount(prev => prev + 1)
-        } else {
-          setLocationError("Não foi possível acessar sua localização após 2 tentativas.")
-        }
+        setLocationError("Não foi possível acessar sua localização.")
       },
       { timeout: 10000 }
     )
@@ -55,13 +75,6 @@ export default function ProfessionalDashboard() {
     }
   }, [])
 
-  // Retry logic if retryCount changes and we still have no location/error
-  useEffect(() => {
-    if (retryCount === 1 && !location && !locationError) {
-      requestLocation()
-    }
-  }, [retryCount])
-
   return (
     <main className="min-h-screen bg-background pb-20">
       <DashboardHeader userName={user?.name || "Profissional"} roleLabel="Profissional" />
@@ -72,16 +85,20 @@ export default function ProfessionalDashboard() {
           <Card variant="neo-elevated" className="border-none rounded-3xl p-4 flex flex-col gap-2">
             <div className="flex justify-between items-center text-primary">
               <Star className="w-5 h-5 fill-primary/20" />
-              <span className="text-xl font-black">4.9</span>
+              <span className="text-xl font-black">
+                {metrics?.reputation_score?.toFixed(1) ?? "—"}
+              </span>
             </div>
             <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-70">Avaliação Média</span>
           </Card>
           <Card variant="neo-elevated" className="border-none rounded-3xl p-4 flex flex-col gap-2">
             <div className="flex justify-between items-center text-secondary">
               <DollarSign className="w-5 h-5" />
-              <span className="text-xl font-black">R$ 1.2k</span>
+              <span className="text-sm font-black truncate">
+                {metrics ? formatCurrency(metrics.total_earnings_cents) : "R$ —"}
+              </span>
             </div>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-70">Ganhos do Mês</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-70">Ganhos Totais</span>
           </Card>
         </section>
 
@@ -111,6 +128,8 @@ export default function ProfessionalDashboard() {
           </div>
 
           <div className="space-y-4">
+            {/* TODO: conectar a GET /search/professionals quando tiver busca por localização */}
+            {/* Os leads reais virão de GET /requests (pedidos abertos na área do profissional) */}
             {leads.map((lead) => (
               <Card key={lead.id} variant="neo-elevated" className="border-none rounded-[2rem] p-4 hover:translate-y-[-2px] transition-transform cursor-pointer group">
                 <div className="flex justify-between items-start mb-3">
@@ -153,5 +172,7 @@ export default function ProfessionalDashboard() {
         </section>
       </div>
     </main>
+  )
+}
   )
 }

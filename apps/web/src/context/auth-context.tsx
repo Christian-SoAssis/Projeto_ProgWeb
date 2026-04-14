@@ -54,6 +54,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("access_token", data.access_token)
     localStorage.setItem("refresh_token", data.refresh_token)
     
+    // Cookie para middleware
+    document.cookie = `access_token=${data.access_token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Strict`
+    
     // Carregar dados completos do usuário
     const userData = await apiFetch("/auth/me")
     setUser(userData)
@@ -75,32 +78,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("access_token", response.access_token)
     localStorage.setItem("refresh_token", response.refresh_token)
     
+    // Cookie para middleware
+    document.cookie = `access_token=${response.access_token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Strict`
+    
     const userData = await apiFetch("/auth/me")
     setUser(userData)
     router.push("/dashboard/client")
   }
 
   const registerPro = async (formData: FormData) => {
-    // Para profissionais, o backend de registro retorna o objeto ProfessionalResponse, 
-    // não tokens diretamente em alguns casos dependendo do endpoint. 
-    // Mas o router.post("/") em professionals.py retorna o professional.
-    // O usuário profissional precisará logar após o cadastro ou o backend emitir tokens.
-    // Olhando professionals.py, ele retorna o objeto professional.
-    
+    // Para profissionais, o backend de registro retorna o objeto ProfessionalResponse
     await apiFetch("/professionals", {
       method: "POST",
       body: formData,
     })
     
-    // Como o endpoint de profissionais não retorna tokens, vamos fazer login automático
-    // se tivermos a senha ou pedir para o usuário logar.
-    // Por simplicidade aqui, vamos apenas avisar e jogar para o login.
     router.push("/login?registered=true")
   }
 
   const logout = () => {
     localStorage.removeItem("access_token")
     localStorage.removeItem("refresh_token")
+    document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
     setUser(null)
     router.push("/login")
   }

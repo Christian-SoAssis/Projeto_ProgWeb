@@ -4,15 +4,46 @@ import { DashboardHeader } from "@/components/dashboard/DashboardHeader"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Search, Plus, MapPin, Clock, ArrowRight } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Search, Plus, MapPin, Clock, ArrowRight, Package } from "lucide-react"
 import { useAuth } from "@/context/auth-context"
+import { useEffect, useState } from "react"
+import { apiFetch } from "@/lib/api"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+
+const statusLabel: Record<string, { label: string; className: string }> = {
+  open:        { label: "Aberto",       className: "bg-primary/20 text-primary" },
+  matched:     { label: "Com bids",     className: "bg-blue-500/20 text-blue-600" },
+  in_progress: { label: "Em andamento", className: "bg-yellow-500/20 text-yellow-700" },
+  done:        { label: "Concluído",    className: "bg-green-500/20 text-green-700" },
+  cancelled:   { label: "Cancelado",    className: "bg-destructive/20 text-destructive" },
+}
 
 export default function ClientDashboard() {
   const { user } = useAuth()
-  const activeRequests = [
-    { id: 1, title: "Reforma Banheiro", status: "Orçamentos (3)", date: "Há 2 dias" },
-    { id: 2, title: "Pintura de Fachada", status: "Em análise", date: "Há 5 horas" },
-  ]
+  const router = useRouter()
+  const [requests, setRequests] = useState<any[]>([])
+  const [categories, setCategories] = useState<any[]>([])
+  const [loadingData, setLoadingData] = useState(true)
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const [reqs, cats] = await Promise.all([
+          apiFetch("/requests?client_only=true&limit=10"),
+          apiFetch("/categories"),
+        ])
+        setRequests(reqs)
+        setCategories(cats)
+      } catch (err) {
+        toast.error("Erro ao carregar dados")
+      } finally {
+        setLoadingData(false)
+      }
+    }
+    load()
+  }, [])
 
   return (
     <main className="min-h-screen bg-background pb-20">
@@ -42,7 +73,11 @@ export default function ClientDashboard() {
 
         {/* Quick Actions */}
         <section className="grid grid-cols-1 gap-4">
-          <Button variant="neo-elevated" className="h-20 rounded-2xl flex justify-between items-center px-6 group">
+          <Button 
+            variant="neo-elevated" 
+            className="h-20 rounded-2xl flex justify-between items-center px-6 group"
+            onClick={() => router.push("/requests/new")}
+          >
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl neo-inset bg-primary/10 flex items-center justify-center">
                 <Plus className="w-6 h-6 text-primary" />
@@ -64,28 +99,61 @@ export default function ClientDashboard() {
           </div>
 
           <div className="space-y-4">
-            {activeRequests.map((req) => (
-              <Card key={req.id} variant="neo-elevated" className="border-none rounded-[2rem] p-2 hover:translate-y-[-2px] transition-transform cursor-pointer group">
-                <CardHeader className="pb-2">
-                  <div className="flex justify-between items-start">
-                    <CardTitle className="text-lg font-bold">{req.title}</CardTitle>
-                    <span className="text-[10px] font-mono font-bold px-3 py-1 bg-primary/20 text-primary rounded-full uppercase">
-                      {req.status}
-                    </span>
+            {loadingData ? (
+              [1, 2].map((i) => (
+                <Card key={i} variant="neo-elevated" className="border-none rounded-[2rem] p-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <Skeleton className="h-6 w-32" />
+                    <Skeleton className="h-5 w-20 rounded-full" />
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex gap-4 text-xs font-medium text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" /> {req.date}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-3 h-3" /> São Paulo, SP
-                    </div>
+                  <div className="flex gap-4">
+                    <Skeleton className="h-3 w-20" />
+                    <Skeleton className="h-3 w-24" />
                   </div>
-                </CardContent>
+                </Card>
+              ))
+            ) : requests.length === 0 ? (
+              <Card variant="neo-elevated" className="border-none rounded-[2rem] p-8 text-center flex flex-col items-center gap-4">
+                <div className="w-16 h-16 neo-inset rounded-3xl flex items-center justify-center bg-background/50">
+                  <Package className="w-8 h-8 text-muted-foreground" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-lg">Nenhum pedido ainda</h4>
+                  <p className="text-sm text-muted-foreground mt-1">Que tal criar o seu primeiro hoje?</p>
+                </div>
+                <Button variant="neo-elevated" size="sm" onClick={() => router.push("/requests/new")} className="font-bold text-primary px-6 rounded-xl">
+                  Começar
+                </Button>
               </Card>
-            ))}
+            ) : (
+              requests.map((req) => (
+                <Card 
+                  key={req.id} 
+                  variant="neo-elevated" 
+                  className="border-none rounded-[2rem] p-2 hover:translate-y-[-2px] transition-transform cursor-pointer group"
+                  onClick={() => router.push(`/requests/${req.id}/matches`)}
+                >
+                  <CardHeader className="pb-2">
+                    <div className="flex justify-between items-start gap-2">
+                      <CardTitle className="text-lg font-bold truncate">{req.title}</CardTitle>
+                      <span className={`text-[10px] font-mono font-bold px-3 py-1 rounded-full uppercase shrink-0 ${statusLabel[req.status]?.className || statusLabel.open.className}`}>
+                        {statusLabel[req.status]?.label || req.status}
+                      </span>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex gap-4 text-xs font-medium text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-3 h-3 text-primary" /> {new Date(req.created_at).toLocaleDateString("pt-BR")}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <MapPin className="w-3 h-3 text-primary" /> Localizado
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
         </section>
       </div>
@@ -94,13 +162,21 @@ export default function ClientDashboard() {
       <section className="px-6 mt-12 max-w-2xl mx-auto">
         <h3 className="text-sm font-black uppercase tracking-widest text-muted-foreground/80 px-1 mb-4">Categorias Populares</h3>
         <div className="grid grid-cols-2 gap-4">
-          {["Limpeza", "Reformas", "Elétrica", "Pintura"].map((cat) => (
-            <Button key={cat} variant="neo-elevated" className="h-16 rounded-2xl bg-background font-bold text-sm">
-              {cat}
+          {(categories.length > 0 ? categories.slice(0, 4) : [
+            { id: "1", name: "Limpeza" },
+            { id: "2", name: "Reformas" },
+            { id: "3", name: "Elétrica" },
+            { id: "4", name: "Pintura" }
+          ]).map((cat: any) => (
+            <Button key={cat.id} variant="neo-elevated" className="h-16 rounded-2xl bg-background font-bold text-sm">
+              {cat.name}
             </Button>
           ))}
         </div>
       </section>
+    </main>
+  )
+}
     </main>
   )
 }
