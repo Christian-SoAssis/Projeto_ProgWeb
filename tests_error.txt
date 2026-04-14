@@ -1,0 +1,273 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.13, pytest-7.4.4, pluggy-1.6.0 -- /usr/local/bin/python3.12
+cachedir: .pytest_cache
+rootdir: /app
+configfile: pytest.ini
+plugins: anyio-4.13.0, asyncio-0.23.6, cov-4.1.0
+asyncio: mode=Mode.AUTO
+collecting ... collected 1 item
+
+tests/integration/test_panels_integration.py::test_get_professional_me ERROR [100%]
+
+==================================== ERRORS ====================================
+__________________ ERROR at setup of test_get_professional_me __________________
+
+db_session = <sqlalchemy.ext.asyncio.session.AsyncSession object at 0x756a4051e5d0>
+async_client = <httpx.AsyncClient object at 0x756a405866f0>
+
+    @pytest_asyncio.fixture
+    async def panels_setup(db_session, async_client):
+        """Cria client, professional verificado com contrato e review."""
+        client_user = User(
+            email=f"client_{uuid4().hex[:6]}@test.com",
+            name="Cliente Teste", password_hash="hash",
+            role=UserRole.CLIENT, is_active=True
+        )
+        db_session.add(client_user)
+    
+        prof_user = User(
+            email=f"prof_{uuid4().hex[:6]}@test.com",
+            name="Profissional Teste", password_hash="hash",
+            role=UserRole.PROFESSIONAL, is_active=True
+        )
+        db_session.add(prof_user)
+        await db_session.flush()
+    
+>       prof = Professional(
+            user_id=prof_user.id,
+            bio="Profissional experiente em hidráulica",
+            latitude=-21.55, longitude=-45.42,
+            service_radius_km=20.0,
+            hourly_rate_cents=8000,
+            reputation_score=4.0,
+            is_verified=True
+        )
+
+tests/integration/test_panels_integration.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <app.models.professional.Professional object at 0x756a40741790>
+kwargs = {'bio': 'Profissional experiente em hidráulica', 'hourly_rate_cents': 8000, 'is_verified': True, 'latitude': -21.55, ...}
+new_state = <sqlalchemy.orm.state.InstanceState object at 0x756a42b22e10>
+
+>   ???
+
+<string>:4: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+mixed = (<sqlalchemy.orm.state.InstanceState object at 0x756a42b22e10>, <app.models.professional.Professional object at 0x756a40741790>)
+kwargs = {'bio': 'Profissional experiente em hidráulica', 'hourly_rate_cents': 8000, 'is_verified': True, 'latitude': -21.55, ...}
+self = <sqlalchemy.orm.state.InstanceState object at 0x756a42b22e10>
+instance = <app.models.professional.Professional object at 0x756a40741790>
+args = ()
+manager = <ClassManager of <class 'app.models.professional.Professional'> at 756a4f6eee90>
+
+    def _initialize_instance(*mixed: Any, **kwargs: Any) -> None:
+        self, instance, args = mixed[0], mixed[1], mixed[2:]  # noqa
+        manager = self.manager
+    
+        manager.dispatch.init(self, args, kwargs)
+    
+        try:
+            manager.original_init(*mixed[1:], **kwargs)
+        except:
+>           with util.safe_reraise():
+
+/usr/local/lib/python3.12/site-packages/sqlalchemy/orm/state.py:566: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.util.langhelpers.safe_reraise object at 0x756a3fc1a9e0>
+type_ = None, value = None, traceback = None
+
+    def __exit__(
+        self,
+        type_: Optional[Type[BaseException]],
+        value: Optional[BaseException],
+        traceback: Optional[types.TracebackType],
+    ) -> NoReturn:
+        assert self._exc_info is not None
+        # see #2703 for notes
+        if type_ is None:
+            exc_type, exc_value, exc_tb = self._exc_info
+            assert exc_value is not None
+            self._exc_info = None  # remove potential circular references
+>           raise exc_value.with_traceback(exc_tb)
+
+/usr/local/lib/python3.12/site-packages/sqlalchemy/util/langhelpers.py:146: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+mixed = (<sqlalchemy.orm.state.InstanceState object at 0x756a42b22e10>, <app.models.professional.Professional object at 0x756a40741790>)
+kwargs = {'bio': 'Profissional experiente em hidráulica', 'hourly_rate_cents': 8000, 'is_verified': True, 'latitude': -21.55, ...}
+self = <sqlalchemy.orm.state.InstanceState object at 0x756a42b22e10>
+instance = <app.models.professional.Professional object at 0x756a40741790>
+args = ()
+manager = <ClassManager of <class 'app.models.professional.Professional'> at 756a4f6eee90>
+
+    def _initialize_instance(*mixed: Any, **kwargs: Any) -> None:
+        self, instance, args = mixed[0], mixed[1], mixed[2:]  # noqa
+        manager = self.manager
+    
+        manager.dispatch.init(self, args, kwargs)
+    
+        try:
+>           manager.original_init(*mixed[1:], **kwargs)
+
+/usr/local/lib/python3.12/site-packages/sqlalchemy/orm/state.py:564: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <app.models.professional.Professional object at 0x756a40741790>
+kwargs = {'bio': 'Profissional experiente em hidráulica', 'hourly_rate_cents': 8000, 'is_verified': True, 'latitude': -21.55, ...}
+cls_ = <class 'app.models.professional.Professional'>, k = 'longitude'
+
+    def _declarative_constructor(self: Any, **kwargs: Any) -> None:
+        """A simple constructor that allows initialization from kwargs.
+    
+        Sets attributes on the constructed instance using the names and
+        values in ``kwargs``.
+    
+        Only keys that are present as
+        attributes of the instance's class are allowed. These could be,
+        for example, any mapped columns or relationships.
+        """
+        cls_ = type(self)
+        for k in kwargs:
+            if not hasattr(cls_, k):
+                raise TypeError(
+                    "%r is an invalid keyword argument for %s" % (k, cls_.__name__)
+                )
+>           setattr(self, k, kwargs[k])
+
+/usr/local/lib/python3.12/site-packages/sqlalchemy/orm/decl_base.py:2145: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <sqlalchemy.ext.hybrid.hybrid_property object at 0x756a42b045f0>
+instance = <app.models.professional.Professional object at 0x756a40741790>
+value = -45.42
+
+    def __set__(self, instance: object, value: Any) -> None:
+        if self.fset is None:
+            raise AttributeError("can't set attribute")
+>       self.fset(instance, value)
+
+/usr/local/lib/python3.12/site-packages/sqlalchemy/ext/hybrid.py:1135: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <app.models.professional.Professional object at 0x756a40741790>
+value = -45.42
+
+    @longitude.setter
+    def longitude(self, value: float):
+        if self.location is None:
+            self.location = f"POINT({value} {self.latitude or 0.0})"
+        else:
+>           p = to_shape(self.location)
+
+app/models/professional.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+args = ('POINT(0.0 -21.55)',), kwds = {}
+
+    @wraps(func)
+    def inner(*args, **kwds):
+        with self._recreate_cm():
+>           return func(*args, **kwds)
+
+/usr/local/lib/python3.12/contextlib.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+element = 'POINT(0.0 -21.55)'
+
+    @check_shapely()
+    def to_shape(element: Union[WKBElement, WKTElement]):
+        """Function to convert a :class:`geoalchemy2.types.SpatialElement` to a Shapely geometry.
+    
+        Args:
+            element: The element to convert into a ``Shapely`` object.
+    
+        Example::
+    
+            lake = Session.query(Lake).get(1)
+            polygon = to_shape(lake.geom)
+        """
+>       assert isinstance(element, (WKBElement, WKTElement))
+E       AssertionError
+
+/usr/local/lib/python3.12/site-packages/geoalchemy2/shape.py:50: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+
+✅ Banco de dados de teste inicializado via Alembic.
+2026-04-14 20:52:05,468 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2026-04-14 20:52:05,468 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-04-14 20:52:05,469 INFO sqlalchemy.engine.Engine select current_schema()
+2026-04-14 20:52:05,469 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-04-14 20:52:05,470 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2026-04-14 20:52:05,470 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-04-14 20:52:05,471 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-14 20:52:05,472 INFO sqlalchemy.engine.Engine DELETE FROM reviews
+2026-04-14 20:52:05,472 INFO sqlalchemy.engine.Engine [generated in 0.00014s] ()
+2026-04-14 20:52:05,473 INFO sqlalchemy.engine.Engine DELETE FROM request_images
+2026-04-14 20:52:05,473 INFO sqlalchemy.engine.Engine [generated in 0.00012s] ()
+2026-04-14 20:52:05,474 INFO sqlalchemy.engine.Engine DELETE FROM professional_categories
+2026-04-14 20:52:05,474 INFO sqlalchemy.engine.Engine [generated in 0.00010s] ()
+2026-04-14 20:52:05,474 INFO sqlalchemy.engine.Engine DELETE FROM favorites
+2026-04-14 20:52:05,474 INFO sqlalchemy.engine.Engine [generated in 0.00011s] ()
+2026-04-14 20:52:05,475 INFO sqlalchemy.engine.Engine DELETE FROM contracts
+2026-04-14 20:52:05,475 INFO sqlalchemy.engine.Engine [generated in 0.00011s] ()
+2026-04-14 20:52:05,476 INFO sqlalchemy.engine.Engine DELETE FROM bids
+2026-04-14 20:52:05,476 INFO sqlalchemy.engine.Engine [generated in 0.00010s] ()
+2026-04-14 20:52:05,477 INFO sqlalchemy.engine.Engine DELETE FROM requests
+2026-04-14 20:52:05,477 INFO sqlalchemy.engine.Engine [generated in 0.00010s] ()
+2026-04-14 20:52:05,478 INFO sqlalchemy.engine.Engine DELETE FROM professionals
+2026-04-14 20:52:05,478 INFO sqlalchemy.engine.Engine [generated in 0.00010s] ()
+2026-04-14 20:52:05,479 INFO sqlalchemy.engine.Engine DELETE FROM notifications
+2026-04-14 20:52:05,479 INFO sqlalchemy.engine.Engine [generated in 0.00011s] ()
+2026-04-14 20:52:05,480 INFO sqlalchemy.engine.Engine DELETE FROM consent_logs
+2026-04-14 20:52:05,480 INFO sqlalchemy.engine.Engine [generated in 0.00011s] ()
+2026-04-14 20:52:05,481 INFO sqlalchemy.engine.Engine DELETE FROM users
+2026-04-14 20:52:05,481 INFO sqlalchemy.engine.Engine [generated in 0.00010s] ()
+2026-04-14 20:52:05,482 INFO sqlalchemy.engine.Engine DELETE FROM categories
+2026-04-14 20:52:05,482 INFO sqlalchemy.engine.Engine [generated in 0.00011s] ()
+2026-04-14 20:52:05,483 INFO sqlalchemy.engine.Engine COMMIT
+2026-04-14 20:52:05,484 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-04-14 20:52:05,552 INFO sqlalchemy.engine.Engine INSERT INTO users (id, name, email, phone, password_hash, role, avatar_url, is_active, last_login_at, created_at, updated_at) VALUES ($1::UUID, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::userrole, $7::VARCHAR, $8::BOOLEAN, $9::TIMESTAMP  ... 182 characters truncated ... OOLEAN, $20::TIMESTAMP WITH TIME ZONE, $21::TIMESTAMP WITH TIME ZONE, $22::TIMESTAMP WITH TIME ZONE)
+2026-04-14 20:52:05,552 INFO sqlalchemy.engine.Engine [generated in 0.00018s (insertmanyvalues) 1/1 (unordered)] (UUID('4fb38105-40c8-47dc-a451-7eebf6507aa9'), 'Cliente Teste', 'client_563349@test.com', None, 'hash', 'client', None, True, None, datetime.datetime(2026, 4, 14, 20, 52, 5, 552341, tzinfo=datetime.timezone.utc), datetime.datetime(2026, 4, 14, 20, 52, 5, 552344, tzinfo=datetime.timezone.utc), UUID('dff5c3b4-e19a-417d-9983-ba757e1caf48'), 'Profissional Teste', 'prof_1af0de@test.com', None, 'hash', 'professional', None, True, None, datetime.datetime(2026, 4, 14, 20, 52, 5, 552350, tzinfo=datetime.timezone.utc), datetime.datetime(2026, 4, 14, 20, 52, 5, 552351, tzinfo=datetime.timezone.utc))
+------------------------------ Captured log setup ------------------------------
+INFO     sqlalchemy.engine.Engine:base.py:1848 select pg_catalog.version()
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 select current_schema()
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 show standard_conforming_strings
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] ()
+INFO     sqlalchemy.engine.Engine:base.py:2690 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1848 DELETE FROM reviews
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00014s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 DELETE FROM request_images
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00012s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 DELETE FROM professional_categories
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00010s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 DELETE FROM favorites
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00011s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 DELETE FROM contracts
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00011s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 DELETE FROM bids
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00010s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 DELETE FROM requests
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00010s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 DELETE FROM professionals
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00010s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 DELETE FROM notifications
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00011s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 DELETE FROM consent_logs
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00011s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 DELETE FROM users
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00010s] ()
+INFO     sqlalchemy.engine.Engine:base.py:1848 DELETE FROM categories
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00011s] ()
+INFO     sqlalchemy.engine.Engine:base.py:2696 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2690 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1843 INSERT INTO users (id, name, email, phone, password_hash, role, avatar_url, is_active, last_login_at, created_at, updated_at) VALUES ($1::UUID, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::userrole, $7::VARCHAR, $8::BOOLEAN, $9::TIMESTAMP  ... 182 characters truncated ... OOLEAN, $20::TIMESTAMP WITH TIME ZONE, $21::TIMESTAMP WITH TIME ZONE, $22::TIMESTAMP WITH TIME ZONE)
+INFO     sqlalchemy.engine.Engine:base.py:1843 [generated in 0.00018s (insertmanyvalues) 1/1 (unordered)] (UUID('4fb38105-40c8-47dc-a451-7eebf6507aa9'), 'Cliente Teste', 'client_563349@test.com', None, 'hash', 'client', None, True, None, datetime.datetime(2026, 4, 14, 20, 52, 5, 552341, tzinfo=datetime.timezone.utc), datetime.datetime(2026, 4, 14, 20, 52, 5, 552344, tzinfo=datetime.timezone.utc), UUID('dff5c3b4-e19a-417d-9983-ba757e1caf48'), 'Profissional Teste', 'prof_1af0de@test.com', None, 'hash', 'professional', None, True, None, datetime.datetime(2026, 4, 14, 20, 52, 5, 552350, tzinfo=datetime.timezone.utc), datetime.datetime(2026, 4, 14, 20, 52, 5, 552351, tzinfo=datetime.timezone.utc))
+=========================== short test summary info ============================
+ERROR tests/integration/test_panels_integration.py::test_get_professional_me
+=============================== 1 error in 1.06s ===============================
+

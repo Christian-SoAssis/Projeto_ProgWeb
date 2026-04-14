@@ -1,12 +1,13 @@
 from typing import List, Optional
 from datetime import datetime
 import uuid
-from sqlalchemy import Column, ForeignKey, Text, Integer, DateTime, CheckConstraint, Boolean
+from sqlalchemy import Column, ForeignKey, Text, Integer, DateTime, CheckConstraint, Boolean, func
 from sqlalchemy.orm import Relationship
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
 from geoalchemy2 import Geometry
 from geoalchemy2.shape import to_shape
+from geoalchemy2.elements import WKBElement, WKTElement
 from shapely.geometry import Point
 from app.core.database import Base
 
@@ -34,33 +35,47 @@ class Request(Base):
 
     @hybrid_property
     def latitude(self) -> float:
-        if isinstance(self, Request) and self.location is not None:
-            point = to_shape(self.location)
-            return point.y
+        if not isinstance(self, Request) or self.location is None:
+            return None
+        if isinstance(self.location, (WKBElement, WKTElement)):
+            return to_shape(self.location).y
+        if isinstance(self.location, str) and "POINT" in self.location:
+            try:
+                return float(self.location.split("(")[1].split(")")[0].split(" ")[1])
+            except (IndexError, ValueError):
+                return None
         return None
 
     @latitude.setter
     def latitude(self, value: float):
-        if self.location is None:
-            self.location = f"POINT({self.longitude or 0.0} {value})"
-        else:
-            p = to_shape(self.location)
-            self.location = f"POINT({p.x} {value})"
+        current_long = self.longitude or 0.0
+        self.location = f"POINT({current_long} {value})"
+
+    @latitude.expression
+    def latitude(cls):
+        return func.ST_Y(cls.location)
 
     @hybrid_property
     def longitude(self) -> float:
-        if isinstance(self, Request) and self.location is not None:
-            point = to_shape(self.location)
-            return point.x
+        if not isinstance(self, Request) or self.location is None:
+            return None
+        if isinstance(self.location, (WKBElement, WKTElement)):
+            return to_shape(self.location).x
+        if isinstance(self.location, str) and "POINT" in self.location:
+            try:
+                return float(self.location.split("(")[1].split(")")[0].split(" ")[0])
+            except (IndexError, ValueError):
+                return None
         return None
 
     @longitude.setter
     def longitude(self, value: float):
-        if self.location is None:
-            self.location = f"POINT({value} {self.latitude or 0.0})"
-        else:
-            p = to_shape(self.location)
-            self.location = f"POINT({value} {p.y})"
+        current_lat = self.latitude or 0.0
+        self.location = f"POINT({value} {current_lat})"
+
+    @longitude.expression
+    def longitude(cls):
+        return func.ST_X(cls.location)
 
     # Relationships
     client = Relationship("User", back_populates="requests", lazy="noload")

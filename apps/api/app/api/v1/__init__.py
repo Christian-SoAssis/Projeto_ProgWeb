@@ -19,13 +19,13 @@ async def v1_root():
     return {"message": "Bem-vindo à API v1 do ServiçoJá!"}
 
 router.include_router(auth_router)
+router.include_router(professionals_panel_router)
 router.include_router(professionals_router)
 router.include_router(admin_router)
 router.include_router(requests_router)
 router.include_router(bids_router)
 router.include_router(reviews_router)
 router.include_router(search_router)
-router.include_router(professionals_panel_router)
 router.include_router(favorites_router)
 router.include_router(notifications_router)
 router.include_router(categories_router)
