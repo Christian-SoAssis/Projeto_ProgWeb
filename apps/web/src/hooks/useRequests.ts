@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
-import { requestsService } from "@/services/requests.service"
-import type { ServiceRequest } from "@/types/request"
+import { requestRepository } from "@/repositories"
+import type { ServiceRequest } from "@/domain/models/request"
 
 export function useRequests() {
     const [requests, setRequests] = useState<ServiceRequest[]>([])
@@ -8,7 +8,7 @@ export function useRequests() {
     const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
-        requestsService.listMine()
+        requestRepository.listMine()
             .then(setRequests)
             .catch(() => setError("Erro ao carregar pedidos"))
             .finally(() => setLoading(false))

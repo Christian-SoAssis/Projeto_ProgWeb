@@ -149,7 +149,7 @@ export default function ClientDashboard() {
                       <div className="flex gap-4 text-xs font-medium text-muted-foreground">
                         <div className="flex items-center gap-1">
                           <Clock className="w-3 h-3 text-primary" />
-                          {formatDate(req.created_at)}
+                          {formatDate(req.createdAt)}
                         </div>
                         <div className="flex items-center gap-1">
                           <MapPin className="w-3 h-3 text-primary" /> Localizado

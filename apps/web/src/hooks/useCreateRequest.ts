@@ -1,8 +1,8 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { requestsService } from "@/services/requests.service"
-import type { CreateRequestPayload } from "@/types/request"
+import { requestRepository } from "@/repositories"
+import type { CreateRequestPayload } from "@/domain/repositories/request.repository"
 
 export function useCreateRequest() {
     const router = useRouter()
@@ -11,7 +11,7 @@ export function useCreateRequest() {
     async function createRequest(payload: CreateRequestPayload) {
         setIsSubmitting(true)
         try {
-            const data = await requestsService.create(payload)
+            const data = await requestRepository.create(payload)
             toast.success("Pedido criado!", {
                 description: "Buscando profissionais próximos...",
             })
