@@ -14,10 +14,9 @@ class ContractStatus(str, Enum):
 class Contract:
     id: UUID
     request_id: UUID
-    bid_id: UUID
     client_id: UUID
     professional_id: UUID
-    amount_cents: int
+    agreed_cents: int
     status: ContractStatus = ContractStatus.PENDING
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

@@ -26,6 +26,19 @@ class ProfessionalRepositoryImpl(ProfessionalRepository):
         model = result.unique().scalar_one_or_none()
         return ProfessionalMapper.to_entity(model) if model else None
 
+    async def get_by_user_id(self, user_id: UUID) -> Optional[Professional]:
+        query = (
+            select(ProfessionalModel)
+            .options(
+                joinedload(ProfessionalModel.user),
+                joinedload(ProfessionalModel.categories)
+            )
+            .where(ProfessionalModel.user_id == user_id)
+        )
+        result = await self.db.execute(query)
+        model = result.unique().scalar_one_or_none()
+        return ProfessionalMapper.to_entity(model) if model else None
+
     async def list_available(self, category_id: Optional[UUID] = None) -> List[Professional]:
         query = select(ProfessionalModel).options(joinedload(ProfessionalModel.user))
         if category_id:

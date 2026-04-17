@@ -9,7 +9,7 @@ class ConsentLog:
     consent_type: str # 'terms', 'privacy'
     version: str
     is_granted: bool
-    id: Optional[int] = None
+    id: Optional[UUID] = None
     ip_address: Optional[str] = None
     user_agent: Optional[str] = None
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    accepted_at: datetime = field(default_factory=datetime.utcnow)

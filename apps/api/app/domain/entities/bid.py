@@ -15,7 +15,7 @@ class Bid:
     id: UUID
     request_id: UUID
     professional_id: UUID
-    amount_cents: int
+    price_cents: int
     message: str
     status: BidStatus = BidStatus.PENDING
     created_at: Optional[datetime] = None

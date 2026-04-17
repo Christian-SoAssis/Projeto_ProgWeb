@@ -13,5 +13,9 @@ class ProfessionalRepository(ABC):
         pass
 
     @abstractmethod
+    async def get_by_user_id(self, user_id: UUID) -> Optional[Professional]:
+        pass
+
+    @abstractmethod
     async def save(self, professional: Professional) -> Professional:
         pass

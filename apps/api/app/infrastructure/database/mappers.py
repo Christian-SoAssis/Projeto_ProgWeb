@@ -183,23 +183,9 @@ class ContractMapper:
         return ContractEntity(
             id=model.id,
             request_id=model.request_id,
-            bid_id=model.bid_id,
             client_id=model.client_id,
             professional_id=model.professional_id,
-            amount_cents=model.agreed_cents,
-            status=ContractStatus(model.status) if model.status else ContractStatus.PENDING,
-            created_at=model.created_at,
-            updated_at=model.updated_at
-        )
-
-    @staticmethod
-    def to_entity(model: ContractModel) -> ContractEntity:
-        return ContractEntity(
-            id=model.id,
-            bid_id=model.bid_id,
-            client_id=model.client_id,
-            professional_id=model.professional_id,
-            amount_cents=model.agreed_cents,
+            agreed_cents=model.agreed_cents,
             status=ContractStatus(model.status) if isinstance(model.status, str) else model.status,
             created_at=model.created_at,
             updated_at=model.updated_at
@@ -210,10 +196,9 @@ class ContractMapper:
         return ContractModel(
             id=entity.id,
             request_id=entity.request_id,
-            bid_id=entity.bid_id,
             client_id=entity.client_id,
             professional_id=entity.professional_id,
-            agreed_cents=entity.amount_cents,
+            agreed_cents=entity.agreed_cents,
             status=entity.status.value if hasattr(entity.status, "value") else entity.status,
             created_at=entity.created_at,
             updated_at=entity.updated_at
@@ -248,7 +233,7 @@ class ConsentMapper:
             is_granted=model.is_granted,
             ip_address=model.ip_address,
             user_agent=model.user_agent,
-            created_at=model.created_at
+            accepted_at=model.accepted_at
         )
 
     @staticmethod
@@ -260,7 +245,7 @@ class ConsentMapper:
             is_granted=entity.is_granted,
             ip_address=entity.ip_address,
             user_agent=entity.user_agent,
-            created_at=entity.created_at
+            accepted_at=entity.accepted_at
         )
 
 class ReviewMapper:
