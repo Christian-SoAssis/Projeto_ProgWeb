@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
-import { categoriesService } from "@/services/categories.service"
-import type { Category } from "@/types/category"
+import { categoryRepository } from "@/repositories"
+import type { Category } from "@/domain/models/category"
 
 export function useCategories() {
     const [categories, setCategories] = useState<Category[]>([])
@@ -8,7 +8,7 @@ export function useCategories() {
     const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
-        categoriesService.list()
+        categoryRepository.list()
             .then(setCategories)
             .catch(() => setError("Erro ao carregar categorias"))
             .finally(() => setLoading(false))

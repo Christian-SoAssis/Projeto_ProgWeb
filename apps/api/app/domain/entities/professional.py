@@ -3,11 +3,7 @@ from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 
-class Category(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    id: UUID
-    name: str
-    color: Optional[str] = None
+from app.domain.entities.category import Category
 
 class Professional(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -19,6 +15,8 @@ class Professional(BaseModel):
     is_verified: bool = False
     hourly_rate_cents: Optional[int] = None
     service_radius_km: float = 10.0
+    document_type: str
+    document_path: Optional[str] = None
     
     # Relationships (Entities)
     categories: List[Category] = []

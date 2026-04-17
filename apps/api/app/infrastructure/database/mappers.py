@@ -1,12 +1,15 @@
 from app.domain.entities.bid import Bid as BidEntity
-from app.domain.entities.professional import Professional as ProfessionalEntity
+from app.domain.entities.professional import Professional as ProfessionalEntity, Category as CategoryEntity
 from app.domain.entities.request import Request as RequestEntity, RequestImage as RequestImageEntity
 from app.domain.entities.contract import Contract as ContractEntity
+from app.domain.entities.user import User as UserEntity
 
 from app.models.bid import Bid as BidModel
 from app.models.professional import Professional as ProfessionalModel
 from app.models.request import Request as RequestModel, RequestImage as RequestImageModel
 from app.models.contract import Contract as ContractModel
+from app.models.user import User as UserModel
+from app.models.category import Category as CategoryModel
 
 class BidMapper:
     @staticmethod
@@ -26,10 +29,67 @@ class BidMapper:
             created_at=entity.created_at
         )
 
+class UserMapper:
+    @staticmethod
+    def to_entity(model: UserModel) -> UserEntity:
+        return UserEntity(
+            id=model.id,
+            name=model.name,
+            email=model.email,
+            phone=model.phone,
+            password_hash=model.password_hash,
+            role=model.role,
+            is_active=model.is_active,
+            is_verified=model.is_verified
+        )
+
+    @staticmethod
+    def to_model(entity: UserEntity) -> UserModel:
+        return UserModel(
+            id=entity.id,
+            name=entity.name,
+            email=entity.email,
+            phone=entity.phone,
+            password_hash=entity.password_hash,
+            role=entity.role,
+            is_active=entity.is_active,
+            is_verified=entity.is_verified
+        )
+
 class ProfessionalMapper:
     @staticmethod
     def to_entity(model: ProfessionalModel) -> ProfessionalEntity:
-        return ProfessionalEntity.model_validate(model)
+        return ProfessionalEntity(
+            id=model.id,
+            user_id=model.user_id,
+            bio=model.bio,
+            reputation_score=model.reputation_score,
+            is_verified=model.is_verified,
+            hourly_rate_cents=model.hourly_rate_cents,
+            service_radius_km=model.service_radius_km,
+            document_type=model.document_type,
+            document_path=model.document_path,
+            categories=[
+                CategoryEntity(id=cat.id, name=cat.name, color=cat.color)
+                for cat in getattr(model, "categories", [])
+            ],
+            name=getattr(model.user, "name", None) if hasattr(model, "user") else None,
+            email=getattr(model.user, "email", None) if hasattr(model, "user") else None
+        )
+
+    @staticmethod
+    def to_model(entity: ProfessionalEntity) -> ProfessionalModel:
+        return ProfessionalModel(
+            id=entity.id,
+            user_id=entity.user_id,
+            bio=entity.bio,
+            reputation_score=entity.reputation_score,
+            is_verified=entity.is_verified,
+            hourly_rate_cents=entity.hourly_rate_cents,
+            service_radius_km=entity.service_radius_km,
+            document_type=entity.document_type,
+            document_path=entity.document_path
+        )
 
 class RequestImageMapper:
     @staticmethod

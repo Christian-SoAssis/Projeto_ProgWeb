@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react"
-import { professionalsService } from "@/services/professionals.service"
-import type { ProfessionalMetrics } from "@/types/professional"
+import { professionalRepository } from "@/repositories"
+import type { ProfessionalMetrics } from "@/domain/models/professional"
 
 const FALLBACK: ProfessionalMetrics = {
-    reputation_score: 0,
-    total_earnings_cents: 0,
-    completed_jobs: 0,
-    pending_bids: 0,
-    conversion_rate: 0,
+    reputationScore: 0,
+    totalEarningsCents: 0,
+    completedJobs: 0,
+    pendingBids: 0,
+    conversionRate: 0,
 }
 
 export function useProfessionalMetrics() {
@@ -15,7 +15,7 @@ export function useProfessionalMetrics() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        professionalsService.getMyMetrics()
+        professionalRepository.getMetrics()
             .then(setMetrics)
             .catch(() => setMetrics(FALLBACK))
             .finally(() => setLoading(false))

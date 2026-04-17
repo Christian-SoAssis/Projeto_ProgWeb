@@ -1,23 +1,16 @@
 import json
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form, Request
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from sqlalchemy.orm import joinedload
 from pydantic import ValidationError
 
-from app.core.database import get_db
-from app.core.security import create_access_token, create_refresh_token
-from app.models.user import UserRole
-from app.models.professional import Professional
+from app.api.v1.deps import get_register_professional_use_case, get_get_professional_use_case
+from app.application.use_cases.register_professional_use_case import RegisterProfessionalUseCase, RegisterProfessionalInput
+from app.application.use_cases.get_professional_use_case import GetProfessionalUseCase
+from app.domain.exceptions import BusinessRuleViolationError, NotFoundError
 from app.schemas.v1.auth import (
-    ProfessionalCreate,
-    UserCreate,
     ProfessionalRegisterResponse,
-    TokenResponse,
 )
 from app.schemas.v1.professionals import ProfessionalPublicProfile
-from app.services import auth_service
 
 router = APIRouter(prefix="/professionals", tags=["Professionals"])
 
@@ -45,102 +38,58 @@ async def register_professional(
     # Upload
     document: UploadFile = File(...),
     
-    db: AsyncSession = Depends(get_db)
+    register_use_case: RegisterProfessionalUseCase = Depends(get_register_professional_use_case)
 ):
-    """Cadastro completo de profissional (Usuário + Profissional + Documento)."""
-    
-    # Bug 2 fix: guard contra request.client None (testes multipart via httpx)
+    """Cadastro completo de profissional via Use Case."""
     ip = request.client.host if request.client else "unknown"
     ua = request.headers.get("user-agent", "unknown")
 
-    # 1. Validar schemas Pydantic manualmente (desde que vem de Form)
     try:
-        category_ids = json.loads(category_ids_json)
-        user_in = UserCreate(
+        category_ids = [UUID(cid) for cid in json.loads(category_ids_json)]
+        
+        input_data = RegisterProfessionalInput(
             name=name, email=email, phone=phone, password=password,
-            consent_terms=consent_terms, consent_privacy=consent_privacy
-        )
-        prof_in = ProfessionalCreate(
             bio=bio, latitude=latitude, longitude=longitude,
             service_radius_km=service_radius_km, hourly_rate_cents=hourly_rate_cents,
-            category_ids=category_ids, document_type=document_type
-        )
-    except (ValidationError, json.JSONDecodeError) as e:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=str(e)
+            category_ids=category_ids, document_type=document_type,
+            document=document, ip_address=ip, user_agent=ua
         )
         
-    # 2. Operação Atômica via Services
-    try:
-        # a) Criar usuário com IP e UA corretos
-        user = await auth_service.create_user_with_consent(
-            db=db,
-            user_in=user_in,
-            role=UserRole.PROFESSIONAL,
-            ip_address=ip,
-            user_agent=ua,
-        )
+        professional = await register_use_case.execute(input_data)
         
-        # b) Criar perfil profissional e salvar documento
-        professional = await auth_service.build_professional(
-            db=db, user_id=user.id, prof_in=prof_in, document=document
-        )
+        # O mapper to_entity já traz os campos necessários do User se carregado
+        # Para a resposta, precisamos de um objeto que o FromProfessional entenda ou adaptar o schema
+        return ProfessionalRegisterResponse.from_professional_entity(professional)
         
-        await db.commit()
-        await db.refresh(professional)
-
-        # Montar resposta manualmente para incluir role do user
-        # e evitar serialização de campos que não existem na tabela (category_ids)
-        return ProfessionalRegisterResponse.from_professional(professional, user)
-        
-    except HTTPException:
-        raise
+    except (ValidationError, json.JSONDecodeError, ValueError) as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    except BusinessRuleViolationError as e:
+        raise HTTPException(status_code=409, detail=str(e))
     except Exception as e:
-        import traceback
-        print(f"\n🔴 ERRO INTERNO PROFISSIONAL: {type(e).__name__}: {e}")
-        print(traceback.format_exc())
-        await db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Erro interno no cadastro: {type(e).__name__}: {e}"
-        )
+        print(f"Error registering professional: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get("/{professional_id}", response_model=ProfessionalPublicProfile)
 async def get_professional_profile(
     professional_id: UUID,
-    db: AsyncSession = Depends(get_db)
+    get_use_case: GetProfessionalUseCase = Depends(get_get_professional_use_case)
 ):
-    """Retorna o perfil público de um profissional por ID."""
-    query = (
-        select(Professional)
-        .options(
-            joinedload(Professional.user),
-            joinedload(Professional.categories)
-        )
-        .where(Professional.id == professional_id)
-    )
-    
-    result = await db.execute(query)
-    professional = result.scalar_one_or_none()
-    
-    if not professional:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Profissional não encontrado"
-        )
-    
-    # Formatar resposta para bater com o schema ProfessionalPublicProfile
-    return {
-        "id": professional.id,
-        "name": professional.user.name,
-        "bio": professional.bio,
-        "reputation_score": professional.reputation_score,
-        "is_verified": professional.is_verified,
-        "hourly_rate_cents": professional.hourly_rate_cents,
-        "categories": [
-            {"id": cat.id, "name": cat.name, "color": cat.color}
-            for cat in professional.categories
-        ]
-    }
+    """Retorna o perfil público de um profissional por ID via Use Case."""
+    try:
+        professional = await get_use_case.execute(professional_id)
+        
+        return {
+            "id": professional.id,
+            "name": professional.name,
+            "bio": professional.bio,
+            "reputation_score": professional.reputation_score,
+            "is_verified": professional.is_verified,
+            "hourly_rate_cents": professional.hourly_rate_cents,
+            "categories": [
+                {"id": cat.id, "name": cat.name, "color": cat.color}
+                for cat in professional.categories
+            ]
+        }
+    except NotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
