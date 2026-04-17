@@ -68,6 +68,7 @@ class RegisterProfessionalUseCase:
                 user_id=user_id,
                 consent_type="terms",
                 version=settings.TERMS_VERSION,
+                is_granted=True,
                 ip_address=input_data.ip_address,
                 user_agent=input_data.user_agent
             ),
@@ -75,6 +76,7 @@ class RegisterProfessionalUseCase:
                 user_id=user_id,
                 consent_type="privacy",
                 version=settings.TERMS_VERSION,
+                is_granted=True,
                 ip_address=input_data.ip_address,
                 user_agent=input_data.user_agent
             )

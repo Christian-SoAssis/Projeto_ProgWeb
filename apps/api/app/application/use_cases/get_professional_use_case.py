@@ -2,7 +2,7 @@ from uuid import UUID
 from typing import Optional
 from app.domain.entities.professional import Professional
 from app.domain.repositories.professional_repository import ProfessionalRepository
-from app.domain.exceptions import NotFoundError
+from app.domain.exceptions import EntityNotFoundError
 
 class GetProfessionalUseCase:
     def __init__(self, prof_repo: ProfessionalRepository):
@@ -11,5 +11,5 @@ class GetProfessionalUseCase:
     async def execute(self, professional_id: UUID) -> Professional:
         professional = await self.prof_repo.get_by_id(professional_id)
         if not professional:
-            raise NotFoundError("Profissional não encontrado")
+            raise EntityNotFoundError("Professional", professional_id)
         return professional

@@ -9,5 +9,9 @@ class ContractRepository(ABC):
         pass
 
     @abstractmethod
+    async def count_completed_by_professional(self, professional_id: UUID) -> int:
+        pass
+
+    @abstractmethod
     async def get_by_id(self, contract_id: UUID) -> Optional[Contract]:
         pass

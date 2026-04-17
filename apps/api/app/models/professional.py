@@ -45,6 +45,8 @@ class Professional(Base):
 
     @latitude.setter
     def latitude(self, value: float):
+        if value is None:
+            return
         current_long = self.longitude or 0.0
         self.location = f"POINT({current_long} {value})"
 
@@ -67,6 +69,8 @@ class Professional(Base):
 
     @longitude.setter
     def longitude(self, value: float):
+        if value is None:
+            return
         current_lat = self.latitude or 0.0
         self.location = f"POINT({value} {current_lat})"
 

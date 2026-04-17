@@ -19,3 +19,10 @@ class BusinessRuleViolationError(DomainError):
 class UnauthorizedError(DomainError):
     """Raised when an action is not authorized."""
     pass
+
+class ConflictError(DomainError):
+    """Raised when there is a conflict (e.g., entity already exists)."""
+    pass
+
+# Aliases for better readability in some contexts
+NotFoundError = EntityNotFoundError

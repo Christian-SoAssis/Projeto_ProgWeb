@@ -23,7 +23,7 @@ class ProfessionalRepositoryImpl(ProfessionalRepository):
             .where(ProfessionalModel.id == professional_id)
         )
         result = await self.db.execute(query)
-        model = result.scalar_one_or_none()
+        model = result.unique().scalar_one_or_none()
         return ProfessionalMapper.to_entity(model) if model else None
 
     async def list_available(self, category_id: Optional[UUID] = None) -> List[Professional]:
@@ -32,7 +32,7 @@ class ProfessionalRepositoryImpl(ProfessionalRepository):
             query = query.filter(ProfessionalModel.categories.any(id=category_id))
         
         result = await self.db.execute(query)
-        models = result.scalars().all()
+        models = result.unique().scalars().all()
         return [ProfessionalMapper.to_entity(m) for m in models]
 
     async def save(self, professional: Professional) -> Professional:
@@ -45,6 +45,8 @@ class ProfessionalRepositoryImpl(ProfessionalRepository):
             existing.service_radius_km = professional.service_radius_km
             existing.document_path = professional.document_path
             existing.is_verified = professional.is_verified
+            existing.latitude = professional.latitude
+            existing.longitude = professional.longitude
             model = existing
         else:
             model = ProfessionalMapper.to_model(professional)

@@ -38,7 +38,6 @@ class UserRepositoryImpl(UserRepository):
             model.password_hash = user.password_hash
             model.role = user.role
             model.is_active = user.is_active
-            model.is_verified = user.is_verified
         else:
             model = UserMapper.to_model(user)
             self.db.add(model)

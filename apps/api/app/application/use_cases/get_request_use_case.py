@@ -2,7 +2,7 @@ import uuid
 from typing import Optional
 from app.domain.entities.request import Request
 from app.domain.repositories.request_repository import RequestRepository
-from app.domain.exceptions import EntityNotFoundError
+from app.domain.exceptions import EntityNotFoundError, BusinessRuleViolationError
 
 class GetRequestUseCase:
     def __init__(self, request_repo: RequestRepository):

@@ -3,10 +3,10 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form, Request
 from pydantic import ValidationError
 
-from app.api.v1.deps import get_register_professional_use_case, get_get_professional_use_case
+from app.api.v1.deps import get_register_professional_use_case, get_professional_use_case
 from app.application.use_cases.register_professional_use_case import RegisterProfessionalUseCase, RegisterProfessionalInput
 from app.application.use_cases.get_professional_use_case import GetProfessionalUseCase
-from app.domain.exceptions import BusinessRuleViolationError, NotFoundError
+from app.domain.exceptions import BusinessRuleViolationError, EntityNotFoundError
 from app.schemas.v1.auth import (
     ProfessionalRegisterResponse,
 )
@@ -73,7 +73,7 @@ async def register_professional(
 @router.get("/{professional_id}", response_model=ProfessionalPublicProfile)
 async def get_professional_profile(
     professional_id: UUID,
-    get_use_case: GetProfessionalUseCase = Depends(get_get_professional_use_case)
+    get_use_case: GetProfessionalUseCase = Depends(get_professional_use_case)
 ):
     """Retorna o perfil público de um profissional por ID via Use Case."""
     try:
@@ -91,5 +91,5 @@ async def get_professional_profile(
                 for cat in professional.categories
             ]
         }
-    except NotFoundError as e:
+    except EntityNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))

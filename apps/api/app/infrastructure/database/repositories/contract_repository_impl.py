@@ -20,6 +20,17 @@ class ContractRepositoryImpl(ContractRepository):
         # For now, return the entity itself as we just saved it.
         return contract
 
+    async def count_completed_by_professional(self, professional_id: UUID) -> int:
+        from sqlalchemy import func
+        result = await self.session.execute(
+            select(func.count(ContractModel.id))
+            .where(
+                ContractModel.professional_id == professional_id,
+                ContractModel.status == "completed"
+            )
+        )
+        return result.scalar() or 0
+
     async def get_by_id(self, contract_id: UUID) -> Optional[ContractEntity]:
         result = await self.session.execute(select(ContractModel).where(ContractModel.id == contract_id))
         model = result.scalar_one_or_none()

@@ -1,21 +1,23 @@
+from dataclasses import dataclass
 from uuid import UUID
 from typing import Optional
+from datetime import datetime
 from enum import Enum
-from pydantic import BaseModel, ConfigDict
 
 class UserRole(str, Enum):
-    ADMIN = "admin"
     CLIENT = "client"
     PROFESSIONAL = "professional"
+    ADMIN = "admin"
 
-class User(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
+@dataclass
+class User:
     id: UUID
     name: str
     email: str
-    phone: Optional[str] = None
     password_hash: str
-    role: UserRole = UserRole.CLIENT
+    role: UserRole
+    phone: Optional[str] = None
+    avatar_url: Optional[str] = None
     is_active: bool = True
-    is_verified: bool = False
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None

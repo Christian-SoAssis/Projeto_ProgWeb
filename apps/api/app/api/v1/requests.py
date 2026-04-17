@@ -12,6 +12,11 @@ from app.application.use_cases.create_request_use_case import CreateRequestUseCa
 from app.application.use_cases.get_request_use_case import GetRequestUseCase
 from app.application.use_cases.list_requests_use_case import ListRequestsUseCase
 from app.domain.exceptions import EntityNotFoundError, UnauthorizedError, DomainError
+from app.schemas.v1.requests import RequestResponse
+from app.schemas.v1.matching import MatchResponse
+from app.schemas.v1.bids import BidResponse as BidResp
+from app.models.bid import Bid
+from app.services.matching_service import get_matches
 
 router = APIRouter(prefix="/requests", tags=["Requests"])
 
