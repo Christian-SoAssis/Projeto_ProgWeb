@@ -32,6 +32,12 @@ class Settings(BaseSettings):
     GOOGLE_API_KEY: str = "[ENCRYPTION_KEY]"
     GEMINI_MODEL: str = "gemini-1.5-flash"
 
+    # OAuth2 Google
+    GOOGLE_CLIENT_ID: str | None = None
+    GOOGLE_CLIENT_SECRET: str | None = None
+    GOOGLE_REDIRECT_URI: str = "http://localhost:8000/api/v1/auth/google/callback"
+    FRONTEND_AUTH_CALLBACK_URL: str = "http://localhost:3000/auth/callback"
+
     model_config = {"env_file": ".env", "case_sensitive": True}
 
 

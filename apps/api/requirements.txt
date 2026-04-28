@@ -40,3 +40,11 @@ shapely==2.1.2
 # AI e Arquivos
 google-genai==0.3.0
 aiofiles==23.2.1
+
+# Observability
+setuptools==69.0.3
+opentelemetry-api==1.22.0
+opentelemetry-sdk==1.22.0
+opentelemetry-instrumentation-fastapi==0.43b0
+opentelemetry-instrumentation-sqlalchemy==0.43b0
+opentelemetry-exporter-otlp==1.22.0

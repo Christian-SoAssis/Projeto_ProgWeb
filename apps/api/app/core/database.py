@@ -11,6 +11,14 @@ engine = create_async_engine(
     future=True,
 )
 
+# Instrumentar o SQLAlchemy com OpenTelemetry (se configurado)
+import os
+if os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT"):
+    from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
+    SQLAlchemyInstrumentor().instrument(
+        engine=engine.sync_engine,
+    )
+
 # Session factory assíncrona
 AsyncSessionLocal = async_sessionmaker(
     engine,

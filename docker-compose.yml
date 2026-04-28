@@ -59,6 +59,12 @@ services:
       LOG_LEVEL: ${LOG_LEVEL:-debug}
       GOOGLE_API_KEY: AIzaSyB0b7F6xj5-14NBouRupB3K2vql1MAwdXU
       GEMINI_MODEL: gemini-1.5-flash
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://observability:4317
+      OTEL_SERVICE_NAME: servicoja-api
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-http://localhost:8000/api/v1/auth/google/callback}
+      FRONTEND_AUTH_CALLBACK_URL: ${FRONTEND_AUTH_CALLBACK_URL:-http://localhost:3000/auth/callback}
     volumes:
       - ./apps/api:/app
       - ./uploads:/app/uploads
@@ -123,6 +129,18 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+
+  observability:
+    image: grafana/otel-lgtm:latest
+    container_name: servicoja-observability
+    restart: unless-stopped
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP
+    networks:
+      - data
+      - frontend
 
 volumes:
   pgdata:

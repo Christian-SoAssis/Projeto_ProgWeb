@@ -144,7 +144,13 @@ export default function LoginPage() {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Button variant="neo-elevated" className="h-12 rounded-xl bg-background border-none flex gap-2 font-semibold">
+            <Button 
+              variant="neo-elevated" 
+              className="h-12 rounded-xl bg-background border-none flex gap-2 font-semibold"
+              onClick={() => {
+                window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/auth/google/login`
+              }}
+            >
                <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"

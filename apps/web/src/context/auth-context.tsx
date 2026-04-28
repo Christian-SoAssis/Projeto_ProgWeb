@@ -16,6 +16,7 @@ interface AuthContextType {
   loading: boolean
   isAuthenticated: boolean
   login: (credentials: any) => Promise<void>
+  oauthLogin: (accessToken: string, refreshToken: string) => Promise<void>
   registerClient: (data: any) => Promise<void>
   registerPro: (formData: FormData) => Promise<void>
   logout: () => void
@@ -99,6 +100,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push("/login?registered=true")
   }
 
+  const oauthLogin = async (accessToken: string, refreshToken: string) => {
+    localStorage.setItem("access_token", accessToken)
+    localStorage.setItem("refresh_token", refreshToken)
+    
+    // Cookie para middleware
+    document.cookie = `access_token=${accessToken}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Strict`
+    
+    // Carregar dados completos do usuário
+    const userData = await apiFetch("/auth/me")
+    setUser(userData)
+    
+    // Redirecionar baseado no papel
+    if (userData.role === "professional") {
+      router.push("/dashboard/pro")
+    } else {
+      router.push("/dashboard/client")
+    }
+  }
+
   const logout = () => {
     localStorage.removeItem("access_token")
     localStorage.removeItem("refresh_token")
@@ -113,6 +133,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loading, 
       isAuthenticated: !!user, 
       login, 
+      oauthLogin,
       registerClient, 
       registerPro,
       logout 

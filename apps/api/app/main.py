@@ -66,4 +66,8 @@ async def health():
 # Registrar middleware
 _app.add_middleware(LogSanitizerMiddleware)
 
+# Configurar Observabilidade (OpenTelemetry)
+from app.core.telemetry import setup_telemetry
+setup_telemetry(_app)
+
 app = _app

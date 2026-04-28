@@ -18,11 +18,11 @@
 ### 1.2 Fundação do Monorepo (`service-marketplace-platform`)
 *Change: `openspec/changes/service-marketplace-platform/` §1*
 - [x] **1.2.1** Setup `apps/web` (Next.js 14) + `apps/api` (FastAPI)
-- [ ] **1.2.2** Setup shadcn/ui: instalar 29 componentes e configurar theme tokens
+- [x] **1.2.2** Setup shadcn/ui: instalar 29 componentes e configurar theme tokens
 - [x] **1.2.3** Banco de dados: Migrations 001–016 (Completo)
 - [x] **1.2.4** Seed inicial de 16 categorias
-- [ ] **1.2.5** CI básica: lint + type-check + testes (GitHub Actions)
-- [ ] **1.2.6** Observabilidade: OpenTelemetry + Grafana básico
+- [x] **1.2.5** CI básica: lint + type-check + testes (GitHub Actions)
+- [x] **1.2.6** Observabilidade: OpenTelemetry + Grafana básico
 - [x] **1.2.7** OpenAPI: Geração automática e validação de schema
 
 ---
@@ -39,7 +39,7 @@
 - [x] **2.2** Endpoint `POST /auth/register` (cliente) com hash bcrypt
 - [x] **2.3** Endpoint `POST /auth/login`
 - [x] **2.4** Endpoint `POST /auth/refresh`
-- [ ] **2.5** OAuth2 Google: configurar callback e vinculação
+- [x] **2.5** OAuth2 Google: configurar callback e vinculação
 - [x] **2.6** Endpoint `POST /professionals` (upload de documentos)
 - [x] **2.7** Admin: Fluxo de verificação (`PATCH /admin/professionals/:id`)
 - [x] **2.8** Middleware: RBAC (client, professional, admin)
