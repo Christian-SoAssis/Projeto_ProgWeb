@@ -19,6 +19,7 @@ interface AuthContextType {
   oauthLogin: (accessToken: string, refreshToken: string) => Promise<void>
   registerClient: (data: any) => Promise<void>
   registerPro: (formData: FormData) => Promise<void>
+  switchRole: () => Promise<void>
   logout: () => void
 }
 
@@ -112,12 +113,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(userData)
     
     // Redirecionar baseado no papel
+    // Redirecionar baseado no papel
     if (userData.role === "professional") {
       router.push("/dashboard/pro")
     } else {
       router.push("/dashboard/client")
     }
   }
+
+  const switchRole = async () => {
+    try {
+      const response = await apiFetch("/auth/test/switch-role", { method: "POST" })
+      
+      localStorage.setItem("access_token", response.access_token)
+      localStorage.setItem("refresh_token", response.refresh_token)
+      document.cookie = `access_token=${response.access_token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Strict`
+      
+      const userData = await apiFetch("/auth/me")
+      setUser(userData)
+      
+      if (userData.role === "professional") {
+        router.push("/dashboard/pro")
+      } else {
+        router.push("/dashboard/client")
+      }
+    } catch (error) {
+      console.error("Falha ao alternar perfil", error)
+      throw error
+    }
+  }
+
 
   const logout = () => {
     localStorage.removeItem("access_token")
@@ -136,6 +161,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       oauthLogin,
       registerClient, 
       registerPro,
+      switchRole,
       logout 
     }}>
       {children}

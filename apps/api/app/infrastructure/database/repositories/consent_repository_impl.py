@@ -16,7 +16,7 @@ class ConsentRepositoryImpl(ConsentRepository):
                 version=c.version,
                 ip_address=c.ip_address,
                 user_agent=c.user_agent,
-                created_at=c.created_at
+                accepted_at=c.accepted_at
             )
             for c in consents
         ]

@@ -8,8 +8,18 @@ from app.models.user import User
 from app.models.professional import Professional
 from app.models.contract import Contract
 from app.models.bid import Bid
+from typing import List
+from datetime import datetime, timezone
 from app.schemas.v1.professionals import ProfessionalResponse
-from app.schemas.v1.panels import ProfessionalMetrics, ProfessionalUpdateRequest
+from app.schemas.v1.panels import (
+    ProfessionalMetrics,
+    ProfessionalUpdateRequest,
+    ContractHistoryItem,
+    AISummaryResponse,
+)
+from app.models.request import Request
+from app.models.review import Review
+from app.services.review_service import generate_professional_reviews_summary
 
 router = APIRouter(prefix="/professionals", tags=["Professionals Panel"])
 
@@ -112,4 +122,68 @@ async def get_my_metrics(
         pending_bids=pending_bids,
         reputation_score=prof.reputation_score,
         conversion_rate=round(conversion_rate, 4),
+    )
+
+
+@router.get("/me/history", response_model=List[ContractHistoryItem])
+async def get_my_history(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    _require_professional(current_user)
+    result = await db.execute(
+        select(Professional).where(Professional.user_id == current_user.id)
+    )
+    prof = result.scalar_one_or_none()
+    if not prof:
+        raise HTTPException(status_code=404, detail="Perfil profissional não encontrado")
+
+    # Buscar os contratos concluídos com dados relacionados
+    query = (
+        select(Contract, Request, User, Review.rating)
+        .join(Request, Contract.request_id == Request.id)
+        .join(User, Contract.client_id == User.id)
+        .outerjoin(Review, Review.contract_id == Contract.id)
+        .where(
+            Contract.professional_id == prof.id,
+            Contract.status == "completed"
+        )
+        .order_by(Contract.completed_at.desc())
+    )
+    history_result = await db.execute(query)
+    
+    items = []
+    for contract, req, client, rating in history_result.all():
+        items.append(
+            ContractHistoryItem(
+                id=contract.id,
+                request_title=req.title,
+                client_name=client.name,
+                agreed_cents=contract.agreed_cents,
+                completed_at=contract.completed_at,
+                rating=rating
+            )
+        )
+        
+    return items
+
+
+@router.get("/me/ai-summary", response_model=AISummaryResponse)
+async def get_my_ai_summary(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    _require_professional(current_user)
+    result = await db.execute(
+        select(Professional).where(Professional.user_id == current_user.id)
+    )
+    prof = result.scalar_one_or_none()
+    if not prof:
+        raise HTTPException(status_code=404, detail="Perfil profissional não encontrado")
+
+    summary_text = await generate_professional_reviews_summary(db, prof.id)
+    
+    return AISummaryResponse(
+        summary=summary_text,
+        generated_at=datetime.now(timezone.utc)
     )

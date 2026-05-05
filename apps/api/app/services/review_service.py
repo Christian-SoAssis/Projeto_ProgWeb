@@ -262,3 +262,50 @@ async def list_reviews_for_professional(
         .order_by(Review.created_at.desc())
     )
     return list(result.scalars().all())
+
+
+async def generate_professional_reviews_summary(
+    db: AsyncSession,
+    professional_id: uuid.UUID,
+) -> str:
+    """Gera um resumo com IA das últimas avaliações do profissional."""
+    if not settings.GOOGLE_API_KEY or settings.GOOGLE_API_KEY == "[ENCRYPTION_KEY]":
+        return "Sem dados suficientes para o resumo (API Key não configurada)."
+
+    # Buscar as últimas 10 reviews
+    reviews = await list_reviews_for_professional(db, professional_id)
+    recent_reviews = reviews[:10]
+
+    if not recent_reviews:
+        return "Ainda não há avaliações suficientes para gerar um resumo."
+
+    reviews_text = "\n".join([f"- {r.text}" for r in recent_reviews if r.text])
+    
+    if not reviews_text.strip():
+        return "As avaliações atuais não possuem comentários detalhados para resumo."
+
+    try:
+        from google import genai
+        from google.genai import types
+        
+        client = genai.Client(api_key=settings.GOOGLE_API_KEY)
+        
+        prompt = f"""Você é um assistente do marketplace 'ServiçoJá'. Baseado nas seguintes avaliações reais de clientes sobre um profissional, gere um breve resumo (no máximo 3 frases) destacando os pontos fortes e principais áreas de destaque ou atenção.
+Mantenha um tom profissional, direto e em português do Brasil. Não use formatação markdown complexa.
+
+Avaliações:
+{reviews_text}
+"""
+        response = client.models.generate_content(
+            model=settings.GEMINI_MODEL,
+            contents=prompt,
+        )
+        
+        if not response.text:
+            return "Não foi possível gerar o resumo no momento."
+            
+        return response.text.strip()
+
+    except Exception as e:
+        logger.error(f"Erro ao gerar resumo de avaliações via Gemini: {e}")
+        return "O resumo das avaliações está temporariamente indisponível."

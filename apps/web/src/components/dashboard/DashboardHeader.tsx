@@ -1,9 +1,10 @@
 "use client"
 
 import { NotificationBell } from "./NotificationBell"
-import { User, LogOut, ChevronDown } from "lucide-react"
+import { User, LogOut, ChevronDown, RefreshCw } from "lucide-react"
 import { useState } from "react"
 import { useAuth } from "@/context/auth-context"
+import { useRouter } from "next/navigation"
 
 interface DashboardHeaderProps {
   userName: string
@@ -12,7 +13,8 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ userName, roleLabel }: DashboardHeaderProps) {
   const [profileOpen, setProfileOpen] = useState(false)
-  const { logout } = useAuth()
+  const { logout, switchRole } = useAuth()
+  const router = useRouter()
 
   return (
     <header className="w-full flex justify-between items-center px-6 py-4 mb-2">
@@ -48,10 +50,30 @@ export function DashboardHeader({ userName, roleLabel }: DashboardHeaderProps) {
 
           {profileOpen && (
             <div className="absolute right-0 mt-3 w-48 py-2 bg-background rounded-2xl neo-elevated border-none z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-              <button className="w-full px-4 py-2 text-left text-sm font-medium hover:text-primary transition-colors flex items-center gap-2">
+              <button 
+                onClick={() => {
+                  setProfileOpen(false)
+                  router.push("/profile")
+                }}
+                className="w-full px-4 py-2 text-left text-sm font-medium hover:text-primary transition-colors flex items-center gap-2"
+              >
                 <User className="w-4 h-4" /> Meu Perfil
               </button>
+              
               <div className="h-px bg-muted/20 my-1 mx-2" />
+              
+              <button 
+                onClick={async () => {
+                  setProfileOpen(false)
+                  await switchRole()
+                }}
+                className="w-full px-4 py-2 text-left text-sm font-medium hover:text-primary transition-colors flex items-center gap-2"
+              >
+                <RefreshCw className="w-4 h-4" /> Alternar Perfil
+              </button>
+
+              <div className="h-px bg-muted/20 my-1 mx-2" />
+              
               <button 
                 onClick={logout}
                 className="w-full px-4 py-2 text-left text-sm font-bold text-destructive hover:bg-destructive/5 transition-colors flex items-center gap-2"

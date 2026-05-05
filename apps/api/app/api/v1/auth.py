@@ -235,3 +235,45 @@ async def google_callback(code: str, request: Request, db: AsyncSession = Depend
     
     redirect_url = f"{settings.FRONTEND_AUTH_CALLBACK_URL}?access_token={sys_access_token}&refresh_token={sys_refresh_token}"
     return RedirectResponse(redirect_url)
+
+
+@router.post("/test/switch-role")
+async def switch_role(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    from sqlalchemy import update, select
+    from app.models.professional import Professional
+    import uuid
+
+    new_role = "professional" if current_user.role.value == "client" else "client"
+
+    # Criar um perfil fake de profissional se não existir
+    if new_role == "professional":
+        result = await db.execute(select(Professional).where(Professional.user_id == current_user.id))
+        prof = result.scalar_one_or_none()
+        if not prof:
+            dummy_prof = Professional(
+                user_id=current_user.id,
+                bio="Perfil de teste gerado dinamicamente para teste de transição.",
+                latitude=-23.5505,
+                longitude=-46.6333,
+                service_radius_km=10.0,
+                hourly_rate_cents=5000,
+                document_type="cpf",
+                document_path="/tmp/mock.pdf",
+                is_verified=True
+            )
+            db.add(dummy_prof)
+
+    await db.execute(
+        update(User)
+        .where(User.id == current_user.id)
+        .values(role=new_role)
+    )
+    await db.commit()
+
+    access_token = create_access_token({"sub": str(current_user.id), "role": new_role})
+    refresh_token = create_refresh_token({"sub": str(current_user.id), "role": new_role})
+
+    return {"access_token": access_token, "refresh_token": refresh_token}

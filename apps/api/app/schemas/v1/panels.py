@@ -54,3 +54,18 @@ class SearchProfessionalResponse(BaseModel):
     is_verified: bool
     distance_km: Optional[float] = None
     model_config = ConfigDict(from_attributes=True)
+
+
+class ContractHistoryItem(BaseModel):
+    id: UUID
+    request_title: str
+    client_name: str
+    agreed_cents: int
+    completed_at: datetime
+    rating: Optional[int] = None
+    model_config = ConfigDict(from_attributes=True)
+
+
+class AISummaryResponse(BaseModel):
+    summary: str
+    generated_at: datetime
