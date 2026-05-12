@@ -17,7 +17,11 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
     }
   }
 
-  const response = await fetch(`${BASE_URL}${endpoint}`, {
+  const url = `${BASE_URL}${endpoint}`;
+  console.log("🚀 [apiFetch] Fetching:", url, "with method:", options.method || "GET");
+  console.log("🚀 [apiFetch] Headers:", headers);
+
+  const response = await fetch(url, {
     ...options,
     headers,
   })
