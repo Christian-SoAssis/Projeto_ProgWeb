@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { SearchBar } from "@/components/SearchBar";
 import Link from "next/link";
 
 export default function HomePage() {
@@ -28,51 +27,36 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* Search Section - Inset */}
       <section className="w-full">
-        <div className="relative group">
-          <div className="neo-inset rounded-full flex items-center px-4 py-1 bg-background">
-            <Search className="w-5 h-5 text-muted-foreground" />
-            <Input 
-              placeholder="Que serviço você precisa hoje?" 
-              className="border-none shadow-none focus-visible:ring-0 bg-transparent h-12 text-base font-sans"
-            />
-          </div>
-        </div>
+        <SearchBar />
       </section>
 
-      {/* Action Cards - Elevated */}
       <section className="grid grid-cols-1 gap-6 w-full">
-        <Card className="neo-elevated border-none bg-background rounded-3xl p-2 transition-transform active:scale-95 cursor-pointer">
-          <CardHeader>
-            <CardTitle className="text-lg font-sans">Encontrar Profissional</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Acesso rápido aos melhores prestadores da sua região com selo de verificação manual.
-            </p>
-          </CardContent>
-        </Card>
+        <Link href="/search">
+          <Card className="neo-elevated border-none bg-background rounded-3xl p-2 transition-transform active:scale-95 cursor-pointer hover:translate-y-[-2px]">
+            <CardHeader>
+              <CardTitle className="text-lg font-sans">Encontrar Profissional</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Acesso rápido aos melhores prestadores da sua região com selo de verificação manual.
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
 
-        <Card className="neo-elevated border-none bg-background rounded-3xl p-2">
-          <CardHeader>
-            <CardTitle className="text-lg font-sans">Meus Pedidos</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="neo-inset rounded-2xl p-4 flex justify-between items-center bg-transparent">
-              <span className="text-sm font-sans font-medium">Reforma Banheiro</span>
-              <span className="text-[10px] font-mono bg-primary/20 text-primary px-2 py-1 rounded-full">
-                EM ANÁLISE VLM
-              </span>
-            </div>
-            <div className="neo-inset rounded-2xl p-4 flex justify-between items-center bg-transparent">
-              <span className="text-sm font-sans font-medium">Pintura Fachada</span>
-              <span className="text-[10px] font-mono bg-secondary/80 text-secondary-foreground px-2 py-1 rounded-full">
-                FINALIZADO
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+        <Link href="/dashboard/client">
+          <Card className="neo-elevated border-none bg-background rounded-3xl p-2 hover:translate-y-[-2px] transition-transform cursor-pointer">
+            <CardHeader>
+              <CardTitle className="text-lg font-sans">Meus Pedidos</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Acompanhe o status dos seus pedidos e veja os lances recebidos.
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
       </section>
 
       <footer className="w-full flex justify-center gap-4 pt-4">
