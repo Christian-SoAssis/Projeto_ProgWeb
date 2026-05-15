@@ -38,6 +38,10 @@ class Settings(BaseSettings):
     GOOGLE_REDIRECT_URI: str = "http://localhost:8000/api/v1/auth/google/callback"
     FRONTEND_AUTH_CALLBACK_URL: str = "http://localhost:3000/auth/callback"
 
+    # MercadoPago
+    MERCADOPAGO_ACCESS_TOKEN: str = "TEST-1234567890-mock-token"
+    MERCADOPAGO_WEBHOOK_SECRET: str = "mock-webhook-secret-123"
+
     model_config = {"env_file": ".env", "case_sensitive": True}
 
 

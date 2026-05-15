@@ -24,6 +24,7 @@ class Category(Base):
     )
     sort_order = Column(Integer, default=0, nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
+    fee_percentage = Column(Integer, default=10, nullable=False)
 
     # Relacionamentos
     parent = relationship("Category", remote_side=[id], back_populates="children")
