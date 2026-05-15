@@ -94,14 +94,14 @@
 *Change: `openspec/changes/global-visual-identity/`*
 - [x] **3.0.1** Tokens: DM Sans + Mono, cores nm, utilitários `elevated` / `inset`
 - [x] **3.0.2** Componentes: Button, Input, NeomorphicCard, Badge customizados
-- [ ] **3.0.3** Landing Page: Hero, Busca afundada, Category Pills neomórficas
+- [x] **3.0.3** Landing Page: Hero, Busca afundada, Category Pills neomórficas
 - [ ] **3.0.4** Acessibilidade: Contraste Modo Claro e responsividade de sombras
 
 ### 3.1 — Experiência do Usuário (Dashboards & Busca)
-- [ ] **3.1.1** Busca split-screen (lista + mapa) (`search-discovery-screen`)
-- [ ] **3.1.2** Novo Pedido Stepper com visual IA (`new-order-step-2`)
-- [ ] **3.1.3** Client Dash Mobile-first (`client-dashboard-v2`)
-- [ ] **3.1.4** Professional Dash Executive grid (`professional-dashboard-v2`)
+- [x] **3.1.1** Busca split-screen (lista + mapa) (`search-discovery-screen`)
+- [x] **3.1.2** Novo Pedido Stepper com visual IA (`new-order-step-2`)
+- [x] **3.1.3** Client Dash Mobile-first (`client-dashboard-v2`)
+- [x] **3.1.4** Professional Dash Executive grid (`professional-dashboard-v2`)
 - [ ] **3.1.5** Chat Seguro Mobile WebSocket (`secure-chat-mobile`)
 
 ---

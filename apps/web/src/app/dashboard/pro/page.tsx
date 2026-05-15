@@ -5,9 +5,10 @@ import { DashboardHeader } from "@/components/dashboard/DashboardHeader"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { MapPin, Star, DollarSign, Briefcase, Zap, AlertCircle, Clock, X } from "lucide-react"
+import { MapPin, Star, DollarSign, Briefcase, Zap, AlertCircle, Clock, X, BadgeCheck, User as UserIcon } from "lucide-react"
 import { useAuth } from "@/context/auth-context"
 import { useProfessionalMetrics } from "@/hooks/useProfessionalMetrics"
+import { useProfessionalProfile } from "@/hooks/useProfessionalProfile"
 import { useGeolocation } from "@/hooks/useGeolocation"
 import { useAvailableRequests } from "@/hooks/useAvailableRequests"
 import { useCreateBid } from "@/hooks/useCreateBid"
@@ -132,7 +133,8 @@ function BidModal({
 
 export default function ProfessionalDashboard() {
     const { user } = useAuth()
-    const { metrics } = useProfessionalMetrics()
+    const { metrics, loading: loadingMetrics } = useProfessionalMetrics()
+    const { profile, loading: loadingProfile } = useProfessionalProfile()
     const { isLocating, error: locationError } = useGeolocation()
     const { requests, loading: loadingRequests } = useAvailableRequests()
     const [selectedRequest, setSelectedRequest] = useState<ServiceRequest | null>(null)
@@ -150,29 +152,90 @@ export default function ProfessionalDashboard() {
                 />
             )}
 
-            <div className="px-6 space-y-8 max-w-2xl mx-auto">
-                <section className="mt-4 grid grid-cols-2 gap-4">
-                    <Card variant="neo-elevated" className="border-none rounded-3xl p-4 flex flex-col gap-2">
-                        <div className="flex justify-between items-center text-primary">
-                            <Star className="w-5 h-5 fill-primary/20" />
-                            <span className="text-xl font-black">
-                                {metrics?.reputation_score?.toFixed(1) ?? "—"}
-                            </span>
+            <div className="px-6 mt-6 space-y-8 max-w-2xl mx-auto">
+                {/* PROFILE CARD */}
+                <Card variant="neo-elevated" className="border-none rounded-[2rem] p-6 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-[100px] -z-10" />
+                    <div className="flex items-start gap-5">
+                        <div className="w-20 h-20 shrink-0 rounded-[1.5rem] neo-inset flex items-center justify-center bg-background overflow-hidden">
+                            {user?.avatar_url ? (
+                                <img src={user.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                            ) : (
+                                <UserIcon className="w-8 h-8 text-muted-foreground/50" />
+                            )}
                         </div>
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-70">
-                            Avaliação Média
-                        </span>
+                        <div className="flex-1 space-y-1 pt-1">
+                            <div className="flex items-center gap-2">
+                                <h2 className="text-xl font-black leading-none">{user?.name || "..."}</h2>
+                                {profile?.is_verified && (
+                                    <BadgeCheck className="w-5 h-5 text-primary" />
+                                )}
+                            </div>
+                            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                                {profile?.categories?.map(c => c.name).join(" • ") || "Profissional"}
+                            </p>
+                            
+                            <div className="pt-2">
+                                {loadingProfile ? (
+                                    <Skeleton className="h-4 w-full" />
+                                ) : (
+                                    <p className="text-sm text-foreground/80 line-clamp-3 leading-relaxed">
+                                        {profile?.bio || "Sua biografia aparecerá aqui..."}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </Card>
+
+                {/* EXECUTIVE METRICS GRID */}
+                <section className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <Card variant="neo-elevated" className="border-none rounded-3xl p-5 flex flex-col justify-between min-h-[110px]">
+                        <div className="flex justify-between items-start">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-70">
+                                Avaliação
+                            </span>
+                            <Star className="w-4 h-4 text-primary fill-primary/20" />
+                        </div>
+                        <div className="mt-2">
+                            {loadingMetrics ? <Skeleton className="h-8 w-16" /> : (
+                                <span className="text-3xl font-black text-primary">
+                                    {metrics?.reputationScore?.toFixed(1) ?? "—"}
+                                </span>
+                            )}
+                        </div>
                     </Card>
-                    <Card variant="neo-elevated" className="border-none rounded-3xl p-4 flex flex-col gap-2">
-                        <div className="flex justify-between items-center text-secondary">
-                            <DollarSign className="w-5 h-5" />
-                            <span className="text-sm font-black truncate">
-                                {metrics ? formatCurrency(metrics.total_earnings_cents) : "R$ —"}
+
+                    <Card variant="neo-elevated" className="border-none rounded-3xl p-5 flex flex-col justify-between min-h-[110px]">
+                        <div className="flex justify-between items-start">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-70">
+                                Ganhos
                             </span>
+                            <DollarSign className="w-4 h-4 text-secondary" />
                         </div>
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-70">
-                            Ganhos Totais
-                        </span>
+                        <div className="mt-2">
+                            {loadingMetrics ? <Skeleton className="h-8 w-24" /> : (
+                                <span className="text-xl sm:text-2xl font-black truncate text-secondary">
+                                    {metrics ? formatCurrency(metrics.totalEarningsCents) : "—"}
+                                </span>
+                            )}
+                        </div>
+                    </Card>
+                    
+                    <Card variant="neo-elevated" className="border-none rounded-3xl p-5 flex flex-col justify-between min-h-[110px] col-span-2 md:col-span-1">
+                        <div className="flex justify-between items-start">
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-70">
+                                Concluídos
+                            </span>
+                            <Briefcase className="w-4 h-4 text-foreground/50" />
+                        </div>
+                        <div className="mt-2">
+                            {loadingMetrics ? <Skeleton className="h-8 w-12" /> : (
+                                <span className="text-3xl font-black text-foreground">
+                                    {metrics?.completedJobs ?? "0"}
+                                </span>
+                            )}
+                        </div>
                     </Card>
                 </section>
 
