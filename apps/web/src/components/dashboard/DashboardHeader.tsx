@@ -28,7 +28,7 @@ export function DashboardHeader({ userName, roleLabel }: DashboardHeaderProps) {
       </div>
 
       <div className="flex items-center gap-4">
-        <NotificationBell hasNotifications={true} />
+        <NotificationBell />
         
         <div className="relative">
           <button
