@@ -9,6 +9,7 @@ interface User {
   name: string
   email: string
   role: "client" | "professional"
+  avatar_url?: string
 }
 
 interface AuthContextType {

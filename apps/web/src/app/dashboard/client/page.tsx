@@ -39,11 +39,12 @@ export default function ClientDashboard() {
     : FALLBACK_CATEGORIES
 
   return (
-    <main className="min-h-screen bg-background pb-20">
+    <main className="min-h-screen bg-background pb-28">
       <DashboardHeader userName={user?.name || "Cliente"} roleLabel="Cliente" />
 
-      <div className="px-6 space-y-8 max-w-2xl mx-auto">
-        <section className="mt-4">
+      <div className="px-6 space-y-6 max-w-md mx-auto pt-4">
+        {/* Saudação e Busca */}
+        <section>
           <h1 className="text-2xl font-black tracking-tight text-foreground/90">
             Olá, <span className="text-primary italic">{user?.name?.split(" ")[0] || "Usuário"}!</span>
           </h1>
@@ -58,74 +59,63 @@ export default function ClientDashboard() {
             <Input
               placeholder="Ex: Encanador, Eletricista..."
               className="border-none shadow-none focus-visible:ring-0 bg-transparent h-14 text-base font-semibold"
+              onClick={() => router.push("/search")}
             />
           </div>
         </section>
 
-        <section className="grid grid-cols-1 gap-4">
-          <Button
-            variant="neo-elevated"
-            className="h-20 rounded-2xl flex justify-between items-center px-6 group"
-            onClick={() => router.push("/requests/new")}
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl neo-inset bg-primary/10 flex items-center justify-center">
-                <Plus className="w-6 h-6 text-primary" />
-              </div>
-              <div className="text-left">
-                <span className="block font-bold text-lg">Criar Novo Pedido</span>
-                <span className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground opacity-60">
-                  Gratuito e rápido
-                </span>
-              </div>
-            </div>
-            <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:translate-x-1 transition-transform" />
-          </Button>
-        </section>
-
-        <section className="space-y-4">
-          <div className="flex justify-between items-center px-1">
-            <h3 className="text-sm font-black uppercase tracking-widest text-muted-foreground/80">
-              Seus Pedidos Ativos
+        {/* Categorias */}
+        <section>
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground/80">
+              Categorias Populares
             </h3>
-            <Button variant="link" size="sm" className="text-xs font-bold text-primary px-0">
-              Ver todos
+            <Button variant="link" size="sm" className="text-[10px] font-bold text-primary px-0">
+              Ver todas
             </Button>
           </div>
+          <div className="grid grid-cols-2 gap-3">
+            {displayCategories.map((cat) => (
+              <Button 
+                key={cat.id} 
+                variant="neo-elevated" 
+                className="h-14 rounded-[1rem] bg-background font-bold text-xs"
+                onClick={() => router.push(`/search?categoryId=${cat.id}`)}
+              >
+                {cat.name}
+              </Button>
+            ))}
+          </div>
+        </section>
 
-          <div className="space-y-4">
+        {/* Pedidos Ativos (Horizontal Scroll) */}
+        <section className="pt-2">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground/80">
+              Seus Pedidos Ativos
+            </h3>
+          </div>
+
+          <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory hide-scrollbar -mx-6 px-6">
             {loadingRequests ? (
               [1, 2].map((i) => (
-                <Card key={i} variant="neo-elevated" className="border-none rounded-[2rem] p-4">
+                <Card key={i} variant="neo-elevated" className="border-none rounded-[1.5rem] p-4 min-w-[260px] snap-center shrink-0">
                   <div className="flex justify-between items-center mb-4">
-                    <Skeleton className="h-6 w-32" />
-                    <Skeleton className="h-5 w-20 rounded-full" />
+                    <Skeleton className="h-5 w-24" />
+                    <Skeleton className="h-4 w-16 rounded-full" />
                   </div>
-                  <div className="flex gap-4">
-                    <Skeleton className="h-3 w-20" />
-                    <Skeleton className="h-3 w-24" />
-                  </div>
+                  <Skeleton className="h-3 w-32" />
                 </Card>
               ))
             ) : requests.length === 0 ? (
-              <Card variant="neo-elevated" className="border-none rounded-[2rem] p-8 text-center flex flex-col items-center gap-4">
-                <div className="w-16 h-16 neo-inset rounded-3xl flex items-center justify-center bg-background/50">
-                  <Package className="w-8 h-8 text-muted-foreground" />
+              <Card variant="neo-elevated" className="border-none rounded-[1.5rem] p-6 text-center flex flex-col items-center gap-3 w-full shrink-0">
+                <div className="w-12 h-12 neo-inset rounded-2xl flex items-center justify-center bg-background/50">
+                  <Package className="w-6 h-6 text-muted-foreground" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-lg">Nenhum pedido ainda</h4>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Que tal criar o seu primeiro hoje?
-                  </p>
+                  <h4 className="font-bold text-sm">Nenhum pedido ainda</h4>
+                  <p className="text-xs text-muted-foreground mt-1">Crie o primeiro usando o botão abaixo.</p>
                 </div>
-                <Button
-                  variant="neo-elevated"
-                  size="sm"
-                  onClick={() => router.push("/requests/new")}
-                  className="font-bold text-primary px-6 rounded-xl"
-                >
-                  Começar
-                </Button>
               </Card>
             ) : (
               requests.map((req) => {
@@ -134,28 +124,29 @@ export default function ClientDashboard() {
                   <Card
                     key={req.id}
                     variant="neo-elevated"
-                    className="border-none rounded-[2rem] p-2 hover:translate-y-[-2px] transition-transform cursor-pointer group"
+                    className="border-none rounded-[1.5rem] p-4 min-w-[260px] max-w-[280px] snap-center shrink-0 hover:translate-y-[-2px] transition-transform cursor-pointer"
                     onClick={() => router.push(`/requests/${req.id}/matches`)}
                   >
-                    <CardHeader className="pb-2">
-                      <div className="flex justify-between items-start gap-2">
-                        <CardTitle className="text-lg font-bold truncate">{req.title}</CardTitle>
-                        <span className={`text-[10px] font-mono font-bold px-3 py-1 rounded-full uppercase shrink-0 ${status.className}`}>
-                          {status.label}
-                        </span>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex gap-4 text-xs font-medium text-muted-foreground">
-                        <div className="flex items-center gap-1">
+                    <div className="flex justify-between items-start gap-3 mb-3">
+                      <h4 className="text-base font-bold truncate flex-1">{req.title}</h4>
+                      <span className={`text-[9px] font-mono font-bold px-2.5 py-1 rounded-md uppercase shrink-0 ${status.className}`}>
+                        {status.label}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-end">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground">
                           <Clock className="w-3 h-3 text-primary" />
                           {formatDate(req.createdAt)}
                         </div>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground">
                           <MapPin className="w-3 h-3 text-primary" /> Localizado
                         </div>
                       </div>
-                    </CardContent>
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                        <ArrowRight className="w-4 h-4 text-primary" />
+                      </div>
+                    </div>
                   </Card>
                 )
               })
@@ -164,18 +155,26 @@ export default function ClientDashboard() {
         </section>
       </div>
 
-      <section className="px-6 mt-12 max-w-2xl mx-auto">
-        <h3 className="text-sm font-black uppercase tracking-widest text-muted-foreground/80 px-1 mb-4">
-          Categorias Populares
-        </h3>
-        <div className="grid grid-cols-2 gap-4">
-          {displayCategories.map((cat) => (
-            <Button key={cat.id} variant="neo-elevated" className="h-16 rounded-2xl bg-background font-bold text-sm">
-              {cat.name}
-            </Button>
-          ))}
-        </div>
-      </section>
+      {/* Floating Action Button */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <Button
+          variant="neo-elevated"
+          className="w-16 h-16 rounded-[1.5rem] bg-primary text-primary-foreground shadow-xl flex items-center justify-center group"
+          onClick={() => router.push("/requests/new")}
+        >
+          <Plus className="w-8 h-8 group-hover:scale-110 transition-transform" />
+        </Button>
+      </div>
+
+      <style jsx global>{`
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </main>
   )
 }

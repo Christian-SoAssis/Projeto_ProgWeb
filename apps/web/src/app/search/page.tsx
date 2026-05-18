@@ -15,6 +15,8 @@ import {
     SlidersHorizontal,
     CheckCircle,
     LocateFixed,
+    Map as MapIcon,
+    List as ListIcon
 } from "lucide-react"
 import { useGeolocation } from "@/hooks/useGeolocation"
 import { useSearchProfessionals } from "@/hooks/useSearchProfessionals"
@@ -35,6 +37,7 @@ function SearchContent() {
     const [categoryId, setCategoryId] = useState(initialCategory)
     const [radiusKm, setRadiusKm] = useState(20)
     const [showFilters, setShowFilters] = useState(false)
+    const [viewMode, setViewMode] = useState<"list" | "map">("list")
 
     const { latitude, longitude, isLocating, error: geoError } = useGeolocation()
     const { categories } = useCategories()
@@ -52,8 +55,9 @@ function SearchContent() {
     }
 
     return (
-        <main className="min-h-screen bg-background pb-20 px-6 max-w-lg mx-auto">
-            <div className="pt-6 pb-4">
+        <main className="min-h-screen bg-background flex flex-col md:flex-row h-screen overflow-hidden relative">
+            {/* Seção da Lista (Esquerda no Desktop, Ocupa tudo no Mobile caso viewMode=list) */}
+            <div className={`flex-1 overflow-y-auto pb-24 px-6 pt-6 transition-all ${viewMode === "map" ? "hidden md:block" : "block"}`}>
                 <Button
                     variant="ghost"
                     size="sm"
@@ -255,6 +259,71 @@ function SearchContent() {
                     ))}
                 </div>
             )}
+            </div>
+
+            {/* Seção do Mapa (Direita no Desktop, Ocupa tudo no Mobile caso viewMode=map) */}
+            <div className={`w-full md:w-1/2 bg-background relative neo-inset md:m-6 md:rounded-[2rem] overflow-hidden ${viewMode === "list" ? "hidden md:block" : "block fixed inset-0 z-40 md:static md:z-auto"}`}>
+                {viewMode === "map" && (
+                    <Button
+                        variant="neo-elevated"
+                        size="icon"
+                        onClick={() => setViewMode("list")}
+                        className="absolute top-6 left-6 z-50 md:hidden w-10 h-10 rounded-full bg-background"
+                    >
+                        <ChevronLeft className="w-5 h-5" />
+                    </Button>
+                )}
+                
+                {/* Mock do Mapa */}
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/5 via-background to-muted/20 flex flex-col items-center justify-center p-6 text-center">
+                    <div className="w-24 h-24 neo-elevated rounded-full flex items-center justify-center mb-6 text-primary">
+                        <MapPin className="w-10 h-10" />
+                    </div>
+                    <h3 className="text-lg font-black text-foreground">Visualização do Mapa</h3>
+                    <p className="text-sm text-muted-foreground mt-2 max-w-xs">
+                        {loading 
+                            ? "Carregando profissionais no mapa..." 
+                            : `${results.length} profissionais encontrados nesta região.`}
+                    </p>
+                    
+                    {/* Mock Markers */}
+                    {!loading && results.length > 0 && (
+                        <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-50">
+                            {results.map((r, i) => (
+                                <div 
+                                    key={r.id} 
+                                    className="absolute w-4 h-4 bg-primary rounded-full shadow-[0_0_15px_rgba(var(--primary),0.5)] animate-pulse"
+                                    style={{
+                                        top: `${20 + (i * 15 % 60)}%`,
+                                        left: `${20 + (i * 25 % 60)}%`
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Floating Toggle Button (Mobile Only) */}
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 md:hidden">
+                <Button
+                    variant="neo-elevated"
+                    className="h-14 rounded-full px-8 bg-background font-bold flex items-center gap-2 shadow-2xl"
+                    onClick={() => setViewMode(viewMode === "list" ? "map" : "list")}
+                >
+                    {viewMode === "list" ? (
+                        <>
+                            <MapIcon className="w-4 h-4 text-primary" />
+                            <span>Ver Mapa</span>
+                        </>
+                    ) : (
+                        <>
+                            <ListIcon className="w-4 h-4 text-primary" />
+                            <span>Ver Lista</span>
+                        </>
+                    )}
+                </Button>
+            </div>
         </main>
     )
 }
