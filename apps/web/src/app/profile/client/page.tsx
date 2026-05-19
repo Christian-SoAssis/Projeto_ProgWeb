@@ -5,6 +5,7 @@ import { useAuth } from "@/context/auth-context"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { User, Mail, Calendar, Settings, LogOut } from "lucide-react"
+import Link from "next/link"
 
 export default function ClientProfile() {
   const { user, logout } = useAuth()
@@ -41,9 +42,11 @@ export default function ClientProfile() {
         </section>
 
         <section className="space-y-4">
-          <Button variant="neo-elevated" className="w-full h-14 rounded-2xl justify-start px-6">
-            <Settings className="w-5 h-5 mr-3 text-primary" />
-            <span className="font-bold">Configurações da Conta</span>
+          <Button variant="neo-elevated" className="w-full h-14 rounded-2xl justify-start px-6" asChild>
+            <Link href="/profile/client/settings">
+              <Settings className="w-5 h-5 mr-3 text-primary" />
+              <span className="font-bold">Configurações da Conta</span>
+            </Link>
           </Button>
           <Button 
             variant="neo-elevated" 
