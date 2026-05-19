@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Search, Plus, MapPin, Clock, ArrowRight, Package } from "lucide-react"
+import { Search, Plus, MapPin, Clock, ArrowRight, Package, MessageSquare } from "lucide-react"
 import { useAuth } from "@/context/auth-context"
 import { useRequests } from "@/hooks/useRequests"
 import { useCategories } from "@/hooks/useCategories"
@@ -125,7 +125,7 @@ export default function ClientDashboard() {
                     key={req.id}
                     variant="neo-elevated"
                     className="border-none rounded-[1.5rem] p-4 min-w-[260px] max-w-[280px] snap-center shrink-0 hover:translate-y-[-2px] transition-transform cursor-pointer"
-                    onClick={() => router.push(`/requests/${req.id}/matches`)}
+                    onClick={() => router.push(req.status === "in_progress" ? `/chat/${req.id}` : `/requests/${req.id}/matches`)}
                   >
                     <div className="flex justify-between items-start gap-3 mb-3">
                       <h4 className="text-base font-bold truncate flex-1">{req.title}</h4>
@@ -144,7 +144,11 @@ export default function ClientDashboard() {
                         </div>
                       </div>
                       <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <ArrowRight className="w-4 h-4 text-primary" />
+                        {req.status === "in_progress" ? (
+                          <MessageSquare className="w-4 h-4 text-primary animate-pulse" />
+                        ) : (
+                          <ArrowRight className="w-4 h-4 text-primary" />
+                        )}
                       </div>
                     </div>
                   </Card>
