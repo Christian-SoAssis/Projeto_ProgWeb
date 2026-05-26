@@ -102,7 +102,7 @@
 - [x] **3.1.2** Novo Pedido Stepper com visual IA (`new-order-step-2`)
 - [x] **3.1.3** Client Dash Mobile-first (`client-dashboard-v2`)
 - [x] **3.1.4** Professional Dash Executive grid (`professional-dashboard-v2`)
-- [ ] **3.1.5** Chat Seguro Mobile WebSocket (`secure-chat-mobile`)
+- [x] **3.1.5** Chat Seguro Mobile WebSocket (`secure-chat-mobile`)
 
 ---
 
