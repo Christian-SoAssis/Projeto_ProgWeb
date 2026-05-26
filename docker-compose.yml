@@ -130,6 +130,29 @@ services:
       retries: 5
       start_period: 30s
 
+  # Serviço dedicado para testes - roda de forma isolada, sem dependências de infra
+  # Uso: docker compose --profile test run --rm web-test
+  # Com coverage: docker compose --profile test run --rm web-test npm run test:coverage
+  web-test:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: servicoja-web-test
+    profiles:
+      - test
+    environment:
+      NODE_ENV: test
+      CI: "true"
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+      - /app/.next
+      - ./apps/web/coverage:/app/coverage  # persiste relatório de coverage no host
+    networks:
+      - frontend
+    command: npm run test
+
+
   observability:
     image: grafana/otel-lgtm:latest
     container_name: servicoja-observability
