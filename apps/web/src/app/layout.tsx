@@ -4,7 +4,7 @@ import "./globals.css";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
-import { AuthProvider } from "@/context/auth-context";
+import { AuthProvider } from "@/presentation/providers/auth-provider";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",

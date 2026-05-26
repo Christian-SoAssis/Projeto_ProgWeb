@@ -22,7 +22,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { ChevronLeft, Github, Loader2 } from "lucide-react"
-import { useAuth } from "@/context/auth-context"
+import { useAuth } from "@/presentation/hooks/use-auth"
 import { useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 

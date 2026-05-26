@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
-import { useAuth } from "@/context/auth-context"
+import { useAuth } from "@/presentation/hooks/use-auth"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 

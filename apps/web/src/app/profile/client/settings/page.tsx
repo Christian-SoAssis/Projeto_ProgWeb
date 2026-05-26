@@ -17,7 +17,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { useAuth } from "@/context/auth-context"
+import { useAuth } from "@/presentation/hooks/use-auth"
 import { toast } from "sonner"
 
 type ThemeMode = "claro" | "escuro" | "sistema"

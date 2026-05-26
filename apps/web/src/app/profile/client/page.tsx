@@ -1,7 +1,7 @@
 "use client"
 
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader"
-import { useAuth } from "@/context/auth-context"
+import { useAuth } from "@/presentation/hooks/use-auth"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { User, Mail, Calendar, Settings, LogOut } from "lucide-react"

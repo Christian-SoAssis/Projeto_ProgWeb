@@ -3,7 +3,7 @@
 import { NotificationBell } from "./NotificationBell"
 import { User, LogOut, ChevronDown, RefreshCw } from "lucide-react"
 import { useState } from "react"
-import { useAuth } from "@/context/auth-context"
+import { useAuth } from "@/presentation/hooks/use-auth"
 import { useRouter } from "next/navigation"
 
 interface DashboardHeaderProps {

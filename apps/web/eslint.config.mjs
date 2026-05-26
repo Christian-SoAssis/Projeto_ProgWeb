@@ -13,6 +13,67 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  // Regras de Fronteira da Clean Architecture (Mapeamento de Círculos do Uncle Bob)
+  {
+    files: ["src/domain/**/*.ts", "src/domain/**/*.tsx"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["**/application/**", "@/application/**", "../application/**"],
+              message: "Regra de Dependência Violada: Camada DOMAIN (Entities) NUNCA deve importar nada de APPLICATION (Use Cases)."
+            },
+            {
+              group: ["**/infrastructure/**", "@/infrastructure/**", "../infrastructure/**"],
+              message: "Regra de Dependência Violada: Camada DOMAIN (Entities) NUNCA deve importar nada de INFRASTRUCTURE (Interface Adapters / Frameworks)."
+            },
+            {
+              group: ["**/presentation/**", "@/presentation/**", "../presentation/**"],
+              message: "Regra de Dependência Violada: Camada DOMAIN (Entities) NUNCA deve importar nada de PRESENTATION (Interface Adapters / Visual)."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    files: ["src/application/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["**/infrastructure/**", "@/infrastructure/**", "../infrastructure/**"],
+              message: "Regra de Dependência Violada: Camada APPLICATION (Use Cases) NUNCA deve importar nada de INFRASTRUCTURE (Interface Adapters / Frameworks)."
+            },
+            {
+              group: ["**/presentation/**", "@/presentation/**", "../presentation/**"],
+              message: "Regra de Dependência Violada: Camada APPLICATION (Use Cases) NUNCA deve importar nada de PRESENTATION (Interface Adapters / Visual)."
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    files: ["src/infrastructure/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["**/presentation/**", "@/presentation/**", "../presentation/**"],
+              message: "Regra de Dependência Violada: Camada INFRASTRUCTURE (Gateways) NUNCA deve importar nada de PRESENTATION (Visual)."
+            }
+          ]
+        }
+      ]
+    }
+  }
 ]);
 
 export default eslintConfig;

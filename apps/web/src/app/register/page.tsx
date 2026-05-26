@@ -25,7 +25,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
 import { ChevronLeft, User, Briefcase, MapPin, Loader2 } from "lucide-react"
-import { useAuth } from "@/context/auth-context"
+import { useAuth } from "@/presentation/hooks/use-auth"
 import { useState, useEffect } from "react"
 
 const registerSchema = z.object({
@@ -91,32 +91,27 @@ export default function RegisterPage() {
           email: values.email,
           phone: values.phone,
           password: values.password,
-          consent_terms: values.consent_terms,
-          consent_privacy: values.consent_privacy,
+          consentTerms: values.consent_terms,
+          consentPrivacy: values.consent_privacy,
         })
         toast.success("Cadastro realizado com sucesso!")
       } else {
-        // Preparar FormData para Profissional (Multipart)
-        const formData = new FormData()
-        formData.append("name", values.name)
-        formData.append("email", values.email)
-        formData.append("phone", values.phone || "")
-        formData.append("password", values.password)
-        formData.append("consent_terms", String(values.consent_terms))
-        formData.append("consent_privacy", String(values.consent_privacy))
-        formData.append("bio", values.bio || "Profissional qualificado em busca de oportunidades.")
-        formData.append("latitude", String(values.latitude || 0))
-        formData.append("longitude", String(values.longitude || 0))
-        formData.append("service_radius_km", "15")
-        formData.append("hourly_rate_cents", "5000") // Mock: R$ 50,00
-        formData.append("category_ids_json", JSON.stringify([])) // Mock: Nenhuma categoria inicial
-        formData.append("document_type", "cpf")
-        
-        // Criar arquivo Dummy conforme solicitado pelo usuário
         const dummyFile = new File(["dummy-content"], "documento.pdf", { type: "application/pdf" })
-        formData.append("document", dummyFile)
-
-        await registerPro(formData)
+        await registerPro({
+          name: values.name,
+          email: values.email,
+          phone: values.phone || "",
+          password: values.password,
+          consentTerms: values.consent_terms,
+          consentPrivacy: values.consent_privacy,
+          bio: values.bio || "Profissional qualificado em busca de oportunidades.",
+          latitude: values.latitude || 0,
+          longitude: values.longitude || 0,
+          serviceRadiusKm: 15,
+          hourlyRateCents: 5000,
+          categoryIds: [],
+          document: dummyFile,
+        })
         toast.success("Cadastro realizado! Faça login para continuar.")
       }
     } catch (error: any) {
