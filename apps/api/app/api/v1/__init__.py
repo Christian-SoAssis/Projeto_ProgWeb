@@ -11,6 +11,7 @@ from app.api.v1.professionals_panel import router as professionals_panel_router
 from app.api.v1.favorites import router as favorites_router
 from app.api.v1.notifications import router as notifications_router
 from app.api.v1.categories import router as categories_router
+from app.api.v1.payments import router as payments_router
 
 router = APIRouter()
 
@@ -29,3 +30,4 @@ router.include_router(search_router)
 router.include_router(favorites_router)
 router.include_router(notifications_router)
 router.include_router(categories_router)
+router.include_router(payments_router)

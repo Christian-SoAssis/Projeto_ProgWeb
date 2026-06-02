@@ -8,9 +8,11 @@ from app.models.request import Request, RequestImage
 from app.models.review import Review
 from app.models.favorite import Favorite
 from app.models.notification import Notification
+from app.models.payment import Payment, Dispute
 
 __all__ = [
     "User", "Category", "Professional", "ConsentLog", 
     "Bid", "Contract", "Request", "RequestImage", 
-    "Review", "Favorite", "Notification"
+    "Review", "Favorite", "Notification",
+    "Payment", "Dispute"
 ]
