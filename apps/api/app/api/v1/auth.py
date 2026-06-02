@@ -37,6 +37,13 @@ from app.api.v1.deps import get_register_client_use_case, get_login_use_case
 from app.application.use_cases.register_client_use_case import RegisterClientUseCase, RegisterClientInput
 from app.application.use_cases.login_use_case import LoginUseCase, LoginInput
 from app.domain.exceptions import BusinessRuleViolationError, UnauthorizedError
+from app.schemas.v1.availability import (
+    ProfessionalPixKeyCreate,
+    ProfessionalPixKeyResponse,
+    ProfessionalAvailabilityCreate,
+    ProfessionalAvailabilityResponse,
+    ProfessionalAvailabilityDay
+)
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -277,3 +284,167 @@ async def switch_role(
     refresh_token = create_refresh_token({"sub": str(current_user.id), "role": new_role})
 
     return {"access_token": access_token, "refresh_token": refresh_token}
+
+
+# --- Professional Pix Key & Availability Settings ---
+
+def mask_pix_key(key_type: str, value: str) -> str:
+    if key_type == "cpf" and len(value) >= 11:
+        return f"***.***.{value[6:9]}-{value[9:]}"
+    elif key_type == "cnpj" and len(value) >= 14:
+        return f"**.***.***/{value[8:12]}-**"
+    elif key_type == "email":
+        parts = value.split("@")
+        if len(parts) == 2:
+            return f"{parts[0][:2]}***@{parts[1]}"
+        return "***"
+    elif key_type == "phone":
+        return f"+55 (**) *****-{value[-4:]}"
+    return "********-****-****-****-************"
+
+
+@router.get("/professional/pix", response_model=ProfessionalPixKeyResponse)
+async def get_professional_pix(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    from sqlalchemy import select
+    from app.models.professional import Professional
+    from app.models.professional_pix_key import ProfessionalPixKey
+
+    result = await db.execute(select(Professional).where(Professional.user_id == current_user.id))
+    professional = result.scalar_one_or_none()
+    if not professional:
+        raise HTTPException(status_code=400, detail="Usuário não possui perfil profissional")
+
+    result = await db.execute(select(ProfessionalPixKey).where(ProfessionalPixKey.professional_id == professional.id))
+    pix_key = result.scalar_one_or_none()
+    if not pix_key:
+        raise HTTPException(status_code=404, detail="Chave Pix não encontrada")
+
+    # Retorna com valor mascarado
+    return ProfessionalPixKeyResponse(
+        id=pix_key.id,
+        professional_id=pix_key.professional_id,
+        key_type=pix_key.key_type,
+        key_value=mask_pix_key(pix_key.key_type, pix_key.key_value),
+        is_active=pix_key.is_active
+    )
+
+
+@router.post("/professional/pix", response_model=ProfessionalPixKeyResponse)
+async def save_professional_pix(
+    pix_in: ProfessionalPixKeyCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    from sqlalchemy import select
+    from app.models.professional import Professional
+    from app.models.professional_pix_key import ProfessionalPixKey
+
+    result = await db.execute(select(Professional).where(Professional.user_id == current_user.id))
+    professional = result.scalar_one_or_none()
+    if not professional:
+        raise HTTPException(status_code=400, detail="Usuário não possui perfil profissional")
+
+    result = await db.execute(select(ProfessionalPixKey).where(ProfessionalPixKey.professional_id == professional.id))
+    pix_key = result.scalar_one_or_none()
+
+    if pix_key:
+        pix_key.key_type = pix_in.key_type
+        pix_key.key_value = pix_in.key_value
+        pix_key.is_active = True
+    else:
+        pix_key = ProfessionalPixKey(
+            professional_id=professional.id,
+            key_type=pix_in.key_type,
+            key_value=pix_in.key_value,
+            is_active=True
+        )
+        db.add(pix_key)
+
+    await db.commit()
+    await db.refresh(pix_key)
+
+    return ProfessionalPixKeyResponse(
+        id=pix_key.id,
+        professional_id=pix_key.professional_id,
+        key_type=pix_key.key_type,
+        key_value=mask_pix_key(pix_key.key_type, pix_key.key_value),
+        is_active=pix_key.is_active
+    )
+
+
+@router.get("/professional/availability", response_model=ProfessionalAvailabilityResponse)
+async def get_professional_availability(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    from sqlalchemy import select
+    from app.models.professional import Professional
+    from app.models.professional_availability import ProfessionalAvailability
+
+    result = await db.execute(select(Professional).where(Professional.user_id == current_user.id))
+    professional = result.scalar_one_or_none()
+    if not professional:
+        raise HTTPException(status_code=400, detail="Usuário não possui perfil profissional")
+
+    result = await db.execute(
+        select(ProfessionalAvailability)
+        .where(ProfessionalAvailability.professional_id == professional.id)
+        .order_by(ProfessionalAvailability.day_of_week)
+    )
+    availabilities = result.scalars().all()
+
+    return ProfessionalAvailabilityResponse(
+        availabilities=[
+            ProfessionalAvailabilityDay(
+                day_of_week=a.day_of_week,
+                start_time=a.start_time,
+                end_time=a.end_time,
+                is_active=a.is_active
+            ) for a in availabilities
+        ]
+    )
+
+
+@router.post("/professional/availability", response_model=ProfessionalAvailabilityResponse)
+async def save_professional_availability(
+    avail_in: ProfessionalAvailabilityCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    from sqlalchemy import select, delete
+    from app.models.professional import Professional
+    from app.models.professional_availability import ProfessionalAvailability
+
+    result = await db.execute(select(Professional).where(Professional.user_id == current_user.id))
+    professional = result.scalar_one_or_none()
+    if not professional:
+        raise HTTPException(status_code=400, detail="Usuário não possui perfil profissional")
+
+    # Deletar disponibilidades existentes para reescrever
+    await db.execute(
+        delete(ProfessionalAvailability).where(ProfessionalAvailability.professional_id == professional.id)
+    )
+
+    new_records = []
+    for day in avail_in.availabilities:
+        new_records.append(
+            ProfessionalAvailability(
+                professional_id=professional.id,
+                day_of_week=day.day_of_week,
+                start_time=day.start_time,
+                end_time=day.end_time,
+                is_active=day.is_active
+            )
+        )
+    
+    if new_records:
+        db.add_all(new_records)
+
+    await db.commit()
+
+    return ProfessionalAvailabilityResponse(
+        availabilities=avail_in.availabilities
+    )

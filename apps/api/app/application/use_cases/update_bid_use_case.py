@@ -15,6 +15,7 @@ class UpdateBidInput:
     bid_id: uuid.UUID
     client_user_id: uuid.UUID
     new_status: str
+    scheduled_start: Optional[datetime] = None
 
 class UpdateBidUseCase:
     def __init__(
@@ -51,6 +52,15 @@ class UpdateBidUseCase:
 
         # 5. Se aceito: criar contrato + atualizar request + cancelar outros bids
         if input_data.new_status == "accepted":
+            scheduled_start = input_data.scheduled_start
+            scheduled_end = None
+            if scheduled_start and bid.estimated_hours:
+                from datetime import timedelta
+                scheduled_end = scheduled_start + timedelta(hours=bid.estimated_hours)
+            elif scheduled_start:
+                from datetime import timedelta
+                scheduled_end = scheduled_start + timedelta(hours=1)
+
             contract = Contract(
                 id=uuid.uuid4(),
                 request_id=bid.request_id,
@@ -58,7 +68,9 @@ class UpdateBidUseCase:
                 client_id=input_data.client_user_id,
                 agreed_cents=bid.price_cents,
                 status="active",
-                started_at=datetime.now(timezone.utc)
+                started_at=datetime.now(timezone.utc),
+                scheduled_start=scheduled_start,
+                scheduled_end=scheduled_end
             )
             await self.contract_repo.save(contract)
 

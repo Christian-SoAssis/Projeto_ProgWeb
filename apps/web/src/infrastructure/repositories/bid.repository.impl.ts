@@ -29,14 +29,17 @@ export class BidRepositoryImpl implements BidRepository {
         return this.mapToEntity(data);
     }
 
-    async updateStatus(bidId: string, status: BidStatus): Promise<{ bid: Bid; contract?: any }> {
+    async updateStatus(bidId: string, status: BidStatus, scheduledStart?: string): Promise<{ bid: Bid; contract?: any }> {
         const data = await apiFetch(`/bids/${bidId}`, {
             method: "PATCH",
-            body: JSON.stringify({ status }),
+            body: JSON.stringify({ 
+                status,
+                scheduled_start: scheduledStart
+            }),
         });
         return {
             bid: this.mapToEntity(data.bid),
-            contract: data.contract, // Contract could also be mapped if needed
+            contract: data.contract,
         };
     }
 

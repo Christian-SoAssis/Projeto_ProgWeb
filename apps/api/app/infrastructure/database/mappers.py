@@ -188,7 +188,9 @@ class ContractMapper:
             agreed_cents=model.agreed_cents,
             status=ContractStatus(model.status) if isinstance(model.status, str) else model.status,
             created_at=model.created_at,
-            updated_at=model.updated_at
+            updated_at=model.updated_at,
+            scheduled_start=model.scheduled_start,
+            scheduled_end=model.scheduled_end
         )
 
     @staticmethod
@@ -201,7 +203,9 @@ class ContractMapper:
             agreed_cents=entity.agreed_cents,
             status=entity.status.value if hasattr(entity.status, "value") else entity.status,
             created_at=entity.created_at,
-            updated_at=entity.updated_at
+            updated_at=entity.updated_at,
+            scheduled_start=entity.scheduled_start,
+            scheduled_end=entity.scheduled_end
         )
 
 class CategoryMapper:

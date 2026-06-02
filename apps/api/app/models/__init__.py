@@ -9,10 +9,12 @@ from app.models.review import Review
 from app.models.favorite import Favorite
 from app.models.notification import Notification
 from app.models.payment import Payment, Dispute
+from app.models.professional_pix_key import ProfessionalPixKey
+from app.models.professional_availability import ProfessionalAvailability
 
 __all__ = [
     "User", "Category", "Professional", "ConsentLog", 
     "Bid", "Contract", "Request", "RequestImage", 
     "Review", "Favorite", "Notification",
-    "Payment", "Dispute"
+    "Payment", "Dispute", "ProfessionalPixKey", "ProfessionalAvailability"
 ]

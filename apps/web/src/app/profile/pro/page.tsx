@@ -4,11 +4,12 @@ import { DashboardHeader } from "@/components/dashboard/DashboardHeader"
 import { useAuth } from "@/presentation/hooks/use-auth"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { User, Sparkles, History, Star, Clock, CheckCircle2, Award } from "lucide-react"
+import { User, Sparkles, History, Star, Clock, CheckCircle2, Award, LogOut } from "lucide-react"
 import { useProfessionalHistory } from "@/hooks/useProfessionalHistory"
 import { useProfessionalAISummary } from "@/hooks/useProfessionalAISummary"
 import { formatCurrency, formatDate } from "@/lib/formatters"
 import { Skeleton } from "@/components/ui/skeleton"
+import Link from "next/link"
 
 export default function ProProfile() {
   const { user } = useAuth()
@@ -115,6 +116,32 @@ export default function ProProfile() {
               ))
             )}
           </div>
+        </section>
+
+        {/* Configuration Buttons */}
+        <section className="space-y-4">
+          <Button variant="neo-elevated" className="w-full h-14 rounded-2xl justify-start px-6" asChild>
+            <Link href="/profile/pro/settings/payout">
+              <Sparkles className="w-5 h-5 mr-3 text-secondary" />
+              <span className="font-bold">Configuração de Recebimento (Pix)</span>
+            </Link>
+          </Button>
+          
+          <Button variant="neo-elevated" className="w-full h-14 rounded-2xl justify-start px-6" asChild>
+            <Link href="/profile/pro/settings/availability">
+              <Clock className="w-5 h-5 mr-3 text-primary" />
+              <span className="font-bold">Grade de Horários e Disponibilidade</span>
+            </Link>
+          </Button>
+
+          <Button 
+            variant="neo-elevated" 
+            className="w-full h-14 rounded-2xl justify-start px-6 text-destructive hover:text-destructive"
+            onClick={() => logout()}
+          >
+            <LogOut className="w-5 h-5 mr-3" />
+            <span className="font-bold">Sair da Conta</span>
+          </Button>
         </section>
       </div>
     </main>

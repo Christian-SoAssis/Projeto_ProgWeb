@@ -20,3 +20,5 @@ class Contract:
     status: ContractStatus = ContractStatus.PENDING
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+    scheduled_start: Optional[datetime] = None
+    scheduled_end: Optional[datetime] = None

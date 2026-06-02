@@ -13,6 +13,7 @@ class BidCreate(BaseModel):
 
 class BidUpdate(BaseModel):
     status: Literal["accepted", "rejected"]
+    scheduled_start: Optional[datetime] = None
 
 
 class BidResponse(BaseModel):

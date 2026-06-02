@@ -24,6 +24,9 @@ class Contract(Base):
                         default=lambda: datetime.now(timezone.utc),
                         nullable=False)
     completed_at = Column(DateTime(timezone=True), nullable=True)
+    payment_confirmed_at = Column(DateTime(timezone=True), nullable=True)
+    scheduled_start = Column(DateTime(timezone=True), nullable=True)
+    scheduled_end = Column(DateTime(timezone=True), nullable=True)
 
     professional = relationship("Professional", lazy="noload")
     client = relationship("User", lazy="noload")

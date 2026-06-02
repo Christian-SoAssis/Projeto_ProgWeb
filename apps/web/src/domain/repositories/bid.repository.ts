@@ -9,6 +9,6 @@ export interface CreateBidPayload {
 
 export interface BidRepository {
     create(payload: CreateBidPayload): Promise<Bid>;
-    updateStatus(bidId: string, status: string): Promise<{ bid: Bid; contract?: any }>;
+    updateStatus(bidId: string, status: string, scheduledStart?: string): Promise<{ bid: Bid; contract?: any }>;
     listByRequest(requestId: string): Promise<Bid[]>;
 }

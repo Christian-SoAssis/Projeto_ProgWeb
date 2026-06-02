@@ -20,6 +20,8 @@ import { useBids } from "@/hooks/useBids"
 import { bidRepository } from "@/repositories"
 import { Contract } from "@/domain/models/contract"
 import { formatCurrency } from "@/lib/formatters"
+import { apiFetch } from "@/lib/api"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 
 function formatDate(iso: string) {
     return new Date(iso).toLocaleDateString("pt-BR", {
@@ -44,12 +46,56 @@ export default function BidsPage() {
     const [processing, setProcessing] = useState<string | null>(null)
     const [acceptedContract, setAcceptedContract] = useState<Contract | null>(null)
 
-    async function handleAccept(bidId: string) {
-        setProcessing(bidId)
+    // Scheduling States
+    const [isScheduling, setIsScheduling] = useState(false)
+    const [selectedBidId, setSelectedBidId] = useState<string | null>(null)
+    const [selectedProId, setSelectedProId] = useState<string | null>(null)
+    const [scheduledDate, setScheduledDate] = useState(() => {
+        const tomorrow = new Date()
+        tomorrow.setDate(tomorrow.getDate() + 1)
+        return tomorrow.toISOString().split("T")[0]
+    })
+    const [availableSlots, setAvailableSlots] = useState<{ start_time: string; end_time: string }[]>([])
+    const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
+    const [loadingSlots, setLoadingSlots] = useState(false)
+
+    async function loadSlots(dateStr: string, proId: string) {
+        setLoadingSlots(true)
         try {
-            const { bid, contract } = await bidRepository.updateStatus(bidId, "accepted")
+            const data = await apiFetch(`/professionals/${proId}/available-slots?date=${dateStr}`)
+            setAvailableSlots(data || [])
+            setSelectedSlot(null)
+        } catch (err) {
+            toast.error("Erro ao buscar horários disponíveis.")
+        } finally {
+            setLoadingSlots(false)
+        }
+    }
+
+    async function handleAcceptClick(bidId: string, proId: string) {
+        setSelectedBidId(bidId)
+        setSelectedProId(proId)
+        setIsScheduling(true)
+        
+        const tomorrow = new Date()
+        tomorrow.setDate(tomorrow.getDate() + 1)
+        const tomorrowStr = tomorrow.toISOString().split("T")[0]
+        setScheduledDate(tomorrowStr)
+        await loadSlots(tomorrowStr, proId)
+    }
+
+    async function confirmAccept() {
+        if (!selectedBidId || !selectedSlot) {
+            toast.error("Por favor, selecione um horário.")
+            return
+        }
+        setProcessing(selectedBidId)
+        setIsScheduling(false)
+        try {
+            const scheduledStart = new Date(`${scheduledDate}T${selectedSlot}:00`).toISOString()
+            const { bid, contract } = await bidRepository.updateStatus(selectedBidId, "accepted", scheduledStart)
             if (contract) setAcceptedContract(contract)
-            toast.success("Lance aceito!", {
+            toast.success("Lance aceito e serviço agendado com sucesso!", {
                 description: "Contrato criado com sucesso.",
             })
             reload()
@@ -57,6 +103,9 @@ export default function BidsPage() {
             toast.error("Erro ao aceitar lance", { description: err.message })
         } finally {
             setProcessing(null)
+            setSelectedBidId(null)
+            setSelectedProId(null)
+            setSelectedSlot(null)
         }
     }
 
@@ -202,7 +251,7 @@ export default function BidsPage() {
                                         <Button
                                             variant="neo-elevated"
                                             className="flex-1 h-9 rounded-xl text-xs font-bold text-green-600 gap-1"
-                                            onClick={() => handleAccept(bid.id)}
+                                            onClick={() => handleAcceptClick(bid.id, bid.professionalId)}
                                             disabled={isLoading}
                                         >
                                             <CheckCircle className="w-3.5 h-3.5" />
@@ -224,6 +273,94 @@ export default function BidsPage() {
                     })}
                 </div>
             )}
+            <Dialog open={isScheduling} onOpenChange={setIsScheduling}>
+                <DialogContent className="bg-background border-none rounded-[2rem] p-6 neo-elevated max-w-sm">
+                    <DialogHeader>
+                        <DialogTitle className="font-extrabold text-lg text-left">Agendar Atendimento</DialogTitle>
+                        <DialogDescription className="text-xs text-muted-foreground text-left">
+                            Escolha a data e um horário disponível do profissional para realizar o serviço.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-4 my-3 text-left">
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                                Data do Serviço
+                            </label>
+                            <input
+                                type="date"
+                                value={scheduledDate}
+                                min={new Date().toISOString().split("T")[0]}
+                                onChange={(e) => {
+                                    setScheduledDate(e.target.value)
+                                    if (selectedProId) loadSlots(e.target.value, selectedProId)
+                                }}
+                                className="w-full h-12 px-4 rounded-xl bg-background border-none text-xs font-bold neo-inset focus:outline-none"
+                            />
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+                                Horários Disponíveis
+                            </label>
+                            
+                            {loadingSlots ? (
+                                <div className="grid grid-cols-3 gap-2">
+                                    {[1, 2, 3].map(i => (
+                                        <div key={i} className="h-9 bg-muted/20 animate-pulse rounded-lg" />
+                                    ))}
+                                </div>
+                            ) : availableSlots.length === 0 ? (
+                                <div className="p-3 bg-muted/10 rounded-xl text-center">
+                                    <p className="text-[10px] font-bold text-muted-foreground">
+                                        Nenhum horário disponível para esta data. Tente outro dia.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-3 gap-2 max-h-40 overflow-y-auto pr-1">
+                                    {availableSlots.map((slot) => {
+                                        const isSelected = selectedSlot === slot.start_time
+                                        return (
+                                            <button
+                                                key={slot.start_time}
+                                                type="button"
+                                                onClick={() => setSelectedSlot(slot.start_time)}
+                                                className={`
+                                                    h-9 rounded-lg text-xs font-bold transition-all
+                                                    ${isSelected 
+                                                        ? "neo-inset text-primary ring-2 ring-primary/20" 
+                                                        : "neo-elevated hover:translate-y-[-1px] text-muted-foreground"
+                                                    }
+                                                `}
+                                            >
+                                                {slot.start_time}
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <DialogFooter className="flex gap-2 pt-2 border-t border-muted/20">
+                        <Button
+                            variant="neo-elevated"
+                            className="flex-1 h-12 rounded-xl text-xs font-bold text-muted-foreground"
+                            onClick={() => setIsScheduling(false)}
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            variant="neo-elevated"
+                            disabled={!selectedSlot}
+                            className="flex-1 h-12 rounded-xl text-xs font-bold text-primary"
+                            onClick={confirmAccept}
+                        >
+                            Confirmar
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </main>
     )
 }

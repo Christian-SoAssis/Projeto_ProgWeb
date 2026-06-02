@@ -65,6 +65,7 @@ async def update_bid_endpoint(
             bid_id=bid_id,
             client_user_id=current_user.id,
             new_status=bid_in.status,
+            scheduled_start=bid_in.scheduled_start,
         ))
         await db.commit()
 
