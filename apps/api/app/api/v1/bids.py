@@ -41,7 +41,11 @@ async def create_bid_endpoint(
         ))
         await db.commit()
         return bid
-    except (EntityNotFoundError, BusinessRuleViolationError) as e:
+    except EntityNotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except BusinessRuleViolationError as e:
+        if "Verificação de conta pendente" in str(e):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except DomainError as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

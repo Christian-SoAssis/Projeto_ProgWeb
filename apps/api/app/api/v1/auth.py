@@ -51,7 +51,8 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 async def register(
     user_in: UserCreate,
     request: Request,
-    register_use_case: RegisterClientUseCase = Depends(get_register_client_use_case)
+    register_use_case: RegisterClientUseCase = Depends(get_register_client_use_case),
+    db: AsyncSession = Depends(get_db)
 ):
     """Registra um novo cliente via Use Case."""
     ip = request.client.host if request.client else "unknown"
@@ -67,6 +68,7 @@ async def register(
             user_agent=ua
         )
         user = await register_use_case.execute(input_data)
+        await db.commit()
         
         return TokenResponse(
             access_token=create_access_token({"sub": str(user.id), "role": user.role.value}),
@@ -78,12 +80,14 @@ async def register(
 @router.post("/login", response_model=TokenResponse)
 async def login(
     login_in: LoginRequest,
-    login_use_case: LoginUseCase = Depends(get_login_use_case)
+    login_use_case: LoginUseCase = Depends(get_login_use_case),
+    db: AsyncSession = Depends(get_db)
 ):
     """Autentica usuário via Use Case."""
     try:
         input_data = LoginInput(email=login_in.email, password=login_in.password)
         user = await login_use_case.execute(input_data)
+        await db.commit()
         
         return TokenResponse(
             access_token=create_access_token({"sub": str(user.id), "role": user.role.value}),
@@ -136,14 +140,40 @@ async def update_me(
 async def delete_me(
     delete_in: DeleteAccountRequest,
     user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
     """Exclusão de conta (Anonimização LGPD)."""
     if not verify_password(delete_in.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Senha incorreta")
-    # LGPD logic remains in service for now
-    await lgpd_service.check_can_delete(None, user.id) # Session handle needs fix in service
+    
+    await lgpd_service.check_can_delete(db, user.id)
     lgpd_service.anonymize_user_object(user)
+    
+    role_val = user.role.value if hasattr(user.role, "value") else str(user.role)
+    if role_val == "professional":
+        await lgpd_service.clear_professional_search_vector(db, user.id)
+        await lgpd_service.cancel_pending_bids(db, user.id)
+        await lgpd_service.remove_professional_documents(user.id)
+        
+    await db.commit()
     return {"message": "Conta excluída com sucesso"}
+
+@router.get("/me/consents", response_model=List[ConsentResponse])
+async def get_my_consents(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Retorna o histórico de consentimentos do usuário (LGPD)."""
+    from app.models.lgpd import ConsentLog
+    from sqlalchemy import select
+    result = await db.execute(
+        select(ConsentLog)
+        .where(ConsentLog.user_id == current_user.id)
+        .order_by(ConsentLog.accepted_at.desc())
+    )
+    consents = result.scalars().all()
+    return consents
+
 
 @router.get("/google/login")
 async def google_login():

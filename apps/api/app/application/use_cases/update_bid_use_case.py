@@ -68,7 +68,7 @@ class UpdateBidUseCase:
                 client_id=input_data.client_user_id,
                 agreed_cents=bid.price_cents,
                 status="active",
-                started_at=datetime.now(timezone.utc),
+                created_at=datetime.now(timezone.utc),
                 scheduled_start=scheduled_start,
                 scheduled_end=scheduled_end
             )

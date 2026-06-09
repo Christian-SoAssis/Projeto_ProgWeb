@@ -56,10 +56,13 @@ class ProfessionalRepositoryImpl(ProfessionalRepository):
             existing.bio = professional.bio
             existing.hourly_rate_cents = professional.hourly_rate_cents
             existing.service_radius_km = professional.service_radius_km
+            existing.document_type = professional.document_type
             existing.document_path = professional.document_path
             existing.is_verified = professional.is_verified
             existing.latitude = professional.latitude
             existing.longitude = professional.longitude
+            existing.reputation_score = professional.reputation_score
+            existing.rejection_reason = professional.rejection_reason
             model = existing
         else:
             model = ProfessionalMapper.to_model(professional)

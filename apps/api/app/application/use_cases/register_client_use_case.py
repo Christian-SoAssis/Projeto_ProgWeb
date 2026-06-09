@@ -32,7 +32,7 @@ class RegisterClientUseCase:
         # 1. Validar se email já existe
         existing_user = await self.user_repo.get_by_email(input_data.email)
         if existing_user:
-            raise BusinessRuleViolationError("Email já cadastrado")
+            raise BusinessRuleViolationError("E-mail já cadastrado")
 
         # 2. Criar Usuário
         user_id = uuid.uuid4()

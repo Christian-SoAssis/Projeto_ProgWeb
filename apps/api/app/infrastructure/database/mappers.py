@@ -27,6 +27,7 @@ class BidMapper:
             price_cents=model.price_cents,
             message=model.message,
             status=BidStatus(model.status) if model.status else BidStatus.PENDING,
+            estimated_hours=model.estimated_hours,
             created_at=model.created_at,
             professional_name=getattr(model.professional.user, "name", None) if model.professional and model.professional.user else None,
             professional_avatar=getattr(model.professional.user, "avatar_url", None) if model.professional and model.professional.user else None
@@ -41,6 +42,7 @@ class BidMapper:
             price_cents=entity.price_cents,
             message=entity.message,
             status=entity.status.value if hasattr(entity.status, "value") else entity.status,
+            estimated_hours=entity.estimated_hours,
             created_at=entity.created_at
         )
 
@@ -54,7 +56,8 @@ class UserMapper:
             phone=model.phone,
             password_hash=model.password_hash,
             role=model.role,
-            is_active=model.is_active
+            is_active=model.is_active,
+            last_login_at=model.last_login_at
         )
 
     @staticmethod
@@ -66,7 +69,8 @@ class UserMapper:
             phone=entity.phone,
             password_hash=entity.password_hash,
             role=entity.role,
-            is_active=entity.is_active
+            is_active=entity.is_active,
+            last_login_at=entity.last_login_at
         )
 
 class ProfessionalMapper:
@@ -84,6 +88,7 @@ class ProfessionalMapper:
             document_path=model.document_path,
             latitude=model.latitude,
             longitude=model.longitude,
+            rejection_reason=model.rejection_reason,
             categories=[
                 CategoryEntity(id=cat.id, name=cat.name, color=cat.color)
                 for cat in getattr(model, "categories", [])
@@ -105,7 +110,8 @@ class ProfessionalMapper:
             document_type=entity.document_type,
             document_path=entity.document_path,
             latitude=entity.latitude,
-            longitude=entity.longitude
+            longitude=entity.longitude,
+            rejection_reason=entity.rejection_reason
         )
 
 class RequestImageMapper:
@@ -187,8 +193,8 @@ class ContractMapper:
             professional_id=model.professional_id,
             agreed_cents=model.agreed_cents,
             status=ContractStatus(model.status) if isinstance(model.status, str) else model.status,
-            created_at=model.created_at,
-            updated_at=model.updated_at,
+            created_at=model.started_at,
+            updated_at=model.completed_at,
             scheduled_start=model.scheduled_start,
             scheduled_end=model.scheduled_end
         )
@@ -202,8 +208,8 @@ class ContractMapper:
             professional_id=entity.professional_id,
             agreed_cents=entity.agreed_cents,
             status=entity.status.value if hasattr(entity.status, "value") else entity.status,
-            created_at=entity.created_at,
-            updated_at=entity.updated_at,
+            started_at=entity.created_at,
+            completed_at=entity.updated_at,
             scheduled_start=entity.scheduled_start,
             scheduled_end=entity.scheduled_end
         )

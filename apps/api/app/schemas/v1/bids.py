@@ -23,7 +23,7 @@ class BidResponse(BaseModel):
     price_cents: int
     estimated_hours: Optional[int] = None
     message: Optional[str] = None
-    status: Literal["pending", "accepted", "rejected", "cancelled"]
+    status: str
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

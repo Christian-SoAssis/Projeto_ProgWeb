@@ -18,6 +18,7 @@ class Bid:
     price_cents: int
     message: str
     status: BidStatus = BidStatus.PENDING
+    estimated_hours: Optional[int] = None
     created_at: Optional[datetime] = None
     professional_name: Optional[str] = None
     professional_avatar: Optional[str] = None

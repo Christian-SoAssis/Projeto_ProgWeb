@@ -28,6 +28,7 @@ async def test_login_success(use_case, mock_user_repo):
     )
     
     mock_user_repo.get_by_email = AsyncMock(return_value=user)
+    mock_user_repo.save = AsyncMock(return_value=user)
 
     # Execute
     result = await use_case.execute(LoginInput(email="user@test.com", password=password))

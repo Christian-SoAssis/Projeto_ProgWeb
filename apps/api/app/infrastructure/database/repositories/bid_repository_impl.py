@@ -24,8 +24,10 @@ class BidRepositoryImpl(BidRepository):
         
         if model:
             # Update existing
-            for key, value in bid.model_dump().items():
-                setattr(model, key, value)
+            model.price_cents = bid.price_cents
+            model.message = bid.message
+            model.status = bid.status.value if hasattr(bid.status, "value") else bid.status
+            model.estimated_hours = bid.estimated_hours
         else:
             # Create new
             model = BidMapper.to_model(bid)

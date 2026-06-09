@@ -65,4 +65,4 @@ async def test_register_client_email_taken(use_case, mock_user_repo):
     with pytest.raises(BusinessRuleViolationError) as exc:
         await use_case.execute(input_data)
     
-    assert "Email já cadastrado" in str(exc.value)
+    assert "E-mail já cadastrado" in str(exc.value)

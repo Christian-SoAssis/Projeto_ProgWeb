@@ -1,12 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { useAuth } from "@/presentation/hooks/use-auth"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
-export default function AuthCallbackPage() {
+function AuthCallback() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const { oauthLogin } = useAuth()
@@ -48,5 +48,18 @@ export default function AuthCallbackPage() {
       <h1 className="text-2xl font-bold tracking-tight">Autenticando...</h1>
       <p className="text-muted-foreground">Por favor, aguarde enquanto configuramos sua conta.</p>
     </main>
+  )
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen p-6 bg-background flex flex-col items-center justify-center gap-4">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+        <h1 className="text-2xl font-bold tracking-tight">Carregando autenticação...</h1>
+      </main>
+    }>
+      <AuthCallback />
+    </Suspense>
   )
 }

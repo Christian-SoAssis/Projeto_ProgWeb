@@ -158,8 +158,8 @@ export default function ProfessionalDashboard() {
                     <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-[100px] -z-10" />
                     <div className="flex items-start gap-5">
                         <div className="w-20 h-20 shrink-0 rounded-[1.5rem] neo-inset flex items-center justify-center bg-background overflow-hidden">
-                            {user?.avatar_url ? (
-                                <img src={user.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                            {user?.avatarUrl ? (
+                                <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                             ) : (
                                 <UserIcon className="w-8 h-8 text-muted-foreground/50" />
                             )}

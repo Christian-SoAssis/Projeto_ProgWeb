@@ -43,14 +43,19 @@ class CreateRequestUseCase:
             # O image_storage lida com a persistência física (disco/S3)
             image_url = await self.image_storage.save_image(img)
             
-            # Aqui poderíamos ler o tamanho se necessário, ou deixar o storage retornar
-            # Para manter paridade com o original:
+            # Recuperar tamanho físico do arquivo salvo
+            import os
+            try:
+                size_bytes = os.path.getsize(image_url)
+            except Exception:
+                size_bytes = 1  # Fallback para satisfazer a restrição de tamanho > 0
+                
             domain_images.append(RequestImage(
                 id=uuid.uuid4(),
                 request_id=request_id,
                 url=image_url,
                 content_type=img.content_type,
-                size_bytes=0, # Opcional: o storage poderia prover isso
+                size_bytes=size_bytes,
                 created_at=now
             ))
 

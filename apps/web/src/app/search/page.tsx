@@ -95,7 +95,6 @@ function SearchContent() {
                         <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
                     </Button>
                 </form>
-            </div>
 
             {showFilters && (
                 <Card variant="neo-elevated" className="border-none rounded-[2rem] p-4 mb-4 space-y-4">

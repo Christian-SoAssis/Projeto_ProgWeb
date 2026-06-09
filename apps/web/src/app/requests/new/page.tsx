@@ -22,7 +22,7 @@ const newRequestSchema = z.object({
   description: z.string().max(2000).optional(),
   category_id: z.string().uuid("Selecione uma categoria."),
   urgency: z.enum(["immediate", "scheduled", "flexible"]),
-  budget_cents: z.coerce.number().int().positive().optional(),
+  budget_cents: z.number().int().positive().optional(),
 })
 
 const URGENCY_LABELS: Record<string, string> = {

@@ -1,7 +1,10 @@
 import uuid
 from typing import List
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.database import get_db
+from app.domain.exceptions import BusinessRuleViolationError
 from app.api.v1.deps import (
     get_add_favorite_use_case,
     get_list_favorites_use_case,
@@ -19,12 +22,18 @@ async def add_favorite(
     fav_in: FavoriteCreate,
     use_case = Depends(get_add_favorite_use_case),
     current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
     """Adiciona um profissional aos favoritos do cliente."""
-    return await use_case.execute(
-        client_id=current_user.id,
-        professional_id=fav_in.professional_id
-    )
+    try:
+        fav = await use_case.execute(
+            client_id=current_user.id,
+            professional_id=fav_in.professional_id
+        )
+        await db.commit()
+        return fav
+    except BusinessRuleViolationError as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 
 
 @router.get("", response_model=List[FavoriteResponse])
@@ -41,9 +50,11 @@ async def remove_favorite(
     professional_id: uuid.UUID,
     use_case = Depends(get_remove_favorite_use_case),
     current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
     """Remove um profissional dos favoritos do cliente."""
     await use_case.execute(
         client_id=current_user.id,
         professional_id=professional_id
     )
+    await db.commit()

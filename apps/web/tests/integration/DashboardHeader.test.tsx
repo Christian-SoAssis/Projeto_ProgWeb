@@ -1,10 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DashboardHeader } from '../../src/components/dashboard/DashboardHeader';
-import { useAuth } from '../../src/context/auth-context';
+import { useAuth } from '../../src/presentation/hooks/use-auth';
 
 // Mock the Auth Context
-vi.mock('../../src/context/auth-context', () => ({
+vi.mock('../../src/presentation/hooks/use-auth', () => ({
   useAuth: vi.fn(),
 }));
 

@@ -118,8 +118,8 @@ export default function ProfessionalProfilePage() {
               {prof.categories?.map((cat: any) => (
                 <Badge 
                   key={cat.id} 
-                  variant="neo-elevated"
-                  className="rounded-xl border-none font-bold text-xs py-2 px-4"
+                  variant="outline"
+                  className="rounded-xl border-none font-bold text-xs py-2 px-4 neo-elevated"
                   style={{ color: cat.color }}
                 >
                   {cat.name}

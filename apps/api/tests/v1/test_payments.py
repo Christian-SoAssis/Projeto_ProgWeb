@@ -1,8 +1,27 @@
 import pytest
+import pytest_asyncio
 import uuid
 from unittest.mock import AsyncMock, patch
 from fastapi import status
 from httpx import AsyncClient
+
+from app.models.user import User, UserRole
+from app.core.security import create_access_token
+
+@pytest_asyncio.fixture(scope="function")
+async def auth_headers(db_session):
+    user = User(
+        email=f"client_{uuid.uuid4().hex[:6]}@test.com",
+        name="Payments Test Client",
+        password_hash="hash",
+        role=UserRole.CLIENT,
+        is_active=True
+    )
+    db_session.add(user)
+    await db_session.flush()
+    token = create_access_token(data={"sub": str(user.id)})
+    return {"Authorization": f"Bearer {token}"}
+
 
 @pytest.mark.asyncio
 async def test_create_payment_intent_not_found(client: AsyncClient, auth_headers: dict):

@@ -23,7 +23,7 @@ import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { ChevronLeft, Github, Loader2 } from "lucide-react"
 import { useAuth } from "@/presentation/hooks/use-auth"
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 
 const loginSchema = z.object({
@@ -31,7 +31,7 @@ const loginSchema = z.object({
   password: z.string().min(1, { message: "Senha é obrigatória." }),
 })
 
-export default function LoginPage() {
+function LoginContent() {
   const { login } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const searchParams = useSearchParams()
@@ -96,7 +96,7 @@ export default function LoginPage() {
                     <FormControl>
                       <Input 
                         placeholder="exemplo@email.com" 
-                        type="email" 
+                         type="email" 
                         autoComplete="email"
                         {...field} 
                       />
@@ -186,5 +186,18 @@ export default function LoginPage() {
         </a>
       </p>
     </main>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen p-6 bg-background flex flex-col items-center justify-center gap-8 max-w-lg mx-auto">
+        <Loader2 className="animate-spin text-primary w-10 h-10" />
+        <p className="text-sm font-medium">Carregando...</p>
+      </main>
+    }>
+      <LoginContent />
+    </Suspense>
   )
 }

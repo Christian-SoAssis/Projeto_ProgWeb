@@ -38,6 +38,7 @@ class UserRepositoryImpl(UserRepository):
             model.password_hash = user.password_hash
             model.role = user.role
             model.is_active = user.is_active
+            model.last_login_at = user.last_login_at
         else:
             model = UserMapper.to_model(user)
             self.db.add(model)

@@ -43,7 +43,8 @@ async def register_professional(
     # Upload
     document: UploadFile = File(...),
     
-    register_use_case: RegisterProfessionalUseCase = Depends(get_register_professional_use_case)
+    register_use_case: RegisterProfessionalUseCase = Depends(get_register_professional_use_case),
+    db: AsyncSession = Depends(get_db)
 ):
     """Cadastro completo de profissional via Use Case."""
     ip = request.client.host if request.client else "unknown"
@@ -61,6 +62,7 @@ async def register_professional(
         )
         
         professional = await register_use_case.execute(input_data)
+        await db.commit()
         
         # O mapper to_entity já traz os campos necessários do User se carregado
         # Para a resposta, precisamos de um objeto que o FromProfessional entenda ou adaptar o schema

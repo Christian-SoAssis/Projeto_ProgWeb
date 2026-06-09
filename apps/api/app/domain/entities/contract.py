@@ -22,3 +22,11 @@ class Contract:
     updated_at: Optional[datetime] = None
     scheduled_start: Optional[datetime] = None
     scheduled_end: Optional[datetime] = None
+
+    @property
+    def started_at(self) -> Optional[datetime]:
+        return self.created_at
+
+    @property
+    def completed_at(self) -> Optional[datetime]:
+        return self.updated_at

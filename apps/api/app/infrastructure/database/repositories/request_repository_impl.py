@@ -42,7 +42,9 @@ class RequestRepositoryImpl(RequestRepository):
             self.session.add(img_model)
             
         await self.session.flush()
-        return RequestMapper.to_entity(model)
+        entity = RequestMapper.to_entity(model)
+        entity.images = request.images
+        return entity
 
     async def update(self, request: RequestEntity) -> RequestEntity:
         result = await self.session.execute(

@@ -5,7 +5,7 @@ export interface ContractHistoryItem {
   id: string
   request_title: string
   client_name: string
-  agreed_cents: int
+  agreed_cents: number
   completed_at: string
   rating?: number
 }

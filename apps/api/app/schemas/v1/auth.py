@@ -123,6 +123,17 @@ class ProfessionalRegisterResponse(BaseModel):
             role=user.role.value if hasattr(user.role, "value") else str(user.role),
         )
 
+    @classmethod
+    def from_professional_entity(cls, entity) -> "ProfessionalRegisterResponse":
+        return cls(
+            id=entity.id,
+            user_id=entity.user_id,
+            is_verified=entity.is_verified,
+            reputation_score=entity.reputation_score,
+            rejection_reason=entity.rejection_reason,
+            role="professional",
+        )
+
 
 class TokenResponse(BaseModel):
     access_token: str

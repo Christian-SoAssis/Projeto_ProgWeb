@@ -18,6 +18,7 @@ class Professional:
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     document_path: Optional[str] = None
+    rejection_reason: Optional[str] = None
     
     # Relationships (Entities)
     categories: List[Category] = field(default_factory=list)

@@ -32,10 +32,11 @@ class ProfessionalPixKeyCreate(BaseModel):
             
         elif key_type == "phone":
             phone_digits = re.sub(r"\D", "", v_clean)
-            # Accept phones starting with +55 or without country code, usually 10-13 digits
-            if not (10 <= len(phone_digits) <= 13):
-                raise ValueError("Phone Pix key must be a valid number with DDD")
-            return f"+{phone_digits}" if not v_clean.startswith("+") else v_clean
+            if not phone_digits.startswith("55") and len(phone_digits) in (10, 11):
+                phone_digits = "55" + phone_digits
+            if not (12 <= len(phone_digits) <= 13):
+                raise ValueError("Phone Pix key must be a valid number with country code and DDD")
+            return f"+{phone_digits}"
             
         elif key_type == "email":
             email_pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"

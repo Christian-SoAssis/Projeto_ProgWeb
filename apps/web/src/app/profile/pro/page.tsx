@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import Link from "next/link"
 
 export default function ProProfile() {
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
   const { history, loading: loadingHistory } = useProfessionalHistory()
   const { data: aiSummary, loading: loadingAI } = useProfessionalAISummary()
 

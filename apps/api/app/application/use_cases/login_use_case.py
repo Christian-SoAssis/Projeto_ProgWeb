@@ -20,9 +20,7 @@ class LoginUseCase:
         if not user or not verify_password(input_data.password, user.password_hash) or not user.is_active:
             raise UnauthorizedError("Credenciais inválidas")
         
-        # O User repository implementation deve lidar com o update do last_login se quisermos
-        # Ou podemos atualizar aqui e salvar
-        # user.last_login_at = datetime.now(timezone.utc)
-        # await self.user_repo.save(user)
+        user.last_login_at = datetime.now(timezone.utc)
+        await self.user_repo.save(user)
         
         return user
