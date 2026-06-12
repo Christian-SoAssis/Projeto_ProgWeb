@@ -78,9 +78,34 @@ async def analyze_request_task(ctx: Dict[str, Any], request_id: str) -> str:
         
     return f"Sucesso: Pedido {request_id} analisado pela IA."
 
+
+async def process_payouts_task(ctx: Dict[str, Any]) -> str:
+    """
+    Job assíncrono para processar pagamentos agendados e liberados (D+2).
+    """
+    logger.info("Iniciando processamento de repasses (payouts)...")
+    from app.services.payment_service import process_payouts
+    async with async_session_maker() as session:
+        count = await process_payouts(session)
+        await session.commit()
+    return f"Sucesso: {count} repasses processados."
+
+
+async def check_disputes_deadline_task(ctx: Dict[str, Any]) -> str:
+    """
+    Job assíncrono para checar prazos de resposta de disputas e auto-escalar se necessário.
+    """
+    logger.info("Iniciando verificação de prazos de disputas...")
+    from app.services.payment_service import check_disputes_deadline
+    async with async_session_maker() as session:
+        count = await check_disputes_deadline(session)
+        await session.commit()
+    return f"Sucesso: {count} disputas escaladas por expiração de prazo."
+
+
 # Configuração da classe de Worker do ARQ
 class WorkerSettings:
-    functions = [analyze_request_task]
+    functions = [analyze_request_task, process_payouts_task, check_disputes_deadline_task]
     redis_settings = RedisSettings.from_dsn(settings.REDIS_URL)
     
     # Contexto compartilhado entre jobs
@@ -89,3 +114,4 @@ class WorkerSettings:
         
     async def on_shutdown(ctx):
         logger.info("Worker finalizando...")
+

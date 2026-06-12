@@ -22,6 +22,9 @@ class Contract:
     updated_at: Optional[datetime] = None
     scheduled_start: Optional[datetime] = None
     scheduled_end: Optional[datetime] = None
+    payment_confirmed_at: Optional[datetime] = None
+    payout_scheduled_at: Optional[datetime] = None
+    payout_completed_at: Optional[datetime] = None
 
     @property
     def started_at(self) -> Optional[datetime]:

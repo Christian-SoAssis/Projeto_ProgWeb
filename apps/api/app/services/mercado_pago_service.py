@@ -2,6 +2,7 @@ import hmac
 import hashlib
 import httpx
 import logging
+import uuid
 from typing import Dict, Any, Optional
 from app.core.config import settings
 
@@ -21,9 +22,13 @@ class MercadoPagoService:
         external_reference: str,
         notification_url: str
     ) -> Optional[Dict[str, Any]]:
-        """
-        Cria uma preferência de pagamento no MercadoPago com split de taxa do marketplace.
-        """
+        if not self.access_token or "mock" in self.access_token or settings.ENVIRONMENT == "development":
+            logger.info(f"[MOCK] Criando preferência de pagamento no MercadoPago para {external_reference}")
+            return {
+                "id": f"pref_{uuid.uuid4().hex[:10]}",
+                "init_point": "https://www.mercadopago.com.br/sandbox/button"
+            }
+
         url = f"{self.base_url}/checkout/preferences"
         headers = {
             "Authorization": f"Bearer {self.access_token}",
@@ -66,40 +71,57 @@ class MercadoPagoService:
     def verify_webhook_signature(self, x_signature: str, x_request_id: str, payload_body: str) -> bool:
         """
         Valida a assinatura HMAC-SHA256 do webhook do MercadoPago.
-        Referência: https://www.mercadopago.com.br/developers/pt/docs/checkout-pro/additional-content/your-integrations/notifications/webhooks
         """
-        if not x_signature or not self.webhook_secret:
-            logger.warning("Tentativa de webhook sem assinatura ou secret não configurado.")
+        if not x_signature:
+            if settings.ENVIRONMENT == "production":
+                logger.warning("Tentativa de webhook sem assinatura em produção.")
+                return False
+            return True
+
+        if not self.webhook_secret:
+            logger.warning("Secret do webhook não configurado.")
             return False
             
         try:
-            # Em modo desenvolvimento, se o secret for 'mock', aceitamos
-            if self.webhook_secret == "mock-webhook-secret-123":
-                return True
-
-            # Formato esperado: v1=hash,ts=timestamp
-            parts = dict(item.split('=') for item in x_signature.split(','))
+            # Parse parts: e.g. "ts=1672531199,v1=abc..." or "v1=abc,ts=1672531199"
+            parts = {}
+            for item in x_signature.split(','):
+                if '=' in item:
+                    k, v = item.split('=', 1)
+                    parts[k.strip()] = v.strip()
+            
             timestamp = parts.get('ts')
             received_hash = parts.get('v1')
 
             if not timestamp or not received_hash:
                 return False
 
-            # No MP v1, a string a ser assinada é construída com id e ts
-            # data_to_sign = f"id:{x_request_id};ts:{timestamp};"
-            # sign = hmac.new(self.webhook_secret.encode(), data_to_sign.encode(), hashlib.sha256).hexdigest()
+            # O formato oficial do MercadoPago para a string a ser assinada:
+            # f"id:{x_request_id};ts:{timestamp};"
+            data_to_sign = f"id:{x_request_id or ''};ts:{timestamp};"
+            expected_signature = hmac.new(
+                self.webhook_secret.encode('utf-8'),
+                data_to_sign.encode('utf-8'),
+                hashlib.sha256
+            ).hexdigest()
             
-            # Nota: A validação real depende da versão da API e do tipo de evento.
-            # Por enquanto, mantemos o log de segurança.
-            return True 
+            if hmac.compare_digest(expected_signature, received_hash):
+                return True
+                
+            return False
         except Exception as e:
             logger.error(f"Falha ao validar assinatura do webhook: {str(e)}")
             return False
 
     async def get_payment_details(self, payment_id: str) -> Optional[Dict[str, Any]]:
-        """
-        Busca detalhes de um pagamento específico.
-        """
+        if not self.access_token or "mock" in self.access_token or settings.ENVIRONMENT == "development":
+            logger.info(f"[MOCK] Buscando detalhes de pagamento no MercadoPago para {payment_id}")
+            return {
+                "id": payment_id,
+                "status": "approved",
+                "external_reference": payment_id
+            }
+
         url = f"{self.base_url}/v1/payments/{payment_id}"
         headers = {"Authorization": f"Bearer {self.access_token}"}
         
@@ -111,5 +133,29 @@ class MercadoPagoService:
         except Exception as e:
             logger.error(f"Erro ao buscar pagamento {payment_id}: {str(e)}")
             return None
+
+    async def refund_payment(self, payment_id: str, amount_cents: int) -> bool:
+        """
+        Simula o estorno de um pagamento no MercadoPago.
+        """
+        url = f"{self.base_url}/v1/payments/{payment_id}/refunds"
+        headers = {
+            "Authorization": f"Bearer {self.access_token}",
+            "Content-Type": "application/json"
+        }
+        
+        if "mock" in self.access_token or settings.ENVIRONMENT == "development":
+            logger.info(f"[MOCK] Reembolso de {amount_cents} centavos solicitado para o pagamento {payment_id}")
+            return True
+            
+        try:
+            payload = {"amount": amount_cents / 100.0}
+            async with httpx.AsyncClient() as client:
+                response = await client.post(url, json=payload, headers=headers)
+                response.raise_for_status()
+                return True
+        except Exception as e:
+            logger.error(f"Erro ao estornar pagamento no MercadoPago: {str(e)}")
+            return False
 
 mercado_pago_service = MercadoPagoService()

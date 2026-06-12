@@ -196,7 +196,10 @@ class ContractMapper:
             created_at=model.started_at,
             updated_at=model.completed_at,
             scheduled_start=model.scheduled_start,
-            scheduled_end=model.scheduled_end
+            scheduled_end=model.scheduled_end,
+            payment_confirmed_at=model.payment_confirmed_at,
+            payout_scheduled_at=model.payout_scheduled_at,
+            payout_completed_at=model.payout_completed_at
         )
 
     @staticmethod
@@ -211,7 +214,10 @@ class ContractMapper:
             started_at=entity.created_at,
             completed_at=entity.updated_at,
             scheduled_start=entity.scheduled_start,
-            scheduled_end=entity.scheduled_end
+            scheduled_end=entity.scheduled_end,
+            payment_confirmed_at=entity.payment_confirmed_at,
+            payout_scheduled_at=entity.payout_scheduled_at,
+            payout_completed_at=entity.payout_completed_at
         )
 
 class CategoryMapper:

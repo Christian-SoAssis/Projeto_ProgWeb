@@ -25,6 +25,8 @@ class Contract(Base):
                         nullable=False)
     completed_at = Column(DateTime(timezone=True), nullable=True)
     payment_confirmed_at = Column(DateTime(timezone=True), nullable=True)
+    payout_scheduled_at = Column(DateTime(timezone=True), nullable=True)
+    payout_completed_at = Column(DateTime(timezone=True), nullable=True)
     scheduled_start = Column(DateTime(timezone=True), nullable=True)
     scheduled_end = Column(DateTime(timezone=True), nullable=True)
 
