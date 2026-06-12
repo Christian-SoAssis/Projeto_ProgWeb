@@ -25,8 +25,10 @@ from app.models.contract import Contract
 from app.models.associations import professional_categories
 from app.matching.engine import matching_engine, LTR_MIN_CONTRACTS
 from app.domain.services.task_queue import TaskQueue
+from opentelemetry import trace
 
 logger = logging.getLogger(__name__)
+tracer = trace.get_tracer(__name__)
 
 
 def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -108,84 +110,94 @@ async def get_matches_impl(
     Implementação interna do matching: recupera candidatos, aplica LTR se qualificado,
     e enfileira eventos de impressão.
     """
-    candidates = await get_matches_v0(db, request, request.category_id)
-    if not candidates:
-        return []
+    with tracer.start_as_current_span("matching_pipeline") as span:
+        span.set_attribute("request.id", str(request.id))
+        span.set_attribute("request.category_id", str(request.category_id))
 
-    # Contar contratos concluídos no sistema
-    contracts_stmt = select(func.count()).select_from(Contract).where(Contract.status == "completed")
-    contracts_result = await db.execute(contracts_stmt)
-    completed_contracts_count = contracts_result.scalar() or 0
+        candidates = await get_matches_v0(db, request, request.category_id)
+        if not candidates:
+            span.set_attribute("matching.candidates_count", 0)
+            return []
 
-    use_ltr = completed_contracts_count >= LTR_MIN_CONTRACTS and matching_engine.is_ready()
+        span.set_attribute("matching.candidates_count", len(candidates))
 
-    if use_ltr:
-        # Preparar as features para o LTR
-        candidate_features = [
-            {
-                "distance_km": float(c["distance_km"]),
-                "reputation_score": float(c["reputation_score"]),
-                "hourly_rate_cents": float(c["hourly_rate_cents"] or 0),
-                "experience_years": 0.0,
-                "rating": float(c["reputation_score"]),
-            }
-            for c in candidates
-        ]
+        # Contar contratos concluídos no sistema
+        contracts_stmt = select(func.count()).select_from(Contract).where(Contract.status == "completed")
+        contracts_result = await db.execute(contracts_stmt)
+        completed_contracts_count = contracts_result.scalar() or 0
         
-        try:
-            scores = matching_engine.score(candidate_features)
-            for i, score in enumerate(scores):
-                candidates[i]["matching_score"] = score
-            candidates = sorted(candidates, key=lambda x: x["matching_score"], reverse=True)
-            logger.info(f"LTR matching utilizado com sucesso para o request {request.id}")
-        except Exception as e:
-            logger.critical(
-                f"Erro crítico no LTR matching para o request {request.id}: {e}. "
-                "Fazendo fallback silencioso para V0.",
-                exc_info=True
-            )
-            candidates = sorted(candidates, key=lambda x: x["reputation_score"], reverse=True)
-    else:
-        # Fallback para V0 sorting
-        candidates = sorted(candidates, key=lambda x: x["reputation_score"], reverse=True)
+        span.set_attribute("matching.completed_contracts", completed_contracts_count)
 
-    top_candidates = candidates[:10]
+        use_ltr = completed_contracts_count >= LTR_MIN_CONTRACTS and matching_engine.is_ready()
+        span.set_attribute("matching.use_ltr", use_ltr)
 
-    # Enfileirar eventos de 'impression' de forma assíncrona
-    if top_candidates:
-        if task_queue is None:
-            from app.infrastructure.services.arq_task_queue import ArqTaskQueue
-            task_queue = ArqTaskQueue()
+        if use_ltr:
+            # Preparar as features para o LTR
+            candidate_features = [
+                {
+                    "distance_km": float(c["distance_km"]),
+                    "reputation_score": float(c["reputation_score"]),
+                    "hourly_rate_cents": float(c["hourly_rate_cents"] or 0),
+                    "experience_years": 0.0,
+                    "rating": float(c["reputation_score"]),
+                }
+                for c in candidates
+            ]
             
-        impression_events = []
-        for idx, cand in enumerate(top_candidates):
-            feat = {
-                "distance_km": float(cand["distance_km"]),
-                "reputation_score": float(cand["reputation_score"]),
-                "hourly_rate_cents": float(cand["hourly_rate_cents"] or 0),
-                "experience_years": 0.0,
-                "rating": float(cand["reputation_score"]),
-            }
-            if "matching_score" in cand:
-                feat["matching_score"] = float(cand["matching_score"])
+            try:
+                scores = matching_engine.score(candidate_features)
+                for i, score in enumerate(scores):
+                    candidates[i]["matching_score"] = score
+                candidates = sorted(candidates, key=lambda x: x["matching_score"], reverse=True)
+                logger.info(f"LTR matching utilizado com sucesso para o request {request.id}")
+            except Exception as e:
+                logger.critical(
+                    f"Erro crítico no LTR matching para o request {request.id}: {e}. "
+                    "Fazendo fallback silencioso para V0.",
+                    exc_info=True
+                )
+                candidates = sorted(candidates, key=lambda x: x["reputation_score"], reverse=True)
+        else:
+            # Fallback para V0 sorting
+            candidates = sorted(candidates, key=lambda x: x["reputation_score"], reverse=True)
 
-            evt_id = str(uuid.uuid4())
-            impression_events.append({
-                "id": evt_id,
-                "event_type": "impression",
-                "request_id": str(request.id),
-                "professional_id": str(cand["id"]),
-                "bid_id": None,
-                "position": idx + 1,
-                "features": feat,
-            })
-        
-        try:
-            await task_queue.enqueue("log_matching_event_task", impression_events)
-        except Exception as queue_err:
-            logger.error(f"Falha ao enfileirar eventos de impression: {queue_err}", exc_info=True)
+        top_candidates = candidates[:10]
 
-    return top_candidates
+        # Enfileirar eventos de 'impression' de forma assíncrona
+        if top_candidates:
+            if task_queue is None:
+                from app.infrastructure.services.arq_task_queue import ArqTaskQueue
+                task_queue = ArqTaskQueue()
+                
+            impression_events = []
+            for idx, cand in enumerate(top_candidates):
+                feat = {
+                    "distance_km": float(cand["distance_km"]),
+                    "reputation_score": float(cand["reputation_score"]),
+                    "hourly_rate_cents": float(cand["hourly_rate_cents"] or 0),
+                    "experience_years": 0.0,
+                    "rating": float(cand["reputation_score"]),
+                }
+                if "matching_score" in cand:
+                    feat["matching_score"] = float(cand["matching_score"])
+
+                evt_id = str(uuid.uuid4())
+                impression_events.append({
+                    "id": evt_id,
+                    "event_type": "impression",
+                    "request_id": str(request.id),
+                    "professional_id": str(cand["id"]),
+                    "bid_id": None,
+                    "position": idx + 1,
+                    "features": feat,
+                })
+            
+            try:
+                await task_queue.enqueue("log_matching_event_task", impression_events)
+            except Exception as queue_err:
+                logger.error(f"Falha ao enfileirar eventos de impression: {queue_err}", exc_info=True)
+
+        return top_candidates
 
 
 async def get_matches(

@@ -56,42 +56,49 @@ class MatchingEngine:
             RuntimeError: se modelo não está pronto
             ValueError: se features inválidas ou vazias
         """
-        if not self.is_ready():
-            raise RuntimeError("Modelo LTR não está pronto. Use matching v0.")
+        from opentelemetry import trace
+        tracer = trace.get_tracer(__name__)
 
-        if not features:
-            raise ValueError("A lista de features não pode estar vazia.")
+        with tracer.start_as_current_span("ltr_scoring") as span:
+            span.set_attribute("ltr.candidates_count", len(features) if features else 0)
+            span.set_attribute("ltr.mock_mode", self.mock_mode)
 
-        # Validação básica de features: cada candidato deve ser um dicionário
-        for i, feat in enumerate(features):
-            if not isinstance(feat, dict):
-                raise ValueError(f"Feature na posição {i} deve ser um dicionário, recebeu {type(feat)}")
+            if not self.is_ready():
+                raise RuntimeError("Modelo LTR não está pronto. Use matching v0.")
 
-        if self.mock_mode:
-            scores = []
-            for feat in features:
-                score_val = feat.get("mock_score")
-                if score_val is None:
-                    # calcula pontuação fictícia
-                    score_val = float(feat.get("experience_years", 0)) * 0.1 + float(feat.get("rating", 0)) * 0.5
-                scores.append(float(score_val))
-            return scores
+            if not features:
+                raise ValueError("A lista de features não pode estar vazia.")
 
-        try:
-            feature_names = self.model.feature_name()
-            data = []
-            for feat in features:
-                row = []
-                for name in feature_names:
-                    val = feat.get(name)
-                    row.append(float(val) if val is not None else 0.0)
-                data.append(row)
+            # Validação básica de features: cada candidato deve ser um dicionário
+            for i, feat in enumerate(features):
+                if not isinstance(feat, dict):
+                    raise ValueError(f"Feature na posição {i} deve ser um dicionário, recebeu {type(feat)}")
 
-            predictions = self.model.predict(data)
-            return [float(p) for p in predictions]
-        except Exception as e:
-            logger.error(f"Erro durante a predição LTR: {e}")
-            raise RuntimeError(f"Erro ao processar predição do modelo LTR: {e}") from e
+            if self.mock_mode:
+                scores = []
+                for feat in features:
+                    score_val = feat.get("mock_score")
+                    if score_val is None:
+                        # calcula pontuação fictícia
+                        score_val = float(feat.get("experience_years", 0)) * 0.1 + float(feat.get("rating", 0)) * 0.5
+                    scores.append(float(score_val))
+                return scores
+
+            try:
+                feature_names = self.model.feature_name()
+                data = []
+                for feat in features:
+                    row = []
+                    for name in feature_names:
+                        val = feat.get(name)
+                        row.append(float(val) if val is not None else 0.0)
+                    data.append(row)
+
+                predictions = self.model.predict(data)
+                return [float(p) for p in predictions]
+            except Exception as e:
+                logger.error(f"Erro durante a predição LTR: {e}")
+                raise RuntimeError(f"Erro ao processar predição do modelo LTR: {e}") from e
 
 
 # Instância singleton do engine
