@@ -1,6 +1,6 @@
 import asyncio
 from typing import Any, Dict
-from arq import create_pool
+from arq import create_pool, cron
 from arq.connections import RedisSettings
 from app.core.config import settings
 from app.core.database import async_session_maker
@@ -103,9 +103,29 @@ async def check_disputes_deadline_task(ctx: Dict[str, Any]) -> str:
     return f"Sucesso: {count} disputas escaladas por expiração de prazo."
 
 
+async def run_data_retention_policy_task(ctx: Dict[str, Any]) -> str:
+    """
+    Job assíncrono diário para rodar a política de retenção de dados da LGPD.
+    """
+    logger.info("Iniciando execução da política de retenção de dados da LGPD...")
+    from app.services.lgpd_service import run_data_retention_policy
+    async with async_session_maker() as session:
+        stats = await run_data_retention_policy(session)
+        await session.commit()
+    return f"Sucesso: {stats['anon_count']} contas anonimizadas, {stats['warned_count']} avisadas, {stats['messages_purged_count']} mensagens limpas, {stats['notifications_purged_count']} notificações removidas."
+
+
 # Configuração da classe de Worker do ARQ
 class WorkerSettings:
-    functions = [analyze_request_task, process_payouts_task, check_disputes_deadline_task]
+    functions = [
+        analyze_request_task,
+        process_payouts_task,
+        check_disputes_deadline_task,
+        run_data_retention_policy_task
+    ]
+    cron_jobs = [
+        cron(run_data_retention_policy_task, hour=3, minute=0)  # Executa diariamente às 3h
+    ]
     redis_settings = RedisSettings.from_dsn(settings.REDIS_URL)
     
     # Contexto compartilhado entre jobs
