@@ -115,13 +115,42 @@ async def run_data_retention_policy_task(ctx: Dict[str, Any]) -> str:
     return f"Sucesso: {stats['anon_count']} contas anonimizadas, {stats['warned_count']} avisadas, {stats['messages_purged_count']} mensagens limpas, {stats['notifications_purged_count']} notificações removidas."
 
 
+async def log_matching_event_task(ctx: Dict[str, Any], events: list) -> str:
+    """
+    Job assíncrono para persistir eventos de matching no banco de dados.
+    """
+    logger.info(f"Persistindo {len(events)} eventos de matching...")
+    from app.models.matching_event import MatchingEvent
+    import uuid
+
+    async with async_session_maker() as session:
+        for evt_data in events:
+            bid_id = evt_data.get("bid_id")
+            if bid_id is not None:
+                bid_id = uuid.UUID(bid_id) if isinstance(bid_id, str) else bid_id
+            
+            evt = MatchingEvent(
+                id=uuid.UUID(evt_data["id"]) if isinstance(evt_data.get("id"), str) else (evt_data.get("id") or uuid.uuid4()),
+                event_type=evt_data["event_type"],
+                request_id=uuid.UUID(evt_data["request_id"]) if isinstance(evt_data["request_id"], str) else evt_data["request_id"],
+                professional_id=uuid.UUID(evt_data["professional_id"]) if isinstance(evt_data["professional_id"], str) else evt_data["professional_id"],
+                bid_id=bid_id,
+                position=evt_data.get("position"),
+                features=evt_data.get("features"),
+            )
+            session.add(evt)
+        await session.commit()
+    return f"Sucesso: {len(events)} eventos persistidos."
+
+
 # Configuração da classe de Worker do ARQ
 class WorkerSettings:
     functions = [
         analyze_request_task,
         process_payouts_task,
         check_disputes_deadline_task,
-        run_data_retention_policy_task
+        run_data_retention_policy_task,
+        log_matching_event_task
     ]
     cron_jobs = [
         cron(run_data_retention_policy_task, hour=3, minute=0)  # Executa diariamente às 3h

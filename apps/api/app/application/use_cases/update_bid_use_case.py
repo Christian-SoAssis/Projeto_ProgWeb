@@ -17,16 +17,24 @@ class UpdateBidInput:
     new_status: str
     scheduled_start: Optional[datetime] = None
 
+from app.domain.services.task_queue import TaskQueue
+
 class UpdateBidUseCase:
     def __init__(
         self,
         bid_repo: BidRepository,
         contract_repo: ContractRepository,
-        request_repo: RequestRepository
+        request_repo: RequestRepository,
+        task_queue: Optional[TaskQueue] = None
     ):
         self.bid_repo = bid_repo
         self.contract_repo = contract_repo
         self.request_repo = request_repo
+        if task_queue is None:
+            from app.infrastructure.services.arq_task_queue import ArqTaskQueue
+            self.task_queue = ArqTaskQueue()
+        else:
+            self.task_queue = task_queue
 
     async def execute(self, input_data: UpdateBidInput) -> Tuple[Bid, Optional[Contract]]:
         # 1. Buscar bid
@@ -86,6 +94,25 @@ class UpdateBidUseCase:
                 other.status = "cancelled"
             
             await self.bid_repo.update_statuses(other_bids)
+
+            # Registrar evento de conversão no motor de matching
+            try:
+                conversion_evt = {
+                    "id": str(uuid.uuid4()),
+                    "event_type": "conversion",
+                    "request_id": str(bid.request_id),
+                    "professional_id": str(bid.professional_id),
+                    "bid_id": str(bid.id),
+                    "position": None,
+                    "features": None,
+                }
+                await self.task_queue.enqueue("log_matching_event_task", [conversion_evt])
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).error(
+                    f"Falha ao enfileirar evento de conversao para bid {bid.id}: {e}",
+                    exc_info=True
+                )
 
         # Salvar o bid atualizado
         updated_bid = await self.bid_repo.save(bid)
