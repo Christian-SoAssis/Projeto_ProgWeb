@@ -4,7 +4,7 @@ from typing import Literal
 
 class Settings(BaseSettings):
     # Ambiente
-    ENVIRONMENT: Literal["development", "production"] = "development"
+    ENVIRONMENT: Literal["development", "production", "test"] = "development"
     LOG_LEVEL: str = "debug"
 
     # Banco de dados
