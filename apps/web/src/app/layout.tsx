@@ -5,6 +5,7 @@ import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/presentation/providers/auth-provider";
+import { ThemeProvider } from "@/presentation/providers/theme-provider";
 
 const dmSans = DM_Sans({
   variable: "--font-dm-sans",
@@ -28,17 +29,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
       <body
         className={`${dmSans.variable} ${dmMono.variable} antialiased bg-background text-foreground`}
       >
-        <TooltipProvider>
-          <AuthProvider>
-            {children}
-            <Toaster />
-          </AuthProvider>
-        </TooltipProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <TooltipProvider>
+            <AuthProvider>
+              {children}
+              <Toaster />
+            </AuthProvider>
+          </TooltipProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
 }
+

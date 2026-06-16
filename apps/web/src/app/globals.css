@@ -58,39 +58,74 @@
 
 :root {
   /* Neomorphic Base: Lavender Powder */
-  --background: oklch(0.85 0.02 284); /* Approx #d0ccdc */
-  --foreground: oklch(0.15 0.02 284);
+  --background: #d0ccdc;
+  --foreground: #140e20;
   
-  --card: oklch(0.85 0.02 284);
-  --card-foreground: oklch(0.15 0.02 284);
+  --card: #d0ccdc;
+  --card-foreground: #140e20;
   
-  --popover: oklch(0.85 0.02 284);
-  --popover-foreground: oklch(0.15 0.02 284);
+  --popover: #d0ccdc;
+  --popover-foreground: #140e20;
   
-  --primary: oklch(0.45 0.15 165); /* Mint approx #1a9878 / #006951 */
-  --primary-foreground: oklch(0.98 0.01 284);
+  --primary: #1a9878;
+  --primary-foreground: #f4f0ff;
   
-  --secondary: oklch(0.92 0.02 284);
-  --secondary-foreground: oklch(0.15 0.02 284);
+  --secondary: #f4f0ff;
+  --secondary-foreground: #584870;
   
-  --muted: oklch(0.92 0.02 284);
-  --muted-foreground: oklch(0.45 0.02 284);
+  --muted: #aca8b8;
+  --muted-foreground: #584870;
   
-  --accent: oklch(0.45 0.15 165);
-  --accent-foreground: oklch(0.98 0.01 284);
+  --accent: #1a9878;
+  --accent-foreground: #f4f0ff;
   
-  --destructive: oklch(0.45 0.25 25);
-  --destructive-foreground: oklch(0.98 0.01 284);
+  --destructive: #b04020;
+  --destructive-foreground: #f4f0ff;
   
-  --border: oklch(0.80 0.02 284);
-  --input: oklch(0.80 0.02 284);
-  --ring: oklch(0.45 0.15 165);
+  --border: #aca8b8;
+  --input: #aca8b8;
+  --ring: #1a9878;
   
   --radius: 1rem;
 
   /* Neomorphic Shadow Colors - Surface Highlights/Shadows */
   --neo-light: #f4f0ff;
   --neo-dark: #aca8b8;
+}
+
+.dark {
+  /* Neomorphic Base: Lavender Noturna */
+  --background: #252030;
+  --foreground: #ddd8f0;
+  
+  --card: #252030;
+  --card-foreground: #ddd8f0;
+  
+  --popover: #252030;
+  --popover-foreground: #ddd8f0;
+  
+  --primary: #30c898;
+  --primary-foreground: #252030;
+  
+  --secondary: #322c3e;
+  --secondary-foreground: #8878b0;
+  
+  --muted: #181422;
+  --muted-foreground: #8878b0;
+  
+  --accent: #30c898;
+  --accent-foreground: #252030;
+  
+  --destructive: #b04020;
+  --destructive-foreground: #ddd8f0;
+  
+  --border: #181422;
+  --input: #181422;
+  --ring: #30c898;
+
+  /* Neomorphic Shadow Colors for Dark Mode */
+  --neo-light: #322c3e;
+  --neo-dark: #181422;
 }
 
 @layer base {

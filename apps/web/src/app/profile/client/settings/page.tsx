@@ -1,7 +1,8 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useTheme } from "next-themes"
 import { 
   ChevronLeft, 
   Sun, 
@@ -25,13 +26,43 @@ type ThemeMode = "claro" | "escuro" | "sistema"
 export default function SettingsAppearancePage() {
   const router = useRouter()
   const { user, logout } = useAuth()
+  const { theme, setTheme } = useTheme()
 
-  // Estados locais para as preferências
-  const [selectedTheme, setSelectedTheme] = useState<ThemeMode>("claro")
+  const [mounted, setMounted] = useState(false)
   const [syncWithSystem, setSyncWithSystem] = useState(false)
   const [notifyBids, setNotifyBids] = useState(true)
   const [notifyChat, setNotifyChat] = useState(true)
   const [notifyContracts, setNotifyContracts] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    if (theme === "system") {
+      setSyncWithSystem(true)
+    } else {
+      setSyncWithSystem(false)
+    }
+  }, [theme])
+
+  const selectedTheme: ThemeMode = !mounted 
+    ? "claro" 
+    : theme === "dark" 
+      ? "escuro" 
+      : theme === "light" 
+        ? "claro" 
+        : "sistema"
+
+  const handleSetTheme = (mode: ThemeMode) => {
+    if (mode === "claro") {
+      setTheme("light")
+      setSyncWithSystem(false)
+    } else if (mode === "escuro") {
+      setTheme("dark")
+      setSyncWithSystem(false)
+    } else if (mode === "sistema") {
+      setTheme("system")
+      setSyncWithSystem(true)
+    }
+  }
 
   // Handlers para ações rápidas de conta
   const handleClearCache = () => {
@@ -94,11 +125,10 @@ export default function SettingsAppearancePage() {
                 
                 {/* Track Oval Afundado */}
                 <div className="h-14 rounded-2xl neo-inset bg-background/50 flex p-1.5 items-center justify-between relative">
-                  
-                  {/* Opção Claro */}
+                      {/* Opção Claro */}
                   <button 
                     type="button"
-                    onClick={() => setSelectedTheme("claro")}
+                    onClick={() => handleSetTheme("claro")}
                     className={`
                       flex-1 h-full rounded-[10px] flex items-center justify-center gap-2 text-xs font-bold transition-all duration-300
                       ${selectedTheme === "claro" 
@@ -114,7 +144,7 @@ export default function SettingsAppearancePage() {
                   {/* Opção Escuro */}
                   <button 
                     type="button"
-                    onClick={() => setSelectedTheme("escuro")}
+                    onClick={() => handleSetTheme("escuro")}
                     className={`
                       flex-1 h-full rounded-[10px] flex items-center justify-center gap-2 text-xs font-bold transition-all duration-300
                       ${selectedTheme === "escuro" 
@@ -130,7 +160,7 @@ export default function SettingsAppearancePage() {
                   {/* Opção Sistema */}
                   <button 
                     type="button"
-                    onClick={() => setSelectedTheme("sistema")}
+                    onClick={() => handleSetTheme("sistema")}
                     className={`
                       flex-1 h-full rounded-[10px] flex items-center justify-center gap-2 text-xs font-bold transition-all duration-300
                       ${selectedTheme === "sistema" 
@@ -204,11 +234,10 @@ export default function SettingsAppearancePage() {
                 <button 
                   type="button"
                   onClick={() => {
-                    setSyncWithSystem(!syncWithSystem)
-                    if(!syncWithSystem) {
-                      setSelectedTheme("sistema")
+                    if (syncWithSystem) {
+                      handleSetTheme("claro")
                     } else {
-                      setSelectedTheme("claro")
+                      handleSetTheme("sistema")
                     }
                   }}
                   className={`
