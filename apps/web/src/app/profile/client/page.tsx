@@ -4,7 +4,7 @@ import { DashboardHeader } from "@/components/dashboard/DashboardHeader"
 import { useAuth } from "@/presentation/hooks/use-auth"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { User, Mail, Calendar, Settings, LogOut } from "lucide-react"
+import { User, Mail, Calendar, Settings, LogOut, ChevronLeft } from "lucide-react"
 import Link from "next/link"
 
 export default function ClientProfile() {
@@ -16,7 +16,15 @@ export default function ClientProfile() {
 
       <div className="px-6 space-y-8 max-w-2xl mx-auto mt-6">
         <section>
-          <h2 className="text-xl font-black mb-4">Meu Perfil</h2>
+          <div className="flex items-center gap-3 mb-4">
+            <Link 
+              href="/dashboard/client"
+              className="w-10 h-10 rounded-full neo-elevated hover:bg-muted/5 flex items-center justify-center transition-all shrink-0"
+            >
+              <ChevronLeft className="w-5 h-5 text-muted-foreground" />
+            </Link>
+            <h2 className="text-xl font-black">Meu Perfil</h2>
+          </div>
           <Card variant="neo-elevated" className="border-none rounded-3xl p-6">
             <div className="flex items-center gap-4 mb-6">
               <div className="w-16 h-16 rounded-full neo-inset flex items-center justify-center bg-background/50">

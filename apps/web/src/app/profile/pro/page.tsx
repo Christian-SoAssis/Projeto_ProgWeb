@@ -4,7 +4,7 @@ import { DashboardHeader } from "@/components/dashboard/DashboardHeader"
 import { useAuth } from "@/presentation/hooks/use-auth"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { User, Sparkles, History, Star, Clock, CheckCircle2, Award, LogOut } from "lucide-react"
+import { User, Sparkles, History, Star, Clock, CheckCircle2, Award, LogOut, ChevronLeft } from "lucide-react"
 import { useProfessionalHistory } from "@/hooks/useProfessionalHistory"
 import { useProfessionalAISummary } from "@/hooks/useProfessionalAISummary"
 import { formatCurrency, formatDate } from "@/lib/formatters"
@@ -21,6 +21,17 @@ export default function ProProfile() {
       <DashboardHeader userName={user?.name || "Profissional"} roleLabel="Perfil Profissional" />
 
       <div className="px-6 space-y-8 max-w-2xl mx-auto mt-6">
+        
+        {/* Back Button & Title */}
+        <div className="flex items-center gap-3">
+          <Link 
+            href="/dashboard/pro"
+            className="w-10 h-10 rounded-full neo-elevated hover:bg-muted/5 flex items-center justify-center transition-all shrink-0"
+          >
+            <ChevronLeft className="w-5 h-5 text-muted-foreground" />
+          </Link>
+          <h2 className="text-xl font-black">Meu Perfil</h2>
+        </div>
         
         {/* Basic Info */}
         <section>
