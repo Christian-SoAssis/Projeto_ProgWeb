@@ -13,7 +13,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD:-servicoja_dev_2026}
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./scripts/init-extensions.sql:/docker-entrypoint-initdb.d/01-extensions.sql:ro
+      - ${WORKSPACE_PATH:-.}/scripts/init-extensions.sql:/docker-entrypoint-initdb.d/01-extensions.sql:ro
     networks:
       - data
     healthcheck:
@@ -66,8 +66,8 @@ services:
       GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-http://localhost:8000/api/v1/auth/google/callback}
       FRONTEND_AUTH_CALLBACK_URL: ${FRONTEND_AUTH_CALLBACK_URL:-http://localhost:3000/auth/callback}
     volumes:
-      - ./apps/api:/app
-      - ./uploads:/app/uploads
+      - ${WORKSPACE_PATH:-.}/apps/api:/app
+      - ${WORKSPACE_PATH:-.}/uploads:/app/uploads
     depends_on:
       db:
         condition: service_healthy
@@ -115,7 +115,7 @@ services:
       API_INTERNAL_URL: http://api:8000
       UPLOADS_URL: http://localhost:${API_PORT:-8000}/uploads
     volumes:
-      - ./apps/web:/app
+      - ${WORKSPACE_PATH:-.}/apps/web:/app
       - /app/node_modules
       - /app/.next
     depends_on:
@@ -144,10 +144,10 @@ services:
       NODE_ENV: test
       CI: "true"
     volumes:
-      - ./apps/web:/app
+      - ${WORKSPACE_PATH:-.}/apps/web:/app
       - /app/node_modules
       - /app/.next
-      - ./apps/web/coverage:/app/coverage  # persiste relatório de coverage no host
+      - ${WORKSPACE_PATH:-.}/apps/web/coverage:/app/coverage  # persiste relatório de coverage no host
     networks:
       - frontend
     command: npm run test
@@ -162,8 +162,8 @@ services:
       - "4317:4317" # OTLP gRPC
       - "4318:4318" # OTLP HTTP
     volumes:
-      - ./observability/grafana/dashboards/dashboards.yaml:/otel-lgtm/grafana/conf/provisioning/dashboards/servicoja-dashboards.yaml:ro
-      - ./observability/grafana/dashboards/servicoja_dashboard.json:/otel-lgtm/servicoja_dashboard.json:ro
+      - ${WORKSPACE_PATH:-.}/observability/grafana/dashboards/dashboards.yaml:/otel-lgtm/grafana/conf/provisioning/dashboards/servicoja-dashboards.yaml:ro
+      - ${WORKSPACE_PATH:-.}/observability/grafana/dashboards/servicoja_dashboard.json:/otel-lgtm/servicoja_dashboard.json:ro
     networks:
       - data
       - frontend
