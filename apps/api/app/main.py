@@ -34,19 +34,23 @@ _app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS — apenas em desenvolvimento
-if settings.ENVIRONMENT == "development":
-    _app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[
-            "http://localhost:3000",
-            "http://127.0.0.1:3000",
-            "http://localhost",
-        ],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+# CORS
+allow_origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost",
+]
+env_origins = os.getenv("CORS_ORIGINS")
+if env_origins:
+    allow_origins.extend([o.strip() for o in env_origins.split(",") if o.strip()])
+
+_app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allow_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Servir arquivos estáticos (uploads)
 uploads_dir = settings.UPLOADS_DIR
